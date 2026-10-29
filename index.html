@@ -148,8 +148,8 @@
               </div>
           </aside>
 
-          <!-- Settings Modal -->
-          <div id="settings-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <!-- Settings Modal (Z-Index’d) -->
+          <div id="settings-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
               <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-200 dark:border-slate-800">
                   <div class="flex items-center justify-between mb-4">
                       <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Settings</h3>
@@ -183,8 +183,8 @@
               </div>
           </div>
 
-          <!-- Library Overlay -->
-          <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
+          <!-- Library Overlay (Z-Index’d) -->
+          <div id="library-overlay" class="fixed inset-0 z-[100] hidden bg-black/40 backdrop-blur-sm transition-all">
               <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
   translate-x-full" id="library-panel">
                   <div class="flex items-center justify-between mb-8">
@@ -205,8 +205,8 @@
               </div>
           </div>
 
-          <!-- API Key Modal -->
-          <div id="key-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <!-- API Key Modal (Z-Index’d) -->
+          <div id="key-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
               <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-200 dark:border-slate-800 overflow-y-auto max-h-[90vh]">
                   <div class="text-center space-y-2">
                       <h3 class="text-2xl font-bold text-slate-900 dark:text-white">API Configuration</h3>
@@ -310,6 +310,12 @@
                   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
                   function init() {
+                      // Force hide all modals on init to prevent "blocking"
+                      document.getElementById('settings-modal').classList.add('hidden');
+                      document.getElementById('key-modal').classList.add('hidden');
+                      document.getElementById('library-overlay').classList.add('hidden');
+                      document.getElementById('library-panel').classList.add('translate-x-full');
+
                       const savedKey = safeStorageGet('yanai_or_key');
                       if (savedKey) OR_API_KEY = savedKey;
                       const savedChats = safeStorageGet('yanai_all_chats');
