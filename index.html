@@ -92,13 +92,16 @@
           <aside class="w-72 bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col hidden md:flex transition-colors duration-300">
               <div class="p-6 flex flex-col h-full">
                   <div class="flex items-center gap-3 mb-10">
-                      <div class="w-9 h-9 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800">
-                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M18 10C18 10 19 8 20 8C21 8 22 9 22 11C22 13 20 13 20 13C20 13 20 15 18 16C16 17 14 16 14 16" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M12 7C12 7 11 4 8 4C5 4 4 6 4 9C4 12 6 13 8 13C10 13 11 11 11 11L12 13C12 15 11 17 9 18C7 19 5 18 5 18" stroke="#f97316" stroke-width="2" stroke-linecap="round"
-  stroke-linejoin="round"/>
-                              <path d="M12 7L14 7C16 7 17 8 17 10C17 12 15 13 13 13" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-                              <circle cx="16" cy="9" r="1" fill="#f97316"/>
+                      <div class="w-10 h-10 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                          <!-- Upgraded Elephant Logo -->
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M17 12C17 14.2091 15.2091 16 13 16C10.7909 16 9 14.2091 9 12C9 9.7909 10.7909 8 13 8C15.2091 8 17 9.7909 17 12Z" fill="#CBD5E1" class="dark:fill-slate-700"/>
+                              <path d="M13 8C15.2091 8 17 9.7909 17 12C17 14.2091 15.2091 16 13 16C10.7909 16 9 14.2091 9 12C9 9.7909 10.7909 8 13 8Z" stroke="#f97316" stroke-width="2"/>
+                              <path d="M13 8C13 6 15 5 16 6M11 8C11 6 9 5 8 6" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                              <path d="M13 16V19C13 20.1046 12.1046 21 11 21C9.89543 21 9 20.1046 9 19V16" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                              <circle cx="14" cy="11" r="1" fill="#f97316"/>
+                              <circle cx="12" cy="11" r="1" fill="#f97316"/>
+                              <path d="M13 13C12 13 11 13.5 11 14.5" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
                           </svg>
                       </div>
                       <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Yanai AI</h1>
@@ -106,11 +109,11 @@
 
                   <div class="space-y-3 mb-6">
                       <button onclick="startNewChat()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700
-  dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
+                          dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
                           <span class="text-lg">＋</span> New Chat
                       </button>
                       <button onclick="toggleLibrary()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700
-  dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
+                          dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
                           <span>📚</span> Library
                       </button>
                   </div>
@@ -119,12 +122,12 @@
                       <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
                       <div class="space-y-2" id="model-selector">
                           <button onclick="setModel('nvidia/nemotron-3.5-super-vl', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500
-  text-white shadow-sm" data-model="nvidia/nemotron-3.5-super-vl">
+                              text-white shadow-sm" data-model="nvidia/nemotron-3.5-super-vl">
                               <div class="font-semibold">Nvidia Nemotron 3.5 Super VL</div>
                               <div class="text-[10px] opacity-80">Vision, documents & complex logic</div>
                           </button>
                           <button onclick="setModel('nvidia/nemotron-3.5-lightning', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200
-  dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-model="nvidia/nemotron-3.5-lightning">
+                              dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-model="nvidia/nemotron-3.5-lightning">
                               <div class="font-semibold">Nvidia Nemotron 3.5 Lightning</div>
                               <div class="text-[10px] opacity-70">Ultra-fast responses & efficiency</div>
                           </button>
@@ -136,23 +139,76 @@
                       <div id="recent-chats-list" class="space-y-1 overflow-y-auto chat-container px-2 pb-4"></div>
                   </div>
 
-                  <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800">
+                  <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                      <button onclick="toggleSettingsModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
+                          transition-all">
+                          <span>⚙️</span> Settings
+                      </button>
                       <button onclick="toggleKeyModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
-  transition-all">
+                          transition-all">
                           <span>🔑</span> API Key
                       </button>
                   </div>
               </div>
           </aside>
 
+          <!-- Settings Modal -->
+          <div id="settings-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+              <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-200 dark:border-slate-800">
+                  <div class="flex items-center justify-between mb-4">
+                      <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Settings</h3>
+                      <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">✕</button>
+                  </div>
+
+                  <div class="space-y-4">
+                      <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
+                          <div>
+                              <p class="font-semibold dark:text-white">Dark Mode</p>
+                              <p class="text-xs text-slate-500 dark:text-slate-400">Switch between light and dark theme</p>
+                          </div>
+                          <button onclick="toggleTheme()" id="settings-theme-toggle" class="w-12 h-6 bg-slate-300 dark:bg-brand-500 rounded-full relative transition-colors">
+                              <div class="absolute top-1 left-1 dark:left-7 w-4 h-4 bg-white rounded-full transition-all"></div>
+                          </button>
+                      </div>
+
+                      <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl space-y-3">
+                          <div>
+                              <p class="font-semibold dark:text-white">Data Management</p>
+                              <p class="text-xs text-slate-500 dark:text-slate-400">Permanent actions on your account data</p>
+                          </div>
+                          <button onclick="clearAllHistory()" class="w-full py-2 px-4 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium hover:bg-red-200
+  dark:hover:bg-red-900/50 transition-all">
+                              Clear All Chat History
+                          </button>
+                          <button onclick="clearLibrary()" class="w-full py-2 px-4 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-slate-300
+  dark:hover:bg-slate-600 transition-all">
+                              Wipe Document Library
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
           <!-- Library Overlay -->
           <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
               <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
-  translate-x-full" id="library-panel">
+                  translate-x-full" id="library-panel">
                   <div class="flex items-center justify-between mb-8">
                       <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Document Library</h3>
                       <button onclick="toggleLibrary()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-all">✕</button>
                   </div>
+
+                  <div class="mb-8">
+                      <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Upload New Document</p>
+                      <div class="flex gap-2">
+                          <button onclick="document.getElementById('library-file-input').click()" class="flex-1 py-3 bg-brand-500 text-white rounded-2xl font-semibold text-sm shadow-lg hover:bg-brand-600
+  transition-all">
+                              Upload File
+                          </button>
+                          <input type="file" id="library-file-input" class="hidden" onchange="handleLibraryUpload(event)">
+                      </div>
+                  </div>
+
                   <div id="library-list" class="space-y-3"></div>
               </div>
           </div>
@@ -168,14 +224,14 @@
                       <p class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">How to get a key:</p>
                       <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
                           <li class="flex gap-2"><span class="font-bold text-brand-500">1.</span> <span>Go to <a href="https://openrouter.ai/" target="_blank" class="text-brand-600 dark:text-brand-400
-  underline font-medium">openrouter.ai</a> and create an account.</span></li>
+                              underline font-medium">openrouter.ai</a> and create an account.</span></li>
                           <li class="flex gap-2"><span class="font-bold text-brand-500">2.</span> <span>Navigate to <span class="font-medium">Keys</span> in your dashboard settings.</span></li>
                           <li class="flex gap-2"><span class="font-bold text-brand-500">3.</span> <span>Click <span class="font-medium">Create Key</span>, copy it.</span></li>
                           <li class="flex gap-2"><span class="font-bold text-brand-500">4.</span> <span>Paste it into the box below and save.</span></li>
                       </ul>
                   </div>
                   <input type="password" id="api-key-input" placeholder="sk-or-..." class="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none
-  focus:ring-2 focus:ring-brand-500 transition-all dark:text-white">
+                      focus:ring-2 focus:ring-brand-500 transition-all dark:text-white">
                   <div class="flex gap-3">
                       <button onclick="toggleKeyModal()" class="flex-1 py-3 text-slate-500 dark:text-slate-400 font-medium rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Cancel</button>
                       <button onclick="saveKey()" class="flex-1 py-3 bg-brand-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-brand-600 transition-all">Save Key</button>
@@ -190,7 +246,7 @@
                       <span id="current-model-display" class="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Nvidia Nemotron 3.5 Super VL</span>
                   </div>
                   <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all
-  hover:scale-110">
+                      hover:scale-110">
                       <span id="theme-icon">🌙</span>
                   </button>
               </header>
@@ -207,35 +263,33 @@
                   <div class="max-w-3xl mx-auto relative">
                       <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
                           <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-full
-  text-xs font-semibold shadow-sm animate-pulse">
+                              text-xs font-semibold shadow-sm animate-pulse">
                               <span>🔑</span> API Key required to chat
                           </div>
                       </div>
 
                       <div id="file-preview" class="hidden absolute -top-14 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 flex items-center gap-3
-  shadow-lg text-xs animate-bounce">
-                          <span class="text-lg">📄</span> <span id="preview-name" class="font-semibold dark:text-white">doc.pdf</span>
-                          <button onclick="clearFile()" class="text-slate-400 hover:text-red-500 transition-colors">✕</button>
+                          shadow-lg text-xs animate-bounce">
+                              <span class="text-lg">📄</span> <span id="preview-name" class="font-semibold dark:text-white">doc.pdf</span>
+                              <button onclick="clearFile()" class="text-slate-400 hover:text-red-500 transition-colors">✕</button>
                       </div>
                       <div class="glass-input flex items-center gap-3 p-4 rounded-[32px] bg-white/50 dark:bg-slate-900/50">
                           <button onclick="document.getElementById('file-input').click()" class="p-3 text-slate-400 dark:text-slate-500 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                           </button>
                           <textarea id="user-input" rows="1" placeholder="Message Yanai..." class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-2 text-slate-700 dark:text-slate-200
-  text-sm leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+                              text-sm leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
 
                           <div class="flex items-center gap-2">
-                              <!-- Send Button -->
                               <button id="send-btn" onclick="handleSend()" class="p-3 bg-brand-500 text-white rounded-2xl shadow-lg shadow-brand-900/20 hover:bg-brand-600 disabled:opacity-50 transition-all
-  active:scale-95">
+                                  active:scale-95">
                                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7
-  7m-7-7v18"></path></svg>
+                                      7m-7-7v18"></path></svg>
                               </button>
-                              <!-- Stop Button -->
                               <button id="stop-btn" onclick="stopResponse()" class="hidden p-3 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl shadow-sm hover:bg-slate-300
-  dark:hover:bg-slate-700 transition-all active:scale-95">
+                                  dark:hover:bg-slate-700 transition-all active:scale-95">
                                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-  12"></path></svg>
+                                      12"></path></svg>
                               </button>
                           </div>
                       </div>
@@ -250,8 +304,8 @@
                   let OR_API_KEY = "";
                   let MODEL = "nvidia/nemotron-3.5-super-vl";
                   let attachedFile = { name: '', content: '' };
-                  let isGenerating = false; // State: Waiting for API response
-                  let isTyping = false;    // State: Typewriter is running
+                  let isGenerating = false;
+                  let isTyping = false;
                   let timerInterval = null;
                   let currentAbortController = null;
 
@@ -271,6 +325,13 @@
                       if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
                       const savedDocs = safeStorageGet('yanai_library');
                       if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
+
+                      // Restore Theme
+                      if (safeStorageGet('yanai_theme') === 'dark') {
+                          document.documentElement.classList.add('dark');
+                          document.getElementById('theme-icon').innerText = '☀️';
+                      }
+
                       checkApiKeyStatus();
                       renderChatList();
                   }
@@ -282,13 +343,13 @@
                       sortedChats.forEach(chat => {
                           const item = document.createElement('div');
                           item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
-  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
+                              dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
                           item.onclick = () => loadChat(chat.id);
                           item.innerHTML = `
                               <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
                               <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
                                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-  12"></path></svg>
+                                      12"></path></svg>
                               </button>`;
                           listContainer.appendChild(item);
                       });
@@ -307,12 +368,18 @@
                       currentChatId = id;
                       const chat = allChats.find(c => c.id === id);
                       if (!chat) return;
-                      document.getElementById('messages').innerHTML = '';
+
+                      const messagesContainer = document.getElementById('messages');
+                      messagesContainer.innerHTML = '';
+
                       if (chat.messages.length === 0) {
                           document.getElementById('welcome-screen').classList.remove('hidden');
                       } else {
                           document.getElementById('welcome-screen').classList.add('hidden');
-                          chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
+                          // BUG FIX: Render historical messages immediately without typewriter effect or saving
+                          chat.messages.forEach(msg => {
+                              appendMessageToUI(msg.role, msg.content, false);
+                          });
                       }
                       renderChatList();
                       scrollToBottom();
@@ -352,8 +419,15 @@
                   function toggleTheme() {
                       const html = document.documentElement;
                       const icon = document.getElementById('theme-icon');
-                      if (html.classList.contains('dark')) { html.classList.remove('dark'); icon.innerText = '🌙'; }
-                      else { html.classList.add('dark'); icon.innerText = '☀️'; }
+                      if (html.classList.contains('dark')) {
+                          html.classList.remove('dark');
+                          icon.innerText = '🌙';
+                          safeStorageSet('yanai_theme', 'light');
+                      } else {
+                          html.classList.add('dark');
+                          icon.innerText = '☀️';
+                          safeStorageSet('yanai_theme', 'dark');
+                      }
                   }
 
                   function checkApiKeyStatus() {
@@ -381,6 +455,29 @@
                       checkApiKeyStatus();
                   }
 
+                  function toggleSettingsModal() {
+                      document.getElementById('settings-modal').classList.toggle('hidden');
+                  }
+
+                  function clearAllHistory() {
+                      if (confirm("Are you sure you want to delete all chat history? This cannot be undone.")) {
+                          allChats = [];
+                          saveAllChats();
+                          renderChatList();
+                          document.getElementById('messages').innerHTML = '';
+                          document.getElementById('welcome-screen').classList.remove('hidden');
+                          currentChatId = null;
+                      }
+                  }
+
+                  function clearLibrary() {
+                      if (confirm("Are you sure you want to wipe your document library?")) {
+                          allUploadedDocs = [];
+                          saveLibrary();
+                          renderLibrary();
+                      }
+                  }
+
                   function toggleLibrary() {
                       const overlay = document.getElementById('library-overlay');
                       const panel = document.getElementById('library-panel');
@@ -401,11 +498,20 @@
                           list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
                           return;
                       }
-                      allUploadedDocs.forEach(doc => {
+                      allUploadedDocs.forEach((doc, index) => {
                           const div = document.createElement('div');
-                          div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800";
-                          div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
-                                            <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>`;
+                          div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group hover:border-brand-500
+  transition-all cursor-pointer";
+                          div.onclick = () => useDocumentFromLibrary(index);
+                          div.innerHTML = `
+                              <div class="flex items-center gap-3 truncate">
+                                  <span class="text-lg">📄</span>
+                                  <span class="text-sm font-medium truncate">${doc.name}</span>
+                              </div>
+                              <div class="flex items-center gap-2">
+                                  <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>
+                                  <button onclick="event.stopPropagation(); removeDocFromLibrary(${index})" class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600">✕</button>
+                              </div>`;
                           list.appendChild(div);
                       });
                   }
@@ -417,26 +523,58 @@
                       document.getElementById('preview-name').innerText = file.name;
                       document.getElementById('file-preview').classList.remove('hidden');
                       try {
-                          if (file.type === 'application/pdf') {
-                              const arrayBuffer = await file.arrayBuffer();
-                              const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                              let text = "";
-                              for (let i = 1; i <= pdf.numPages; i++) {
-                                  const page = await pdf.getPage(i);
-                                  const content = await page.getTextContent();
-                                  text += content.items.map(s => s.str).join(" ") + "\n";
-                              }
-                              attachedFile.content = text;
-                          } else if (file.name.endsWith('.docx')) {
-                              const arrayBuffer = await file.arrayBuffer();
-                              const result = await mammoth.extractRawText({ arrayBuffer });
-                              attachedFile.content = result.value;
-                          } else {
-                              attachedFile.content = await file.text();
-                          }
-                          allUploadedDocs.push({ name: file.name, date: Date.now() });
+                          const content = await extractTextFromFile(file);
+                          attachedFile.content = content;
+                          // Auto-add to library as well
+                          allUploadedDocs.push({ name: file.name, date: Date.now(), content: content });
                           saveLibrary();
                       } catch (err) { alert("File Error: " + err.message); }
+                  }
+
+                  async function handleLibraryUpload(e) {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      try {
+                          const content = await extractTextFromFile(file);
+                          allUploadedDocs.push({ name: file.name, date: Date.now(), content: content });
+                          saveLibrary();
+                          renderLibrary();
+                          alert(`${file.name} added to library!`);
+                      } catch (err) { alert("File Error: " + err.message); }
+                  }
+
+                  async function extractTextFromFile(file) {
+                      if (file.type === 'application/pdf') {
+                          const arrayBuffer = await file.arrayBuffer();
+                          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                          let text = "";
+                          for (let i = 1; i <= pdf.numPages; i++) {
+                              const page = await pdf.getPage(i);
+                              const content = await page.getTextContent();
+                              text += content.items.map(s => s.str).join(" ") + "\n";
+                          }
+                          return text;
+                      } else if (file.name.endsWith('.docx')) {
+                          const arrayBuffer = await file.arrayBuffer();
+                          const result = await mammoth.extractRawText({ arrayBuffer });
+                          return result.value;
+                      } else {
+                          return await file.text();
+                      }
+                  }
+
+                  function removeDocFromLibrary(index) {
+                      allUploadedDocs.splice(index, 1);
+                      saveLibrary();
+                      renderLibrary();
+                  }
+
+                  function useDocumentFromLibrary(index) {
+                      const doc = allUploadedDocs[index];
+                      attachedFile = { name: doc.name, content: doc.content };
+                      document.getElementById('preview-name').innerText = doc.name;
+                      document.getElementById('file-preview').classList.remove('hidden');
+                      toggleLibrary();
                   }
 
                   function clearFile() { attachedFile = { name: '', content: '' }; document.getElementById('file-preview').classList.add('hidden'); }
@@ -451,7 +589,6 @@
                               setTimeout(type, speed);
                               scrollToBottom();
                           } else {
-                              // Only reset buttons if we actually finished the text (not interrupted)
                               if (i >= text.length) {
                                   isTyping = false;
                                   updateInputButtons();
@@ -461,7 +598,23 @@
                       type();
                   }
 
+                  // Separation of concerns: UI only append
+                  function appendMessageToUI(role, text) {
+                      const container = document.getElementById('messages');
+                      const msgDiv = document.createElement('div');
+                      msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+
+                      if (role === 'user') {
+                          msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
+                      } else {
+                          msgDiv.innerHTML = `<div class="max-w-[90%] p-4 ai-msg text-sm leading-relaxed"><div class="prose-ai">${marked.parse(text)}</div></div>`;
+                      }
+                      container.appendChild(msgDiv);
+                      scrollToBottom();
+                  }
+
                   function appendMessage(role, text, save = true) {
+                      // For new messages, we use the typewriter for AI
                       const container = document.getElementById('messages');
                       const msgDiv = document.createElement('div');
                       msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
@@ -529,12 +682,12 @@
                           const userQuestion = text || "Please summarize this document and highlight the key points.";
                           fullPrompt = `SYSTEM: You are analyzing a provided document. Use the context below to answer the user's request.
 
-  DOCUMENT CONTENT:
-  ---
-  ${attachedFile.content}
-  ---
+                          DOCUMENT CONTENT:
+                          ---
+                          ${attachedFile.content}
+                          ---
 
-  USER REQUEST: ${userQuestion}`;
+                          USER REQUEST: ${userQuestion}`;
                       } else {
                           fullPrompt = text;
                       }
@@ -595,7 +748,6 @@
 
                           loadingDiv.remove();
 
-                          // Start typing effect
                           isTyping = true;
                           appendMessage('ai', data.choices[0].message.content);
                       } catch (e) {
