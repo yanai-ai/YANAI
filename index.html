@@ -34,7 +34,6 @@
               .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
               @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-              /* --- Authentic AI Content --- */
               .prose-ai { line-height: 1.7; color: inherit; }
               .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
               .dark .prose-ai h1 { color: #fdba74; }
@@ -51,7 +50,6 @@
               .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
               .dark .prose-ai code { background: rgba(255,255,255,0.1); }
 
-              /* --- Chat Bubbles --- */
               .user-msg {
                   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
                   color: white;
@@ -71,7 +69,6 @@
                   border: 1px solid #334155;
               }
 
-              /* --- Enhanced Thinking Animation --- */
               .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
               .core-center { width: 8px; height: 8px; background: #f97316; border-radius: 50%; z-index: 10; box-shadow: 0 0 12px #f97316; animation: pulse-glow 1.5s infinite ease-in-out; }
               .core-ring { position: absolute; border: 2px solid #f97316; border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -93,7 +90,6 @@
               <div class="p-6 flex flex-col h-full">
                   <div class="flex items-center gap-3 mb-10">
                       <div class="w-10 h-10 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                          <!-- Upgraded Elephant Logo -->
                           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M17 12C17 14.2091 15.2091 16 13 16C10.7909 16 9 14.2091 9 12C9 9.7909 10.7909 8 13 8C15.2091 8 17 9.7909 17 12Z" fill="#CBD5E1" class="dark:fill-slate-700"/>
                               <path d="M13 8C15.2091 8 17 9.7909 17 12C17 14.2091 15.2091 16 13 16C10.7909 16 9 14.2091 9 12C9 9.7909 10.7909 8 13 8Z" stroke="#f97316" stroke-width="2"/>
@@ -109,11 +105,11 @@
 
                   <div class="space-y-3 mb-6">
                       <button onclick="startNewChat()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700
-                          dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
+  dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
                           <span class="text-lg">＋</span> New Chat
                       </button>
                       <button onclick="toggleLibrary()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700
-                          dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
+  dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
                           <span>📚</span> Library
                       </button>
                   </div>
@@ -122,12 +118,12 @@
                       <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
                       <div class="space-y-2" id="model-selector">
                           <button onclick="setModel('nvidia/nemotron-3.5-super-vl', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500
-                              text-white shadow-sm" data-model="nvidia/nemotron-3.5-super-vl">
+  text-white shadow-sm" data-model="nvidia/nemotron-3.5-super-vl">
                               <div class="font-semibold">Nvidia Nemotron 3.5 Super VL</div>
                               <div class="text-[10px] opacity-80">Vision, documents & complex logic</div>
                           </button>
                           <button onclick="setModel('nvidia/nemotron-3.5-lightning', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200
-                              dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-model="nvidia/nemotron-3.5-lightning">
+  dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-model="nvidia/nemotron-3.5-lightning">
                               <div class="font-semibold">Nvidia Nemotron 3.5 Lightning</div>
                               <div class="text-[10px] opacity-70">Ultra-fast responses & efficiency</div>
                           </button>
@@ -141,11 +137,11 @@
 
                   <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
                       <button onclick="toggleSettingsModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
-                          transition-all">
+  transition-all">
                           <span>⚙️</span> Settings
                       </button>
                       <button onclick="toggleKeyModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
-                          transition-all">
+  transition-all">
                           <span>🔑</span> API Key
                       </button>
                   </div>
@@ -159,7 +155,6 @@
                       <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Settings</h3>
                       <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">✕</button>
                   </div>
-
                   <div class="space-y-4">
                       <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                           <div>
@@ -170,7 +165,6 @@
                               <div class="absolute top-1 left-1 dark:left-7 w-4 h-4 bg-white rounded-full transition-all"></div>
                           </button>
                       </div>
-
                       <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl space-y-3">
                           <div>
                               <p class="font-semibold dark:text-white">Data Management</p>
@@ -192,12 +186,11 @@
           <!-- Library Overlay -->
           <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
               <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
-                  translate-x-full" id="library-panel">
+  translate-x-full" id="library-panel">
                   <div class="flex items-center justify-between mb-8">
                       <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Document Library</h3>
                       <button onclick="toggleLibrary()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-all">✕</button>
                   </div>
-
                   <div class="mb-8">
                       <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Upload New Document</p>
                       <div class="flex gap-2">
@@ -208,7 +201,6 @@
                           <input type="file" id="library-file-input" class="hidden" onchange="handleLibraryUpload(event)">
                       </div>
                   </div>
-
                   <div id="library-list" class="space-y-3"></div>
               </div>
           </div>
@@ -224,14 +216,14 @@
                       <p class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">How to get a key:</p>
                       <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
                           <li class="flex gap-2"><span class="font-bold text-brand-500">1.</span> <span>Go to <a href="https://openrouter.ai/" target="_blank" class="text-brand-600 dark:text-brand-400
-                              underline font-medium">openrouter.ai</a> and create an account.</span></li>
+  underline font-medium">openrouter.ai</a> and create an account.</span></li>
                           <li class="flex gap-2"><span class="font-bold text-brand-500">2.</span> <span>Navigate to <span class="font-medium">Keys</span> in your dashboard settings.</span></li>
                           <li class="flex gap-2"><span class="font-bold text-brand-500">3.</span> <span>Click <span class="font-medium">Create Key</span>, copy it.</span></li>
                           <li class="flex gap-2"><span class="font-bold text-brand-500">4.</span> <span>Paste it into the box below and save.</span></li>
                       </ul>
                   </div>
                   <input type="password" id="api-key-input" placeholder="sk-or-..." class="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none
-                      focus:ring-2 focus:ring-brand-500 transition-all dark:text-white">
+  focus:ring-2 focus:ring-brand-500 transition-all dark:text-white">
                   <div class="flex gap-3">
                       <button onclick="toggleKeyModal()" class="flex-1 py-3 text-slate-500 dark:text-slate-400 font-medium rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Cancel</button>
                       <button onclick="saveKey()" class="flex-1 py-3 bg-brand-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-brand-600 transition-all">Save Key</button>
@@ -246,7 +238,7 @@
                       <span id="current-model-display" class="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Nvidia Nemotron 3.5 Super VL</span>
                   </div>
                   <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all
-                      hover:scale-110">
+  hover:scale-110">
                       <span id="theme-icon">🌙</span>
                   </button>
               </header>
@@ -263,33 +255,32 @@
                   <div class="max-w-3xl mx-auto relative">
                       <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
                           <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-full
-                              text-xs font-semibold shadow-sm animate-pulse">
+  text-xs font-semibold shadow-sm animate-pulse">
                               <span>🔑</span> API Key required to chat
                           </div>
                       </div>
 
                       <div id="file-preview" class="hidden absolute -top-14 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 flex items-center gap-3
-                          shadow-lg text-xs animate-bounce">
-                              <span class="text-lg">📄</span> <span id="preview-name" class="font-semibold dark:text-white">doc.pdf</span>
-                              <button onclick="clearFile()" class="text-slate-400 hover:text-red-500 transition-colors">✕</button>
+  shadow-lg text-xs animate-bounce">
+                          <span class="text-lg">📄</span> <span id="preview-name" class="font-semibold dark:text-white">doc.pdf</span>
+                          <button onclick="clearFile()" class="text-slate-400 hover:text-red-500 transition-colors">✕</button>
                       </div>
                       <div class="glass-input flex items-center gap-3 p-4 rounded-[32px] bg-white/50 dark:bg-slate-900/50">
                           <button onclick="document.getElementById('file-input').click()" class="p-3 text-slate-400 dark:text-slate-500 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                           </button>
                           <textarea id="user-input" rows="1" placeholder="Message Yanai..." class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-2 text-slate-700 dark:text-slate-200
-                              text-sm leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
-
+  text-sm leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
                           <div class="flex items-center gap-2">
                               <button id="send-btn" onclick="handleSend()" class="p-3 bg-brand-500 text-white rounded-2xl shadow-lg shadow-brand-900/20 hover:bg-brand-600 disabled:opacity-50 transition-all
-                                  active:scale-95">
+  active:scale-95">
                                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7
-                                      7m-7-7v18"></path></svg>
+  7m-7-7v18"></path></svg>
                               </button>
                               <button id="stop-btn" onclick="stopResponse()" class="hidden p-3 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl shadow-sm hover:bg-slate-300
-                                  dark:hover:bg-slate-700 transition-all active:scale-95">
+  dark:hover:bg-slate-700 transition-all active:scale-95">
                                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-                                      12"></path></svg>
+  12"></path></svg>
                               </button>
                           </div>
                       </div>
@@ -326,7 +317,6 @@
                       const savedDocs = safeStorageGet('yanai_library');
                       if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
 
-                      // Restore Theme
                       if (safeStorageGet('yanai_theme') === 'dark') {
                           document.documentElement.classList.add('dark');
                           document.getElementById('theme-icon').innerText = '☀️';
@@ -338,18 +328,19 @@
 
                   function renderChatList() {
                       const listContainer = document.getElementById('recent-chats-list');
+                      if (!listContainer) return;
                       listContainer.innerHTML = '';
                       const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
                       sortedChats.forEach(chat => {
                           const item = document.createElement('div');
                           item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
-                              dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
+  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
                           item.onclick = () => loadChat(chat.id);
                           item.innerHTML = `
                               <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
                               <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
                                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-                                      12"></path></svg>
+  12"></path></svg>
                               </button>`;
                           listContainer.appendChild(item);
                       });
@@ -376,9 +367,8 @@
                           document.getElementById('welcome-screen').classList.remove('hidden');
                       } else {
                           document.getElementById('welcome-screen').classList.add('hidden');
-                          // BUG FIX: Render historical messages immediately without typewriter effect or saving
                           chat.messages.forEach(msg => {
-                              appendMessageToUI(msg.role, msg.content, false);
+                              appendMessageToUI(msg.role, msg.content);
                           });
                       }
                       renderChatList();
@@ -493,6 +483,7 @@
 
                   function renderLibrary() {
                       const list = document.getElementById('library-list');
+                      if (!list) return;
                       list.innerHTML = '';
                       if (allUploadedDocs.length === 0) {
                           list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
@@ -525,7 +516,6 @@
                       try {
                           const content = await extractTextFromFile(file);
                           attachedFile.content = content;
-                          // Auto-add to library as well
                           allUploadedDocs.push({ name: file.name, date: Date.now(), content: content });
                           saveLibrary();
                       } catch (err) { alert("File Error: " + err.message); }
@@ -598,7 +588,6 @@
                       type();
                   }
 
-                  // Separation of concerns: UI only append
                   function appendMessageToUI(role, text) {
                       const container = document.getElementById('messages');
                       const msgDiv = document.createElement('div');
@@ -614,7 +603,6 @@
                   }
 
                   function appendMessage(role, text, save = true) {
-                      // For new messages, we use the typewriter for AI
                       const container = document.getElementById('messages');
                       const msgDiv = document.createElement('div');
                       msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
@@ -641,7 +629,7 @@
 
                   function scrollToBottom() {
                       const win = document.getElementById('chat-window');
-                      win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
+                      if (win) win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
                   }
 
                   function stopResponse() {
@@ -680,14 +668,8 @@
                       let fullPrompt = "";
                       if (attachedFile.content) {
                           const userQuestion = text || "Please summarize this document and highlight the key points.";
-                          fullPrompt = `SYSTEM: You are analyzing a provided document. Use the context below to answer the user's request.
-
-                          DOCUMENT CONTENT:
-                          ---
-                          ${attachedFile.content}
-                          ---
-
-                          USER REQUEST: ${userQuestion}`;
+                          fullPrompt = `SYSTEM: You are analyzing a provided document. Use the context below to answer the user's request.\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n\nUSER
+  REQUEST: ${userQuestion}`;
                       } else {
                           fullPrompt = text;
                       }
@@ -747,7 +729,6 @@
                           if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
 
                           loadingDiv.remove();
-
                           isTyping = true;
                           appendMessage('ai', data.choices[0].message.content);
                       } catch (e) {
