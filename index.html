@@ -149,9 +149,7 @@
                       <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Document Library</h3>
                       <button onclick="toggleLibrary()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-all">✕</button>
                   </div>
-                  <div id="library-list" class="space-y-3">
-                      <!-- Documents populating here -->
-                  </div>
+                  <div id="library-list" class="space-y-3"></div>
               </div>
           </div>
 
@@ -228,325 +226,348 @@
                           </button>
                       </div>
                   </div>
-              </div>
-          </main>
+              </main>
 
-          <input type="file" id="file-input" class="hidden" onchange="handleFileUpload(event)">
+              <input type="file" id="file-input" class="hidden" onchange="handleFileUpload(event)">
 
-          <script>
-              const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
+              <script>
+                  const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
 
-              let OR_API_KEY = "";
-              let MODEL = "nvidia/nemotron-3.5-super-vl";
-              let attachedFile = { name: '', content: '' };
-              let isTyping = false;
-              let timerInterval = null;
+                  let OR_API_KEY = "";
+                  let MODEL = "nvidia/nemotron-3.5-super-vl";
+                  let attachedFile = { name: '', content: '' };
+                  let isTyping = false;
+                  let timerInterval = null;
 
-              let allChats = [];
-              let currentChatId = null;
-              let allUploadedDocs = []; // Library tracking
+                  let allChats = [];
+                  let currentChatId = null;
+                  let allUploadedDocs = [];
 
-              function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
-              function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
+                  function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+                  function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
-              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-              function init() {
-                  const savedKey = safeStorageGet('yanai_or_key');
-                  if (savedKey) OR_API_KEY = savedKey;
-                  const savedChats = safeStorageGet('yanai_all_chats');
-                  if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
-                  const savedDocs = safeStorageGet('yanai_library');
-                  if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
-                  checkApiKeyStatus();
-                  renderChatList();
-              }
-
-              function renderChatList() {
-                  const listContainer = document.getElementById('recent-chats-list');
-                  listContainer.innerHTML = '';
-                  const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
-                  sortedChats.forEach(chat => {
-                      const item = document.createElement('div');
-                      item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
-  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
-                      item.onclick = () => loadChat(chat.id);
-                      item.innerHTML = `
-                          <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
-                          <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
-                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-  12"></path></svg>
-                          </button>`;
-                      listContainer.appendChild(item);
-                  });
-              }
-
-              function startNewChat() {
-                  currentChatId = 'chat_' + Date.now();
-                  allChats.push({ id: currentChatId, title: 'New Conversation', timestamp: Date.now(), messages: [] });
-                  document.getElementById('messages').innerHTML = '';
-                  document.getElementById('welcome-screen').classList.remove('hidden');
-                  saveAllChats();
-                  renderChatList();
-              }
-
-              function loadChat(id) {
-                  currentChatId = id;
-                  const chat = allChats.find(c => c.id === id);
-                  if (!chat) return;
-                  document.getElementById('messages').innerHTML = '';
-                  if (chat.messages.length === 0) {
-                      document.getElementById('welcome-screen').classList.remove('hidden');
-                  } else {
-                      document.getElementById('welcome-screen').classList.add('hidden');
-                      chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
+                  function init() {
+                      const savedKey = safeStorageGet('yanai_or_key');
+                      if (savedKey) OR_API_KEY = savedKey;
+                      const savedChats = safeStorageGet('yanai_all_chats');
+                      if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
+                      const savedDocs = safeStorageGet('yanai_library');
+                      if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
+                      checkApiKeyStatus();
+                      renderChatList();
                   }
-                  renderChatList();
-                  scrollToBottom();
-              }
 
-              function deleteChat(id) {
-                  allChats = allChats.filter(c => c.id !== id);
-                  saveAllChats();
-                  renderChatList();
-                  if (currentChatId === id) { currentChatId = null; document.getElementById('messages').innerHTML = ''; document.getElementById('welcome-screen').classList.remove('hidden'); }
-              }
+                  function renderChatList() {
+                      const listContainer = document.getElementById('recent-chats-list');
+                      listContainer.innerHTML = '';
+                      const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
+                      sortedChats.forEach(chat => {
+                          const item = document.createElement('div');
+                          item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
+  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
+                          item.onclick = () => loadChat(chat.id);
+                          item.innerHTML = `
+                              <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
+                              <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
+                                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
+  12"></path></svg>
+                              </button>`;
+                          listContainer.appendChild(item);
+                      });
+                  }
 
-              function saveAllChats() { safeStorageSet('yanai_all_chats', JSON.stringify(allChats)); }
-              function saveLibrary() { safeStorageSet('yanai_library', JSON.stringify(allUploadedDocs)); }
-
-              function updateChatTitle(text) {
-                  const chat = allChats.find(c => c.id === currentChatId);
-                  if (chat && chat.title === 'New Conversation') {
-                      chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
+                  function startNewChat() {
+                      currentChatId = 'chat_' + Date.now();
+                      allChats.push({ id: currentChatId, title: 'New Conversation', timestamp: Date.now(), messages: [] });
+                      document.getElementById('messages').innerHTML = '';
+                      document.getElementById('welcome-screen').classList.remove('hidden');
                       saveAllChats();
                       renderChatList();
                   }
-              }
 
-              function setModel(modelId, btn) {
-                  MODEL = modelId;
-                  const display = document.getElementById('current-model-display');
-                  display.innerText = btn.querySelector('.font-semibold').innerText;
-                  document.querySelectorAll('.model-btn').forEach(b => {
-                      b.classList.remove('bg-brand-500', 'text-white', 'shadow-sm');
-                      b.classList.add('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
-                  });
-                  btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
-                  btn.classList.add('bg-brand-500', 'text-white', 'shadow-sm');
-              }
-
-              function toggleTheme() {
-                  const html = document.documentElement;
-                  const icon = document.getElementById('theme-icon');
-                  if (html.classList.contains('dark')) { html.classList.remove('dark'); icon.innerText = '🌙'; }
-                  else { html.classList.add('dark'); icon.innerText = '☀️'; }
-              }
-
-              function checkApiKeyStatus() {
-                  const input = document.getElementById('user-input');
-                  const btn = document.getElementById('send-btn');
-                  const warning = document.getElementById('api-warning');
-                  if (!OR_API_KEY) {
-                      input.disabled = true; input.placeholder = "API Key required to chat...";
-                      btn.disabled = true; warning.classList.remove('hidden');
-                  } else {
-                      input.disabled = false; input.placeholder = "Message Yanai...";
-                      btn.disabled = false; warning.classList.add('hidden');
-                  }
-              }
-
-              function toggleKeyModal() {
-                  document.getElementById('key-modal').classList.toggle('hidden');
-                  document.getElementById('api-key-input').value = OR_API_KEY;
-              }
-
-              function saveKey() {
-                  OR_API_KEY = document.getElementById('api-key-input').value.trim();
-                  safeStorageSet('yanai_or_key', OR_API_KEY);
-                  toggleKeyModal();
-                  checkApiKeyStatus();
-              }
-
-              function toggleLibrary() {
-                  const overlay = document.getElementById('library-overlay');
-                  const panel = document.getElementById('library-panel');
-                  if (overlay.classList.contains('hidden')) {
-                      overlay.classList.remove('hidden');
-                      setTimeout(() => panel.classList.remove('translate-x-full'), 10);
-                      renderLibrary();
-                  } else {
-                      panel.classList.add('translate-x-full');
-                      setTimeout(() => overlay.classList.add('hidden'), 300);
-                  }
-              }
-
-              function renderLibrary() {
-                  const list = document.getElementById('library-list');
-                  list.innerHTML = '';
-                  if (allUploadedDocs.length === 0) {
-                      list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
-                      return;
-                  }
-                  allUploadedDocs.forEach(doc => {
-                      const div = document.createElement('div');
-                      div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800";
-                      div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
-                                        <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>`;
-                      list.appendChild(div);
-                  });
-              }
-
-              async function handleFileUpload(e) {
-                  const file = e.target.files[0];
-                  if (!file) return;
-                  if (MODEL === 'nvidia/nemotron-3.5-lightning') {
-                      alert("3.5 Lightning does not support document analysis.");
-                      e.target.value = ''; return;
-                  }
-                  attachedFile.name = file.name;
-                  document.getElementById('preview-name').innerText = file.name;
-                  document.getElementById('file-preview').classList.remove('hidden');
-                  try {
-                      if (file.type === 'application/pdf') {
-                          const arrayBuffer = await file.arrayBuffer();
-                          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                          let text = "";
-                          for (let i = 1; i <= pdf.numPages; i++) {
-                              const page = await pdf.getPage(i);
-                              const content = await page.getTextContent();
-                              text += content.items.map(s => s.str).join(" ") + "\n";
-                          }
-                          attachedFile.content = text;
-                      } else if (file.name.endsWith('.docx')) {
-                          const arrayBuffer = await file.arrayBuffer();
-                          const result = await mammoth.extractRawText({ arrayBuffer });
-                          attachedFile.content = result.value;
+                  function loadChat(id) {
+                      currentChatId = id;
+                      const chat = allChats.find(c => c.id === id);
+                      if (!chat) return;
+                      document.getElementById('messages').innerHTML = '';
+                      if (chat.messages.length === 0) {
+                          document.getElementById('welcome-screen').classList.remove('hidden');
                       } else {
-                          attachedFile.content = await file.text();
+                          document.getElementById('welcome-screen').classList.add('hidden');
+                          chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
                       }
-                      // Add to library
-                      allUploadedDocs.push({ name: file.name, date: Date.now() });
-                      saveLibrary();
-                  } catch (err) { alert("File Error: " + err.message); }
-              }
-
-              function clearFile() { attachedFile = { name: '', content: '' }; document.getElementById('file-preview').classList.add('hidden'); }
-
-              async function typeWriter(element, text) {
-                  let i = 0;
-                  const speed = 5;
-                  function type() {
-                      if (i < text.length) {
-                          element.innerHTML = marked.parse(text.substring(0, i + 1));
-                          i++;
-                          setTimeout(type, speed);
-                          scrollToBottom();
-                      }
+                      renderChatList();
+                      scrollToBottom();
                   }
-                  type();
-              }
 
-              function appendMessage(role, text, save = true) {
-                  const container = document.getElementById('messages');
-                  const msgDiv = document.createElement('div');
-                  msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
-
-                  if (role === 'user') {
-                      msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
-                  } else {
-                      msgDiv.innerHTML = `<div class="max-w-[90%] p-0 ai-msg text-sm leading-relaxed"><div class="prose-ai" id="typing-target"></div></div>`;
-                      const target = msgDiv.querySelector('#typing-target');
-                      typeWriter(target, text);
+                  function deleteChat(id) {
+                      allChats = allChats.filter(c => c.id !== id);
+                      saveAllChats();
+                      renderChatList();
+                      if (currentChatId === id) { currentChatId = null; document.getElementById('messages').innerHTML = ''; document.getElementById('welcome-screen').classList.remove('hidden'); }
                   }
-                  container.appendChild(msgDiv);
-                  scrollToBottom();
 
-                  if (save) {
+                  function saveAllChats() { safeStorageSet('yanai_all_chats', JSON.stringify(allChats)); }
+                  function saveLibrary() { safeStorageSet('yanai_library', JSON.stringify(allUploadedDocs)); }
+
+                  function updateChatTitle(text) {
                       const chat = allChats.find(c => c.id === currentChatId);
-                      if (chat) {
-                          chat.messages.push({ role, content: text });
-                          if (role === 'user') updateChatTitle(text);
+                      if (chat && chat.title === 'New Conversation') {
+                          chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
                           saveAllChats();
+                          renderChatList();
                       }
                   }
-              }
 
-              function scrollToBottom() {
-                  const window = document.getElementById('chat-window');
-                  window.scrollTo({ top: window.scrollHeight, behavior: 'smooth' });
-              }
-
-              async function handleSend() {
-                  const input = document.getElementById('user-input');
-                  const btn = document.getElementById('send-btn');
-                  const text = input.value.trim();
-                  if (!OR_API_KEY) return alert("Set OpenRouter Key first!");
-                  if (!text && !attachedFile.content) return;
-                  if (isTyping) return;
-
-                  if (!currentChatId) startNewChat();
-
-                  document.getElementById('welcome-screen').classList.add('hidden');
-                  let fullPrompt = text;
-                  if (attachedFile.content) {
-                      fullPrompt = `Analyze this document:\n\n${attachedFile.content}\n\nQuestion: ${text}`;
-                  }
-
-                  const displayUserText = text || `Analyze: ${attachedFile.name}`;
-                  appendMessage('user', displayUserText);
-                  input.value = '';
-                  input.style.height = '';
-                  clearFile();
-                  isTyping = true; btn.disabled = true;
-
-                  const startTime = Date.now();
-                  const loadingDiv = document.createElement('div');
-                  loadingDiv.className = 'flex justify-start message-appear';
-                  loadingDiv.innerHTML = `
-                      <div class="ai-msg p-4 flex items-center gap-4">
-                          <div class="ai-core">
-                              <div class="core-center"></div>
-                              <div class="core-ring ring-1"></div>
-                              <div class="core-ring ring-2"></div>
-                          </div>
-                          <span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span>
-                      </div>`;
-                  document.getElementById('messages').appendChild(loadingDiv);
-
-                  timerInterval = setInterval(() => {
-                      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                      const timerSpan = document.getElementById('timer-text');
-                      if (timerSpan) timerSpan.innerText = `Yanai is thinking... ${elapsed}s`;
-                  }, 1000);
-
-                  try {
-                      const chat = allChats.find(c => c.id === currentChatId);
-                      const history = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
-
-                      const response = await fetch(API_PROXY_URL, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                              headers: { Authorization: `Bearer ${OR_API_KEY}` },
-                              model: MODEL,
-                              messages: [...history, { role: 'user', content: fullPrompt }]
-                          })
+                  function setModel(modelId, btn) {
+                      MODEL = modelId;
+                      const display = document.getElementById('current-model-display');
+                      display.innerText = btn.querySelector('.font-semibold').innerText;
+                      document.querySelectorAll('.model-btn').forEach(b => {
+                          b.classList.remove('bg-brand-500', 'text-white', 'shadow-sm');
+                          b.classList.add('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
                       });
-                      const data = await response.json();
-                      if (data.error) throw new Error(data.error.message);
-                      loadingDiv.remove();
-                      appendMessage('ai', data.choices[0].message.content);
-                  } catch (e) {
-                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">Error: ${e.message}</div>`;
-                  } finally {
-                      clearInterval(timerInterval);
-                      isTyping = false;
-                      btn.disabled = false;
+                      btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
+                      btn.classList.add('bg-brand-500', 'text-white', 'shadow-sm');
                   }
-              }
 
-              init();
-          </script>
-      </body>
-  </html>
+                  function toggleTheme() {
+                      const html = document.documentElement;
+                      const icon = document.getElementById('theme-icon');
+                      if (html.classList.contains('dark')) { html.classList.remove('dark'); icon.innerText = '🌙'; }
+                      else { html.classList.add('dark'); icon.innerText = '☀️'; }
+                  }
+
+                  function checkApiKeyStatus() {
+                      const input = document.getElementById('user-input');
+                      const btn = document.getElementById('send-btn');
+                      const warning = document.getElementById('api-warning');
+                      if (!OR_API_KEY) {
+                          input.disabled = true; input.placeholder = "API Key required to chat...";
+                          btn.disabled = true; warning.classList.remove('hidden');
+                      } else {
+                          input.disabled = false; input.placeholder = "Message Yanai...";
+                          btn.disabled = false; warning.classList.add('hidden');
+                      }
+                  }
+
+                  function toggleKeyModal() {
+                      document.getElementById('key-modal').classList.toggle('hidden');
+                      document.getElementById('api-key-input').value = OR_API_KEY;
+                  }
+
+                  function saveKey() {
+                      OR_API_KEY = document.getElementById('api-key-input').value.trim();
+                      safeStorageSet('yanai_or_key', OR_API_KEY);
+                      toggleKeyModal();
+                      checkApiKeyStatus();
+                  }
+
+                  function toggleLibrary() {
+                      const overlay = document.getElementById('library-overlay');
+                      const panel = document.getElementById('library-panel');
+                      if (overlay.classList.contains('hidden')) {
+                          overlay.classList.remove('hidden');
+                          setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+                          renderLibrary();
+                      } else {
+                          panel.classList.add('translate-x-full');
+                          setTimeout(() => overlay.classList.add('hidden'), 300);
+                      }
+                  }
+
+                  function renderLibrary() {
+                      const list = document.getElementById('library-list');
+                      list.innerHTML = '';
+                      if (allUploadedDocs.length === 0) {
+                          list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
+                          return;
+                      }
+                      allUploadedDocs.forEach(doc => {
+                          const div = document.createElement('div');
+                          div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800";
+                          div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
+                                            <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>`;
+                          list.appendChild(div);
+                      });
+                  }
+
+                  async function handleFileUpload(e) {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      if (MODEL === 'nvidia/nemotron-3.5-lightning') {
+                          alert("3.5 Lightning does not support document analysis.");
+                          e.target.value = ''; return;
+                      }
+                      attachedFile.name = file.name;
+                      document.getElementById('preview-name').innerText = file.name;
+                      document.getElementById('file-preview').classList.remove('hidden');
+                      try {
+                          if (file.type === 'application/pdf') {
+                              const arrayBuffer = await file.arrayBuffer();
+                              const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                              let text = "";
+                              for (let i = 1; i <= pdf.numPages; i++) {
+                                  const page = await pdf.getPage(i);
+                                  const content = await page.getTextContent();
+                                  text += content.items.map(s => s.str).join(" ") + "\n";
+                              }
+                              attachedFile.content = text;
+                          } else if (file.name.endsWith('.docx')) {
+                              const arrayBuffer = await file.arrayBuffer();
+                              const result = await mammoth.extractRawText({ arrayBuffer });
+                              attachedFile.content = result.value;
+                          } else {
+                              attachedFile.content = await file.text();
+                          }
+                          allUploadedDocs.push({ name: file.name, date: Date.now() });
+                          saveLibrary();
+                      } catch (err) { alert("File Error: " + err.message); }
+                  }
+
+                  function clearFile() { attachedFile = { name: '', content: '' }; document.getElementById('file-preview').classList.add('hidden'); }
+
+                  async function typeWriter(element, text) {
+                      let i = 0;
+                      const speed = 5;
+                      function type() {
+                          if (i < text.length) {
+                              element.innerHTML = marked.parse(text.substring(0, i + 1));
+                              i++;
+                              setTimeout(type, speed);
+                              scrollToBottom();
+                          }
+                      }
+                      type();
+                  }
+
+                  function appendMessage(role, text, save = true) {
+                      const container = document.getElementById('messages');
+                      const msgDiv = document.createElement('div');
+                      msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+
+                      if (role === 'user') {
+                          msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
+                      } else {
+                          msgDiv.innerHTML = `<div class="max-w-[90%] p-0 ai-msg text-sm leading-relaxed"><div class="prose-ai" id="typing-target"></div></div>`;
+                          const target = msgDiv.querySelector('#typing-target');
+                          typeWriter(target, text);
+                      }
+                      container.appendChild(msgDiv);
+                      scrollToBottom();
+
+                      if (save) {
+                          const chat = allChats.find(c => c.id === currentChatId);
+                          if (chat) {
+                              chat.messages.push({ role, content: text });
+                              if (role === 'user') updateChatTitle(text);
+                              saveAllChats();
+                          }
+                      }
+                  }
+
+                  function scrollToBottom() {
+                      const win = document.getElementById('chat-window');
+                      win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
+                  }
+
+                  async function handleSend() {
+                      const input = document.getElementById('user-input');
+                      const btn = document.getElementById('send-btn');
+                      const text = input.value.trim();
+
+                      if (!OR_API_KEY) return alert("Set OpenRouter Key first!");
+                      if (!text && !attachedFile.content) return;
+                      if (isTyping) return;
+
+                      if (!currentChatId) startNewChat();
+
+                      document.getElementById('welcome-screen').classList.add('hidden');
+
+                      let fullPrompt = "";
+                      if (attachedFile.content) {
+                          const userQuestion = text || "Please summarize this document and highlight the key points.";
+                          fullPrompt = `SYSTEM: You are analyzing a provided document. Use the context below to answer the user's request.
+
+  DOCUMENT CONTENT:
+  ---
+  ${attachedFile.content}
+  ---
+
+  USER REQUEST: ${userQuestion}`;
+                      } else {
+                          fullPrompt = text;
+                      }
+
+                      const displayUserText = text || (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!");
+                      appendMessage('user', displayUserText);
+
+                      input.value = '';
+                      input.style.height = '';
+                      clearFile();
+                      isTyping = true; btn.disabled = true;
+
+                      const startTime = Date.now();
+                      const loadingDiv = document.createElement('div');
+                      loadingDiv.className = 'flex justify-start message-appear';
+                      loadingDiv.innerHTML = `
+                          <div class="ai-msg p-4 flex items-center gap-4">
+                              <div class="ai-core">
+                                  <div class="core-center"></div>
+                                  <div class="core-ring ring-1"></div>
+                                  <div class="core-ring ring-2"></div>
+                              </div>
+                              <span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span>
+                          </div>`;
+                      document.getElementById('messages').appendChild(loadingDiv);
+
+                      timerInterval = setInterval(() => {
+                          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                          const timerSpan = document.getElementById('timer-text');
+                          if (timerSpan) timerSpan.innerText = `Yanai is thinking... ${elapsed}s`;
+                      }, 1000);
+
+                      try {
+                          const chat = allChats.find(c => c.id === currentChatId);
+                          const history = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
+
+                          const controller = new AbortController();
+                          const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+                          const response = await fetch(API_PROXY_URL, {
+                              method: 'POST',
+                              signal: controller.signal,
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                  headers: { Authorization: `Bearer ${OR_API_KEY}` },
+                                  model: MODEL,
+                                  messages: [...history, { role: 'user', content: fullPrompt }]
+                              })
+                          });
+
+                          clearTimeout(timeoutId);
+                          const data = await response.json();
+
+                          if (data.error) throw new Error(data.error.message || "API Error occurred");
+                          if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
+
+                          loadingDiv.remove();
+                          appendMessage('ai', data.choices[0].message.content);
+                      } catch (e) {
+                          console.error(e);
+                          loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
+                              ${e.name === 'AbortError' ? 'Request timed out. The document might be too large.' : 'Error: ' + e.message}
+                          </div>`;
+                      } finally {
+                          clearInterval(timerInterval);
+                          isTyping = false;
+                          btn.disabled = false;
+                      }
+                  }
+
+                  init();
+              </script>
+          </body>
+      </html>
