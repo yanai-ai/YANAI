@@ -148,7 +148,7 @@
               </div>
           </aside>
 
-          <!-- Settings Modal (Z-Index’d) -->
+          <!-- Settings Modal -->
           <div id="settings-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
               <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-200 dark:border-slate-800">
                   <div class="flex items-center justify-between mb-4">
@@ -159,74 +159,52 @@
                       <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                           <div>
                               <p class="font-semibold dark:text-white">Dark Mode</p>
-                              <p class="text-xs text-slate-500 dark:text-slate-400">Switch between light and dark theme</p>
+                              <p class="text-xs text-slate-500 dark:text-slate-400">Switch theme</p>
                           </div>
-                          <button onclick="toggleTheme()" id="settings-theme-toggle" class="w-12 h-6 bg-slate-300 dark:bg-brand-500 rounded-full relative transition-colors">
+                          <button onclick="toggleTheme()" class="w-12 h-6 bg-slate-300 dark:bg-brand-500 rounded-full relative transition-colors">
                               <div class="absolute top-1 left-1 dark:left-7 w-4 h-4 bg-white rounded-full transition-all"></div>
                           </button>
                       </div>
                       <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl space-y-3">
-                          <div>
-                              <p class="font-semibold dark:text-white">Data Management</p>
-                              <p class="text-xs text-slate-500 dark:text-slate-400">Permanent actions on your account data</p>
-                          </div>
+                          <p class="font-semibold dark:text-white">Data</p>
                           <button onclick="clearAllHistory()" class="w-full py-2 px-4 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium hover:bg-red-200
-  dark:hover:bg-red-900/50 transition-all">
-                              Clear All Chat History
-                          </button>
+  transition-all">Clear History</button>
                           <button onclick="clearLibrary()" class="w-full py-2 px-4 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-slate-300
-  dark:hover:bg-slate-600 transition-all">
-                              Wipe Document Library
-                          </button>
+  transition-all">Wipe Library</button>
                       </div>
                   </div>
               </div>
           </div>
 
-          <!-- Library Overlay (Z-Index’d) -->
+          <!-- Library Overlay -->
           <div id="library-overlay" class="fixed inset-0 z-[100] hidden bg-black/40 backdrop-blur-sm transition-all">
               <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
   translate-x-full" id="library-panel">
                   <div class="flex items-center justify-between mb-8">
-                      <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Document Library</h3>
+                      <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Library</h3>
                       <button onclick="toggleLibrary()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-all">✕</button>
                   </div>
                   <div class="mb-8">
-                      <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Upload New Document</p>
-                      <div class="flex gap-2">
-                          <button onclick="document.getElementById('library-file-input').click()" class="flex-1 py-3 bg-brand-500 text-white rounded-2xl font-semibold text-sm shadow-lg hover:bg-brand-600
-  transition-all">
-                              Upload File
-                          </button>
-                          <input type="file" id="library-file-input" class="hidden" onchange="handleLibraryUpload(event)">
-                      </div>
+                      <button onclick="document.getElementById('library-file-input').click()" class="w-full py-3 bg-brand-500 text-white rounded-2xl font-semibold text-sm shadow-lg hover:bg-brand-600
+  transition-all">Upload File</button>
+                      <input type="file" id="library-file-input" class="hidden" onchange="handleLibraryUpload(event)">
                   </div>
                   <div id="library-list" class="space-y-3"></div>
               </div>
           </div>
 
-          <!-- API Key Modal (Z-Index’d) -->
+          <!-- API Key Modal -->
           <div id="key-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-              <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-200 dark:border-slate-800 overflow-y-auto max-h-[90vh]">
+              <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-200 dark:border-slate-800">
                   <div class="text-center space-y-2">
-                      <h3 class="text-2xl font-bold text-slate-900 dark:text-white">API Configuration</h3>
-                      <p class="text-sm text-slate-500 dark:text-slate-400">Enter your OpenRouter key to start chatting</p>
-                  </div>
-                  <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-                      <p class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">How to get a key:</p>
-                      <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
-                          <li class="flex gap-2"><span class="font-bold text-brand-500">1.</span> <span>Go to <a href="https://openrouter.ai/" target="_blank" class="text-brand-600 dark:text-brand-400
-  underline font-medium">openrouter.ai</a> and create an account.</span></li>
-                          <li class="flex gap-2"><span class="font-bold text-brand-500">2.</span> <span>Navigate to <span class="font-medium">Keys</span> in your dashboard settings.</span></li>
-                          <li class="flex gap-2"><span class="font-bold text-brand-500">3.</span> <span>Click <span class="font-medium">Create Key</span>, copy it.</span></li>
-                          <li class="flex gap-2"><span class="font-bold text-brand-500">4.</span> <span>Paste it into the box below and save.</span></li>
-                      </ul>
+                      <h3 class="text-2xl font-bold text-slate-900 dark:text-white">API Key</h3>
+                      <p class="text-sm text-slate-500 dark:text-slate-400">Enter OpenRouter key</p>
                   </div>
                   <input type="password" id="api-key-input" placeholder="sk-or-..." class="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none
   focus:ring-2 focus:ring-brand-500 transition-all dark:text-white">
                   <div class="flex gap-3">
                       <button onclick="toggleKeyModal()" class="flex-1 py-3 text-slate-500 dark:text-slate-400 font-medium rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Cancel</button>
-                      <button onclick="saveKey()" class="flex-1 py-3 bg-brand-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-brand-600 transition-all">Save Key</button>
+                      <button onclick="saveKey()" class="flex-1 py-3 bg-brand-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-brand-600 transition-all">Save</button>
                   </div>
               </div>
           </div>
@@ -310,12 +288,6 @@
                   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
                   function init() {
-                      // Force hide all modals on init to prevent "blocking"
-                      document.getElementById('settings-modal').classList.add('hidden');
-                      document.getElementById('key-modal').classList.add('hidden');
-                      document.getElementById('library-overlay').classList.add('hidden');
-                      document.getElementById('library-panel').classList.add('translate-x-full');
-
                       const savedKey = safeStorageGet('yanai_or_key');
                       if (savedKey) OR_API_KEY = savedKey;
                       const savedChats = safeStorageGet('yanai_all_chats');
@@ -456,7 +428,7 @@
                   }
 
                   function clearAllHistory() {
-                      if (confirm("Are you sure you want to delete all chat history? This cannot be undone.")) {
+                      if (confirm("Delete all history?")) {
                           allChats = [];
                           saveAllChats();
                           renderChatList();
@@ -467,7 +439,7 @@
                   }
 
                   function clearLibrary() {
-                      if (confirm("Are you sure you want to wipe your document library?")) {
+                      if (confirm("Wipe library?")) {
                           allUploadedDocs = [];
                           saveLibrary();
                           renderLibrary();
@@ -492,7 +464,7 @@
                       if (!list) return;
                       list.innerHTML = '';
                       if (allUploadedDocs.length === 0) {
-                          list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
+                          list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents yet.</p>';
                           return;
                       }
                       allUploadedDocs.forEach((doc, index) => {
@@ -535,7 +507,7 @@
                           allUploadedDocs.push({ name: file.name, date: Date.now(), content: content });
                           saveLibrary();
                           renderLibrary();
-                          alert(`${file.name} added to library!`);
+                          alert(`${file.name} added!`);
                       } catch (err) { alert("File Error: " + err.message); }
                   }
 
@@ -598,7 +570,6 @@
                       const container = document.getElementById('messages');
                       const msgDiv = document.createElement('div');
                       msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
-
                       if (role === 'user') {
                           msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
                       } else {
@@ -612,7 +583,6 @@
                       const container = document.getElementById('messages');
                       const msgDiv = document.createElement('div');
                       msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
-
                       if (role === 'user') {
                           msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
                       } else {
@@ -622,7 +592,6 @@
                       }
                       container.appendChild(msgDiv);
                       scrollToBottom();
-
                       if (save) {
                           const chat = allChats.find(c => c.id === currentChatId);
                           if (chat) {
@@ -639,9 +608,7 @@
                   }
 
                   function stopResponse() {
-                      if (currentAbortController) {
-                          currentAbortController.abort();
-                      }
+                      if (currentAbortController) currentAbortController.abort();
                       isGenerating = false;
                       isTyping = false;
                       updateInputButtons();
@@ -662,27 +629,19 @@
                   async function handleSend() {
                       const input = document.getElementById('user-input');
                       const text = input.value.trim();
-
-                      if (!OR_API_KEY) return alert("Set OpenRouter Key first!");
+                      if (!OR_API_KEY) return alert("Set API Key!");
                       if (!text && !attachedFile.content) return;
                       if (isGenerating) return;
 
                       if (!currentChatId) startNewChat();
-
                       document.getElementById('welcome-screen').classList.add('hidden');
 
-                      let fullPrompt = "";
+                      let fullPrompt = text;
                       if (attachedFile.content) {
-                          const userQuestion = text || "Please summarize this document and highlight the key points.";
-                          fullPrompt = `SYSTEM: You are analyzing a provided document. Use the context below to answer the user's request.\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n\nUSER
-  REQUEST: ${userQuestion}`;
-                      } else {
-                          fullPrompt = text;
+                          fullPrompt = `SYSTEM: Analyze the document below.\n\nCONTENT:\n${attachedFile.content}\n\nREQUEST: ${text || 'Summarize'}`;
                       }
 
-                      const displayUserText = text || (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!");
-                      appendMessage('user', displayUserText);
-
+                      appendMessage('user', text || (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!"));
                       input.value = '';
                       input.style.height = '';
                       clearFile();
@@ -693,15 +652,8 @@
                       const startTime = Date.now();
                       const loadingDiv = document.createElement('div');
                       loadingDiv.className = 'flex justify-start message-appear';
-                      loadingDiv.innerHTML = `
-                          <div class="ai-msg p-4 flex items-center gap-4">
-                              <div class="ai-core">
-                                  <div class="core-center"></div>
-                                  <div class="core-ring ring-1"></div>
-                                  <div class="core-ring ring-2"></div>
-                              </div>
-                              <span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span>
-                          </div>`;
+                      loadingDiv.innerHTML = `<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
+  ring-2"></div></div><span id="timer-text" class="text-xs text-slate-400 italic">Yanai is thinking... 0s</span></div>`;
                       document.getElementById('messages').appendChild(loadingDiv);
 
                       timerInterval = setInterval(() => {
@@ -713,39 +665,19 @@
                       try {
                           const chat = allChats.find(c => c.id === currentChatId);
                           const history = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
-
                           currentAbortController = new AbortController();
-                          const timeoutId = setTimeout(() => currentAbortController.abort(), 60000);
-
                           const response = await fetch(API_PROXY_URL, {
                               method: 'POST',
                               signal: currentAbortController.signal,
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                  headers: { Authorization: `Bearer ${OR_API_KEY}` },
-                                  model: MODEL,
-                                  messages: [...history, { role: 'user', content: fullPrompt }]
-                              })
+                              body: JSON.stringify({ headers: { Authorization: `Bearer ${OR_API_KEY}` }, model: MODEL, messages: [...history, { role: 'user', content: fullPrompt }] })
                           });
-
-                          clearTimeout(timeoutId);
                           const data = await response.json();
-
-                          if (data.error) throw new Error(data.error.message || "API Error occurred");
-                          if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
-
                           loadingDiv.remove();
                           isTyping = true;
                           appendMessage('ai', data.choices[0].message.content);
                       } catch (e) {
-                          console.error(e);
-                          if (e.name === 'AbortError') {
-                              loadingDiv.innerHTML = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl text-slate-500 dark:text-slate-400 text-sm">Response stopped by user.</div>`;
-                          } else {
-                              loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
-                                  ${e.name === 'AbortError' ? 'Request timed out. The document might be too large.' : 'Error: ' + e.message}
-                              </div>`;
-                          }
+                          loadingDiv.innerHTML = `<div class="bg-red-50 p-4 rounded-2xl text-red-500 text-sm">Error: ${e.message}</div>`;
                       } finally {
                           clearInterval(timerInterval);
                           isGenerating = false;
@@ -756,4 +688,4 @@
                   init();
               </script>
           </body>
-      </html>
+      </html >
