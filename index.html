@@ -34,7 +34,7 @@
               .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
               @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-              /* --- Gemini-style AI Content --- */
+              /* --- Authentic AI Content --- */
               .prose-ai { line-height: 1.7; color: inherit; }
               .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
               .dark .prose-ai h1 { color: #fdba74; }
@@ -51,7 +51,7 @@
               .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
               .dark .prose-ai code { background: rgba(255,255,255,0.1); }
 
-              /* --- Gemini-style Chat Bubbles --- */
+              /* --- Chat Bubbles --- */
               .user-msg {
                   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
                   color: white;
@@ -59,13 +59,17 @@
                   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
               }
               .ai-msg {
-                  background: transparent;
+                  background: #ffffff;
                   color: #334155;
-                  border-left: 4px solid #f97316;
-                  padding-left: 1.5rem;
-                  border-radius: 0 12px 12px 0;
+                  border: 1px solid #e2e8f0;
+                  border-radius: 22px 22px 22px 4px;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
               }
-              .dark .ai-msg { color: #f1f5f9; border-left-color: #fdba74; }
+              .dark .ai-msg {
+                  background: #1e293b;
+                  color: #f1f5f9;
+                  border: 1px solid #334155;
+              }
 
               /* --- Enhanced Thinking Animation --- */
               .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
@@ -397,10 +401,6 @@
                   async function handleFileUpload(e) {
                       const file = e.target.files[0];
                       if (!file) return;
-                      if (MODEL === 'nvidia/nemotron-3.5-lightning') {
-                          alert("3.5 Lightning does not support document analysis.");
-                          e.target.value = ''; return;
-                      }
                       attachedFile.name = file.name;
                       document.getElementById('preview-name').innerText = file.name;
                       document.getElementById('file-preview').classList.remove('hidden');
@@ -451,7 +451,7 @@
                       if (role === 'user') {
                           msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
                       } else {
-                          msgDiv.innerHTML = `<div class="max-w-[90%] p-0 ai-msg text-sm leading-relaxed"><div class="prose-ai" id="typing-target"></div></div>`;
+                          msgDiv.innerHTML = `<div class="max-w-[90%] p-4 ai-msg text-sm leading-relaxed"><div class="prose-ai" id="typing-target"></div></div>`;
                           const target = msgDiv.querySelector('#typing-target');
                           typeWriter(target, text);
                       }
