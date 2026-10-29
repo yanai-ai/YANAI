@@ -223,10 +223,19 @@
                           </button>
                           <textarea id="user-input" rows="1" placeholder="Message Yanai..." class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-2 text-slate-700 dark:text-slate-200
   text-sm leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+
+                          <!-- Send Button -->
                           <button id="send-btn" onclick="handleSend()" class="p-3 bg-brand-500 text-white rounded-2xl shadow-lg shadow-brand-900/20 hover:bg-brand-600 disabled:opacity-50 transition-all
   active:scale-95">
                               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7
   7m-7-7v18"></path></svg>
+                          </button>
+
+                          <!-- Stop Button (Hidden by default) -->
+                          <button id="stop-btn" onclick="stopResponse()" class="hidden p-3 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl shadow-sm hover:bg-slate-300
+  dark:hover:bg-slate-700 transition-all active:scale-95">
+                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
+  12"></path></svg>
                           </button>
                       </div>
                   </div>
@@ -242,6 +251,7 @@
                   let attachedFile = { name: '', content: '' };
                   let isTyping = false;
                   let timerInterval = null;
+                  let currentAbortController = null; // Track active request
 
                   let allChats = [];
                   let currentChatId = null;
@@ -433,7 +443,7 @@
                       let i = 0;
                       const speed = 5;
                       function type() {
-                          if (i < text.length) {
+                          if (i < text.length && isTyping) {
                               element.innerHTML = marked.parse(text.substring(0, i + 1));
                               i++;
                               setTimeout(type, speed);
@@ -473,9 +483,28 @@
                       win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
                   }
 
+                  function stopResponse() {
+                      if (currentAbortController) {
+                          currentAbortController.abort();
+                      }
+                      isTyping = false;
+                      updateInputButtons();
+                  }
+
+                  function updateInputButtons() {
+                      const sendBtn = document.getElementById('send-btn');
+                      const stopBtn = document.getElementById('stop-btn');
+                      if (isTyping) {
+                          sendBtn.classList.add('hidden');
+                          stopBtn.classList.remove('hidden');
+                      } else {
+                          sendBtn.classList.remove('hidden');
+                          stopBtn.classList.add('hidden');
+                      }
+                  }
+
                   async function handleSend() {
                       const input = document.getElementById('user-input');
-                      const btn = document.getElementById('send-btn');
                       const text = input.value.trim();
 
                       if (!OR_API_KEY) return alert("Set OpenRouter Key first!");
@@ -507,7 +536,9 @@
                       input.value = '';
                       input.style.height = '';
                       clearFile();
-                      isTyping = true; btn.disabled = true;
+
+                      isTyping = true;
+                      updateInputButtons();
 
                       const startTime = Date.now();
                       const loadingDiv = document.createElement('div');
@@ -533,12 +564,13 @@
                           const chat = allChats.find(c => c.id === currentChatId);
                           const history = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
 
-                          const controller = new AbortController();
-                          const timeoutId = setTimeout(() => controller.abort(), 60000);
+                          // Setup AbortController for the Stop button
+                          currentAbortController = new AbortController();
+                          const timeoutId = setTimeout(() => currentAbortController.abort(), 60000);
 
                           const response = await fetch(API_PROXY_URL, {
                               method: 'POST',
-                              signal: controller.signal,
+                              signal: currentAbortController.signal,
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({
                                   headers: { Authorization: `Bearer ${OR_API_KEY}` },
@@ -557,13 +589,18 @@
                           appendMessage('ai', data.choices[0].message.content);
                       } catch (e) {
                           console.error(e);
-                          loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
-                              ${e.name === 'AbortError' ? 'Request timed out. The document might be too large.' : 'Error: ' + e.message}
-                          </div>`;
+                          if (e.name === 'AbortError') {
+                              loadingDiv.innerHTML = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl text-slate-500 dark:text-slate-400 text-sm">Response stopped by user.</div>`;
+                          } else {
+                              loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
+                                  ${e.name === 'AbortError' ? 'Request timed out. The document might be too large.' : 'Error: ' + e.message}
+                              </div>`;
+                          }
                       } finally {
                           clearInterval(timerInterval);
                           isTyping = false;
-                          btn.disabled = false;
+                          updateInputButtons();
+                          currentAbortController = null;
                       }
                   }
 
