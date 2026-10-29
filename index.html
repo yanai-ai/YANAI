@@ -34,6 +34,7 @@
               .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
               @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+              /* --- Authentic AI Content --- */
               .prose-ai { line-height: 1.7; color: inherit; }
               .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
               .dark .prose-ai h1 { color: #fdba74; }
@@ -50,6 +51,7 @@
               .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
               .dark .prose-ai code { background: rgba(255,255,255,0.1); }
 
+              /* --- Chat Bubbles --- */
               .user-msg {
                   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
                   color: white;
@@ -69,6 +71,7 @@
                   border: 1px solid #334155;
               }
 
+              /* --- Enhanced Thinking Animation --- */
               .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
               .core-center { width: 8px; height: 8px; background: #f97316; border-radius: 50%; z-index: 10; box-shadow: 0 0 12px #f97316; animation: pulse-glow 1.5s infinite ease-in-out; }
               .core-ring { position: absolute; border: 2px solid #f97316; border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -90,6 +93,7 @@
               <div class="p-6 flex flex-col h-full">
                   <div class="flex items-center gap-3 mb-10">
                       <div class="w-10 h-10 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                          <!-- Upgraded Elephant Logo -->
                           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M17 12C17 14.2091 15.2091 16 13 16C10.7909 16 9 14.2091 9 12C9 9.7909 10.7909 8 13 8C15.2091 8 17 9.7909 17 12Z" fill="#CBD5E1" class="dark:fill-slate-700"/>
                               <path d="M13 8C15.2091 8 17 9.7909 17 12C17 14.2091 15.2091 16 13 16C10.7909 16 9 14.2091 9 12C9 9.7909 10.7909 8 13 8Z" stroke="#f97316" stroke-width="2"/>
@@ -159,16 +163,16 @@
                       <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                           <div>
                               <p class="font-semibold dark:text-white">Dark Mode</p>
-                              <p class="text-xs text-slate-500 dark:text-slate-400">Switch theme</p>
+                              <p class="text-xs text-slate-500 dark:text-slate-400">Switch between themes</p>
                           </div>
                           <button onclick="toggleTheme()" class="w-12 h-6 bg-slate-300 dark:bg-brand-500 rounded-full relative transition-colors">
                               <div class="absolute top-1 left-1 dark:left-7 w-4 h-4 bg-white rounded-full transition-all"></div>
                           </button>
                       </div>
                       <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl space-y-3">
-                          <p class="font-semibold dark:text-white">Data</p>
+                          <p class="font-semibold dark:text-white">Data Management</p>
                           <button onclick="clearAllHistory()" class="w-full py-2 px-4 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium hover:bg-red-200
-  transition-all">Clear History</button>
+  transition-all">Clear Chat History</button>
                           <button onclick="clearLibrary()" class="w-full py-2 px-4 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-slate-300
   transition-all">Wipe Library</button>
                       </div>
@@ -198,7 +202,7 @@
               <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-200 dark:border-slate-800">
                   <div class="text-center space-y-2">
                       <h3 class="text-2xl font-bold text-slate-900 dark:text-white">API Key</h3>
-                      <p class="text-sm text-slate-500 dark:text-slate-400">Enter OpenRouter key</p>
+                      <p class="text-sm text-slate-500 dark:text-slate-400">Enter OpenRouter Key</p>
                   </div>
                   <input type="password" id="api-key-input" placeholder="sk-or-..." class="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none
   focus:ring-2 focus:ring-brand-500 transition-all dark:text-white">
@@ -428,7 +432,7 @@
                   }
 
                   function clearAllHistory() {
-                      if (confirm("Delete all history?")) {
+                      if (confirm("Delete history?")) {
                           allChats = [];
                           saveAllChats();
                           renderChatList();
@@ -688,4 +692,4 @@
                   init();
               </script>
           </body>
-      </html >
+      </html>
