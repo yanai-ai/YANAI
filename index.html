@@ -33,11 +33,11 @@
           .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
           @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-          /* AI Prose Styling */
-          .prose-ai { line-height: 1.8; color: inherit; font-size: 1.05rem; }
-          .prose-ai h1 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
+          /* AI Prose Styling - Readability focus */
+          .prose-ai { line-height: 1.7; color: inherit; font-size: 1.05rem; }
+          .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
           .dark .prose-ai h1 { color: #fdba74; }
-          .prose-ai h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(249,115,22,0.2); padding-bottom: 0.25rem; }
+          .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(249,115,22,0.2); padding-bottom: 0.25rem; }
           .prose-ai p { margin-bottom: 1.25rem; }
           .prose-ai strong { font-weight: 700; color: #1e293b; }
           .dark .prose-ai strong { color: #f1f5f9; }
@@ -50,9 +50,9 @@
           .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
           .dark .prose-ai code { background: rgba(255,255,255,0.1); }
 
-          /* Message Bubbles */
-          .user-msg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border-radius: 24px 24px 4px 24px; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2); font-size: 1.1rem; }
-          .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 24px 24px 24px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 1.1rem; }
+          /* Message Bubbles - Balanced size */
+          .user-msg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2); font-size: 1.05rem; }
+          .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 1.05rem; }
           .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
 
           /* AI Core Animation */
@@ -258,15 +258,16 @@
           </header>
 
           <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-8">
-              <div id="welcome-screen" class="max-w-4xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
+              <div id="welcome-screen" class="max-w-3xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
                   <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
                   <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload a document, ask a complex question, or simply start a conversation.</p>
               </div>
-              <div id="messages" class="max-w-6xl mx-auto space-y-10 pb-32"></div>
+              <!-- Constrained width for readability (max-w-4xl) -->
+              <div id="messages" class="max-w-4xl mx-auto space-y-10 pb-32"></div>
           </div>
 
           <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50 dark:from-black via-slate-50 dark:via-black to-transparent">
-              <div class="max-w-5xl mx-auto relative">
+              <div class="max-w-4xl mx-auto relative">
                   <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
                       <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-full text-xs
   font-semibold shadow-sm animate-pulse">
@@ -350,7 +351,7 @@
               }
           }
 
-          // Resize Logic
+          // Resize Logic - Added limits for stability
           let isResizing = false;
           resizer.addEventListener('mousedown', (e) => {
               isResizing = true;
@@ -361,7 +362,8 @@
           window.addEventListener('mousemove', (e) => {
               if (!isResizing) return;
               const newWidth = e.clientX;
-              if (newWidth > 80 && newWidth < 600) {
+              // Limit resizing between 200px and 450px
+              if (newWidth > 200 && newWidth < 450) {
                   sidebar.style.width = `${newWidth}px`;
                   isSidebarCollapsed = false;
                   document.querySelectorAll('.sidebar-text').forEach(t => t.classList.remove('hidden'));
@@ -664,7 +666,7 @@
               if (role === 'user') {
                   msgDiv.innerHTML = `<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
               } else {
-                  msgDiv.innerHTML = `<div class="max-w-[95%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
+                  msgDiv.innerHTML = `<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
                   const target = msgDiv.querySelector('.typing-target');
                   if (!save) {
                       target.innerHTML = marked.parse(text);
