@@ -32,10 +32,12 @@
           .dark .chat-container::-webkit-scrollbar-thumb { background: #334155; }
           .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
           @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-          .prose-ai { line-height: 1.7; color: inherit; }
-          .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
+
+          /* AI Prose Styling */
+          .prose-ai { line-height: 1.8; color: inherit; font-size: 1.05rem; }
+          .prose-ai h1 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
           .dark .prose-ai h1 { color: #fdba74; }
-          .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(249,115,22,0.2); padding-bottom: 0.25rem; }
+          .prose-ai h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(249,115,22,0.2); padding-bottom: 0.25rem; }
           .prose-ai p { margin-bottom: 1.25rem; }
           .prose-ai strong { font-weight: 700; color: #1e293b; }
           .dark .prose-ai strong { color: #f1f5f9; }
@@ -45,11 +47,15 @@
           .prose-ai ol { list-style-type: none; margin-left: 0.5rem; margin-bottom: 1.25rem; counter-reset: item; }
           .prose-ai ol li { position: relative; padding-left: 2rem; margin-bottom: 0.5rem; counter-increment: item; }
           .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: #f97316; font-weight: 800; }
-          .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
+          .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
           .dark .prose-ai code { background: rgba(255,255,255,0.1); }
-          .user-msg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2); }
-          .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+
+          /* Message Bubbles */
+          .user-msg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border-radius: 24px 24px 4px 24px; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2); font-size: 1.1rem; }
+          .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 24px 24px 24px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 1.1rem; }
           .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
+
+          /* AI Core Animation */
           .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
           .core-center { width: 8px; height: 8px; background: #f97316; border-radius: 50%; z-index: 10; box-shadow: 0 0 12px #f97316; animation: pulse-glow 1.5s infinite ease-in-out; }
           .core-ring { position: absolute; border: 2px solid #f97316; border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -57,28 +63,47 @@
           .ring-2 { width: 20px; height: 20px; animation-delay: 0.6s; }
           @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px #f97316; } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px #f97316; } }
           @keyframes orbit { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
+
           .glass-input { backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(0, 0, 0, 0.05); }
           .dark .glass-input { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); }
           .chat-item.active { background: rgba(249, 115, 22, 0.1); border-color: #f97316; color: #f97316; }
           .dark .chat-item.active { background: rgba(249, 115, 22, 0.2); border-color: #f97316; color: #fdba74; }
+
+          /* Sidebar Resizer */
+          #sidebar-resizer {
+              width: 4px;
+              cursor: col-resize;
+              transition: background 0.2s;
+              z-index: 20;
+          }
+          #sidebar-resizer:hover {
+              background: #f97316;
+          }
       </style>
   </head>
   <body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-100">
 
       <!-- Sidebar -->
-      <aside class="w-72 bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col hidden md:flex transition-colors duration-300">
-          <div class="p-6 flex flex-col h-full">
-              <div class="flex items-center gap-3 mb-10">
-                  <div class="w-9 h-9 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M18 10C18 10 19 8 20 8C21 8 22 9 22 11C22 13 20 13 20 13C20 13 20 15 18 16C16 17 14 16 14 16" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M12 7C12 7 11 4 8 4C5 4 4 6 4 9C4 12 6 13 8 13C10 13 11 11 11 11L12 13C12 15 11 17 9 18C7 19 5 18 5 18" stroke="#f97316" stroke-width="2" stroke-linecap="round"
+      <aside id="sidebar" class="bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 relative" style="width: 288px;">
+          <div class="p-6 flex flex-col h-full overflow-hidden">
+              <div class="flex items-center justify-between mb-10">
+                  <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 10C18 10 19 8 20 8C21 8 22 9 22 11C22 13 20 13 20 13C20 13 20 15 18 16C16 17 14 16 14 16" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                              <path d="M12 7C12 7 11 4 8 4C5 4 4 6 4 9C4 12 6 13 8 13C10 13 11 11 11 11L12 13C12 15 11 17 9 18C7 19 5 18 5 18" stroke="#f97316" stroke-width="2" stroke-linecap="round"
   stroke-linejoin="round"/>
-                          <path d="M12 7L14 7C16 7 17 8 17 10C17 12 15 13 13 13" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-                          <circle cx="16" cy="9" r="1" fill="#f97316"/>
-                      </svg>
+                              <path d="M12 7L14 7C16 7 17 8 17 10C17 12 15 13 13 13" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                              <circle cx="16" cy="9" r="1" fill="#f97316"/>
+                          </svg>
+                      </div>
+                      <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">Yanai AI</h1>
                   </div>
-                  <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Yanai AI</h1>
+                  <!-- Collapse Button -->
+                  <button onclick="toggleSidebar()" class="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                      <svg id="collapse-icon" class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11
+  19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
+                  </button>
               </div>
 
               <div class="space-y-3 mb-6">
@@ -86,35 +111,35 @@
   rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group">
                       <svg class="w-4 h-4 text-brand-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
   stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                      New Chat
+                      <span class="sidebar-text">New Chat</span>
                   </button>
                   <button onclick="toggleLibrary()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
   rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group">
                       <svg class="w-4 h-4 text-brand-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
   stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477
   18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                      Library
+                      <span class="sidebar-text">Library</span>
                   </button>
               </div>
 
-              <div class="mb-6">
-                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
+              <div class="mb-6 overflow-hidden">
+                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3 sidebar-text">Select Intelligence</p>
                   <div class="space-y-2" id="model-selector">
                       <button onclick="setModel('nvidia/nemotron-3.5-super-vl', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500
   text-white shadow-sm" data-model="nvidia/nemotron-3.5-super-vl">
-                          <div class="font-semibold">Nvidia Nemotron 3.5 Super VL</div>
-                          <div class="text-[10px] opacity-80">Vision, documents & complex logic</div>
+                          <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Super VL</div>
+                          <div class="text-[10px] opacity-80 sidebar-text">Vision & complex logic</div>
                       </button>
                       <button onclick="setModel('nvidia/nemotron-3.5-lightning', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200
   dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-model="nvidia/nemotron-3.5-lightning">
-                          <div class="font-semibold">Nvidia Nemotron 3.5 Lightning</div>
-                          <div class="text-[10px] opacity-70">Ultra-fast responses & efficiency</div>
+                          <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Lightning</div>
+                          <div class="text-[10px] opacity-70 sidebar-text">Ultra-fast responses</div>
                       </button>
                   </div>
               </div>
 
               <div class="flex-1 overflow-hidden flex flex-col">
-                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
+                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3 sidebar-text">Recent Chats</p>
                   <div id="recent-chats-list" class="space-y-1 overflow-y-auto chat-container px-2 pb-4"></div>
               </div>
 
@@ -124,10 +149,12 @@
                       <svg class="w-4 h-4 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
   stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.457 3.043.72 3.043 2.466v10.5c0 1.746-1.5 2.924-3.043 2.466a1.724 1.724 0
   00-2.573-1.066c-1.543.457-3.043-.72-3.043-2.466v-10.5c0-1.746 1.5-2.924 3.043-2.466z"></path></svg>
-                      Settings
+                      <span class="sidebar-text">Settings</span>
                   </button>
               </div>
           </div>
+          <!-- Resizer Handle -->
+          <div id="sidebar-resizer" class="absolute right-0 top-0 h-full hover:bg-brand-500"></div>
       </aside>
 
       <!-- Library Overlay -->
@@ -165,7 +192,6 @@
                   </button>
               </div>
 
-              <!-- Tutorial Section -->
               <div class="bg-brand-50 dark:bg-brand-900/10 p-4 rounded-2xl border border-brand-200 dark:border-brand-800 space-y-3">
                   <p class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider flex items-center gap-2">
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0
@@ -181,7 +207,6 @@
                   </ul>
               </div>
 
-              <!-- API Key Field -->
               <div class="space-y-4">
                   <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Configuration</p>
                   <div class="space-y-2">
@@ -191,7 +216,6 @@
                   </div>
               </div>
 
-              <!-- Appearance -->
               <div class="space-y-4">
                   <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Appearance</p>
                   <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
@@ -202,7 +226,6 @@
                   </div>
               </div>
 
-              <!-- Data Management -->
               <div class="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
                   <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Danger Zone</p>
                   <div class="space-y-3">
@@ -223,7 +246,7 @@
       </div>
 
       <!-- Main Chat Area -->
-      <main class="flex-1 flex flex-col relative bg-slate-50 dark:bg-black">
+      <main class="flex-1 flex flex-col relative bg-slate-50 dark:bg-black overflow-hidden">
           <header class="h-16 flex items-center justify-between px-8 border-b border-slate-200 dark:border-slate-900 bg-white/80 dark:bg-black/50 backdrop-blur-md z-10">
               <div class="flex items-center gap-4">
                   <span id="current-model-display" class="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Nvidia Nemotron 3.5 Super VL</span>
@@ -234,21 +257,22 @@
               </button>
           </header>
 
-          <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-0">
-              <div id="welcome-screen" class="max-w-2xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
+          <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-8">
+              <!-- Expanded the message container width -->
+              <div id="welcome-screen" class="max-w-4xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
                   <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
                   <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload a document, ask a complex question, or simply start a conversation.</p>
               </div>
-              <div id="messages" class="max-w-3xl mx-auto space-y-8 pb-32"></div>
+              <div id="messages" class="max-w-6xl mx-auto space-y-10 pb-32"></div>
           </div>
 
           <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50 dark:from-black via-slate-50 dark:via-black to-transparent">
-              <div class="max-w-3xl mx-auto relative">
+              <div class="max-w-5xl mx-auto relative">
                   <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
                       <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-full text-xs
   font-semibold shadow-sm animate-pulse">
                           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0
-  01-7.743 5.743L11 17H//n9v-5.257a6 6 0 01-7.743-5.743L3 6a1 1 0 011-1h16a1 1 0 011 1z"></path></svg>
+  01-7.743 5.743L11 17H9v-5.257a6 6 0 01-7.743-5.743L3 6a1 1 0 011-1h16a1 1 0 011 1z"></path></svg>
                           API Key required to chat
                       </div>
                   </div>
@@ -305,6 +329,52 @@
           function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
           pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+          // Sidebar Logic
+          let isSidebarCollapsed = false;
+          const sidebar = document.getElementById('sidebar');
+          const resizer = document.getElementById('sidebar-resizer');
+
+          function toggleSidebar() {
+              isSidebarCollapsed = !isSidebarCollapsed;
+              const texts = document.querySelectorAll('.sidebar-text');
+              const icon = document.getElementById('collapse-icon');
+
+              if (isSidebarCollapsed) {
+                  sidebar.style.width = '80px';
+                  texts.forEach(t => t.classList.add('hidden'));
+                  icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>';
+              } else {
+                  sidebar.style.width = '288px';
+                  texts.forEach(t => t.classList.remove('hidden'));
+                  icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>';
+              }
+          }
+
+          // Resize Logic
+          let isResizing = false;
+          resizer.addEventListener('mousedown', (e) => {
+              isResizing = true;
+              document.body.style.cursor = 'col-resize';
+              document.body.style.userSelect = 'none';
+          });
+
+          window.addEventListener('mousemove', (e) => {
+              if (!isResizing) return;
+              const newWidth = e.clientX;
+              if (newWidth > 80 && newWidth < 600) {
+                  sidebar.style.width = `${newWidth}px`;
+                  isSidebarCollapsed = false;
+                  document.querySelectorAll('.sidebar-text').forEach(t => t.classList.remove('hidden'));
+                  document.getElementById('collapse-icon').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>';
+              }
+          });
+
+          window.addEventListener('mouseup', () => {
+              isResizing = false;
+              document.body.style.cursor = 'default';
+              document.body.style.userSelect = 'auto';
+          });
 
           function init() {
               const savedKey = safeStorageGet('yanai_or_key');
@@ -593,9 +663,9 @@
               msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
 
               if (role === 'user') {
-                  msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
+                  msgDiv.innerHTML = `<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
               } else {
-                  msgDiv.innerHTML = `<div class="max-w-[90%] p-4 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
+                  msgDiv.innerHTML = `<div class="max-w-[95%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
                   const target = msgDiv.querySelector('.typing-target');
                   if (!save) {
                       target.innerHTML = marked.parse(text);
