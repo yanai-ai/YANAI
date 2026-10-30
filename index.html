@@ -427,10 +427,12 @@
           function clearFile() { attachedFile = { name: '', content: '' }; document.getElementById('file-preview').classList.add('hidden'); }
 
           function retrieveContext(query) {
-              if (allUploadedDocs.length === 0) return "";
+              if (!allUploadedDocs || allUploadedDocs.length === 0) return "";
               const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length > 3);
               let relevantSnippets = [];
               allUploadedDocs.forEach(doc => {
+                  // SAFETY CHECK: ensure doc.content exists before calling toLowerCase
+                  if (!doc.content) return;
                   const content = doc.content.toLowerCase();
                   const matchCount = keywords.reduce((acc, kw) => acc + (content.includes(kw) ? 1 : 0), 0);
                   if (matchCount > 0) {
@@ -471,7 +473,6 @@
               if (role === 'user') {
                   msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
               } else {
-                  // Use a class instead of an ID to fix history loading bug
                   msgDiv.innerHTML = `<div class="max-w-[90%] p-4 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
                   const target = msgDiv.querySelector('.typing-target');
                   if (!save) {
