@@ -84,11 +84,11 @@
   <body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-100">
 
       <!-- Sidebar -->
-      <aside id="sidebar" class="bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 relative" style="width: 288px;">
+      <aside id="sidebar" class="bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 relative overflow-x-hidden" style="width: 288px;">
           <div class="p-6 flex flex-col h-full overflow-hidden">
               <div class="flex items-center justify-between mb-10">
-                  <div class="flex items-center gap-3">
-                      <div class="w-9 h-9 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800">
+                  <div class="flex items-center gap-3 overflow-hidden">
+                      <div class="w-9 h-9 bg-white dark:bg-slate-900 rounded-xl flex-shrink-0 flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M18 10C18 10 19 8 20 8C21 8 22 9 22 11C22 13 20 13 20 13C20 13 20 15 18 16C16 17 14 16 14 16" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
                               <path d="M12 7C12 7 11 4 8 4C5 4 4 6 4 9C4 12 6 13 8 13C10 13 11 11 11 11L12 13C12 15 11 17 9 18C7 19 5 18 5 18" stroke="#f97316" stroke-width="2" stroke-linecap="round"
@@ -97,10 +97,10 @@
                               <circle cx="16" cy="9" r="1" fill="#f97316"/>
                           </svg>
                       </div>
-                      <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">Yanai AI</h1>
+                      <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap sidebar-text">Yanai AI</h1>
                   </div>
                   <!-- Collapse Button -->
-                  <button onclick="toggleSidebar()" class="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                  <button onclick="toggleSidebar()" class="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors flex-shrink-0">
                       <svg id="collapse-icon" class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11
   19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
                   </button>
@@ -108,17 +108,17 @@
 
               <div class="space-y-3 mb-6">
                   <button onclick="startNewChat()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
-  rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group">
-                      <svg class="w-4 h-4 text-brand-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-  stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                      <span class="sidebar-text">New Chat</span>
+  rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
+                      <svg class="w-4 h-4 text-brand-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
+  stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                      <span class="sidebar-text whitespace-nowrap">New Chat</span>
                   </button>
                   <button onclick="toggleLibrary()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
-  rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group">
-                      <svg class="w-4 h-4 text-brand-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-  stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477
-  18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                      <span class="sidebar-text">Library</span>
+  rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
+                      <svg class="w-4 h-4 text-brand-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
+  stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477
+  4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                      <span class="sidebar-text whitespace-nowrap">Library</span>
                   </button>
               </div>
 
@@ -126,14 +126,14 @@
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3 sidebar-text">Select Intelligence</p>
                   <div class="space-y-2" id="model-selector">
                       <button onclick="setModel('nvidia/nemotron-3.5-super-vl', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500
-  text-white shadow-sm" data-model="nvidia/nemotron-3.5-super-vl">
+  text-white shadow-sm overflow-hidden" data-model="nvidia/nemotron-3.5-super-vl">
                           <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Super VL</div>
-                          <div class="text-[10px] opacity-80 sidebar-text">Vision & complex logic</div>
+                          <div class="text-[10px] opacity-80 sidebar-text whitespace-nowrap">Vision & complex logic</div>
                       </button>
                       <button onclick="setModel('nvidia/nemotron-3.5-lightning', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200
-  dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-model="nvidia/nemotron-3.5-lightning">
+  dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 overflow-hidden" data-model="nvidia/nemotron-3.5-lightning">
                           <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Lightning</div>
-                          <div class="text-[10px] opacity-70 sidebar-text">Ultra-fast responses</div>
+                          <div class="text-[10px] opacity-70 sidebar-text whitespace-nowrap">Ultra-fast responses</div>
                       </button>
                   </div>
               </div>
@@ -145,11 +145,11 @@
 
               <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1">
                   <button onclick="toggleSettingsModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
-  transition-all group">
-                      <svg class="w-4 h-4 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-  stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.457 3.043.72 3.043 2.466v10.5c0 1.746-1.5 2.924-3.043 2.466a1.724 1.724 0
+  transition-all group overflow-hidden">
+                      <svg class="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
+  stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.457 3.043.72 3.043 2.466v10.5c0 1.746-1.5 2.924-3.043 2.466a1.724 1.724 0
   00-2.573-1.066c-1.543.457-3.043-.72-3.043-2.466v-10.5c0-1.746 1.5-2.924 3.043-2.466z"></path></svg>
-                      <span class="sidebar-text">Settings</span>
+                      <span class="sidebar-text whitespace-nowrap">Settings</span>
                   </button>
               </div>
           </div>
@@ -258,7 +258,6 @@
           </header>
 
           <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-8">
-              <!-- Expanded the message container width -->
               <div id="welcome-screen" class="max-w-4xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
                   <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
                   <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload a document, ask a complex question, or simply start a conversation.</p>
