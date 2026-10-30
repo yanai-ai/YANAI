@@ -33,7 +33,7 @@
           .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
           @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-          /* AI Prose Styling - Readability focus */
+          /* AI Prose Styling */
           .prose-ai { line-height: 1.7; color: inherit; font-size: 1.05rem; }
           .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
           .dark .prose-ai h1 { color: #fdba74; }
@@ -50,7 +50,7 @@
           .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
           .dark .prose-ai code { background: rgba(255,255,255,0.1); }
 
-          /* Message Bubbles - Balanced size */
+          /* Message Bubbles */
           .user-msg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2); font-size: 1.05rem; }
           .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 1.05rem; }
           .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
@@ -97,13 +97,8 @@
                               <circle cx="16" cy="9" r="1" fill="#f97316"/>
                           </svg>
                       </div>
-                      <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap sidebar-text">Yanai AI</h1>
+                      <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">Yanai AI</h1>
                   </div>
-                  <!-- Collapse Button -->
-                  <button onclick="toggleSidebar()" class="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors flex-shrink-0">
-                      <svg id="collapse-icon" class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11
-  19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
-                  </button>
               </div>
 
               <div class="space-y-3 mb-6">
@@ -111,35 +106,35 @@
   rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
                       <svg class="w-4 h-4 text-brand-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
   stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                      <span class="sidebar-text whitespace-nowrap">New Chat</span>
+                      <span class="whitespace-nowrap">New Chat</span>
                   </button>
                   <button onclick="toggleLibrary()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
   rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
                       <svg class="w-4 h-4 text-brand-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
   stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477
   4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                      <span class="sidebar-text whitespace-nowrap">Library</span>
+                      <span class="whitespace-nowrap">Library</span>
                   </button>
               </div>
 
               <div class="mb-6 overflow-hidden">
-                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3 sidebar-text">Select Intelligence</p>
+                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
                   <div class="space-y-2" id="model-selector">
                       <button onclick="setModel('nvidia/nemotron-3.5-super-vl', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500
   text-white shadow-sm overflow-hidden" data-model="nvidia/nemotron-3.5-super-vl">
                           <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Super VL</div>
-                          <div class="text-[10px] opacity-80 sidebar-text whitespace-nowrap">Vision & complex logic</div>
+                          <div class="text-[10px] opacity-80 whitespace-nowrap">Vision & complex logic</div>
                       </button>
                       <button onclick="setModel('nvidia/nemotron-3.5-lightning', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200
   dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 overflow-hidden" data-model="nvidia/nemotron-3.5-lightning">
                           <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Lightning</div>
-                          <div class="text-[10px] opacity-70 sidebar-text whitespace-nowrap">Ultra-fast responses</div>
+                          <div class="text-[10px] opacity-70 whitespace-nowrap">Ultra-fast responses</div>
                       </button>
                   </div>
               </div>
 
               <div class="flex-1 overflow-hidden flex flex-col">
-                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3 sidebar-text">Recent Chats</p>
+                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
                   <div id="recent-chats-list" class="space-y-1 overflow-y-auto chat-container px-2 pb-4"></div>
               </div>
 
@@ -149,7 +144,7 @@
                       <svg class="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
   stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.457 3.043.72 3.043 2.466v10.5c0 1.746-1.5 2.924-3.043 2.466a1.724 1.724 0
   00-2.573-1.066c-1.543.457-3.043-.72-3.043-2.466v-10.5c0-1.746 1.5-2.924 3.043-2.466z"></path></svg>
-                      <span class="sidebar-text whitespace-nowrap">Settings</span>
+                      <span class="whitespace-nowrap">Settings</span>
                   </button>
               </div>
           </div>
@@ -262,7 +257,6 @@
                   <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
                   <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload a document, ask a complex question, or simply start a conversation.</p>
               </div>
-              <!-- Constrained width for readability (max-w-4xl) -->
               <div id="messages" class="max-w-4xl mx-auto space-y-10 pb-32"></div>
           </div>
 
@@ -331,27 +325,10 @@
           pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
           // Sidebar Logic
-          let isSidebarCollapsed = false;
           const sidebar = document.getElementById('sidebar');
           const resizer = document.getElementById('sidebar-resizer');
 
-          function toggleSidebar() {
-              isSidebarCollapsed = !isSidebarCollapsed;
-              const texts = document.querySelectorAll('.sidebar-text');
-              const icon = document.getElementById('collapse-icon');
-
-              if (isSidebarCollapsed) {
-                  sidebar.style.width = '80px';
-                  texts.forEach(t => t.classList.add('hidden'));
-                  icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>';
-              } else {
-                  sidebar.style.width = '288px';
-                  texts.forEach(t => t.classList.remove('hidden'));
-                  icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>';
-              }
-          }
-
-          // Resize Logic - Added limits for stability
+          // Resize Logic - Minimum set to 260px to ensure model names are visible
           let isResizing = false;
           resizer.addEventListener('mousedown', (e) => {
               isResizing = true;
@@ -362,12 +339,9 @@
           window.addEventListener('mousemove', (e) => {
               if (!isResizing) return;
               const newWidth = e.clientX;
-              // Limit resizing between 200px and 450px
-              if (newWidth > 200 && newWidth < 450) {
+              // Min: 260px (covers "Nvidia Nemotron 3.5 Super VL"), Max: 450px
+              if (newWidth > 260 && newWidth < 450) {
                   sidebar.style.width = `${newWidth}px`;
-                  isSidebarCollapsed = false;
-                  document.querySelectorAll('.sidebar-text').forEach(t => t.classList.remove('hidden'));
-                  document.getElementById('collapse-icon').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>';
               }
           });
 
