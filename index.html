@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -221,6 +221,12 @@
       <input type="file" id="file-input" class="hidden" onchange="handleFileUpload(event)">
 
       <script>
+          // Global Error Catcher to prevent "freezing"
+          window.onerror = function(msg, url, line) {
+              alert("A JavaScript error occurred: " + msg + "\nLine: " + line);
+              return false;
+          };
+
           const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
 
           let OR_API_KEY = "";
@@ -233,7 +239,7 @@
 
           let allChats = [];
           let currentChatId = null;
-          let allUploadedDocs = []; // These are now saved as {name, date, content}
+          let allUploadedDocs = [];
 
           function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
           function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
@@ -252,12 +258,14 @@
           }
 
           function autoResize(textarea) {
+              if(!textarea) return;
               textarea.style.height = 'auto';
               textarea.style.height = textarea.scrollHeight + 'px';
           }
 
           function renderChatList() {
               const listContainer = document.getElementById('recent-chats-list');
+              if(!listContainer) return;
               listContainer.innerHTML = '';
               const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
               sortedChats.forEach(chat => {
@@ -321,7 +329,7 @@
           function setModel(modelId, btn) {
               MODEL = modelId;
               const display = document.getElementById('current-model-display');
-              display.innerText = btn.querySelector('.font-semibold').innerText;
+              if(display) display.innerText = btn.querySelector('.font-semibold').innerText;
               document.querySelectorAll('.model-btn').forEach(b => {
                   b.classList.remove('bg-brand-500', 'text-white', 'shadow-sm');
                   b.classList.add('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
@@ -333,8 +341,8 @@
           function toggleTheme() {
               const html = document.documentElement;
               const icon = document.getElementById('theme-icon');
-              if (html.classList.contains('dark')) { html.classList.remove('dark'); icon.innerText = '🌙'; }
-              else { html.classList.add('dark'); icon.innerText = '☀️'; }
+              if (html.classList.contains('dark')) { html.classList.remove('dark'); if(icon) icon.innerText = '🌙'; }
+              else { html.classList.add('dark'); if(icon) icon.innerText = '☀️'; }
           }
 
           function checkApiKeyStatus() {
@@ -342,11 +350,15 @@
               const btn = document.getElementById('send-btn');
               const warning = document.getElementById('api-warning');
               if (!OR_API_KEY) {
-                  input.disabled = true; input.placeholder = "API Key required to chat...";
-                  btn.disabled = true; warning.classList.remove('hidden');
+                  if(input) input.disabled = true;
+                  if(input) input.placeholder = "API Key required to chat...";
+                  if(btn) btn.disabled = true;
+                  if(warning) warning.classList.remove('hidden');
               } else {
-                  input.disabled = false; input.placeholder = "Message Yanai...";
-                  btn.disabled = false; warning.classList.add('hidden');
+                  if(input) input.disabled = false;
+                  if(input) input.placeholder = "Message Yanai...";
+                  if(btn) btn.disabled = false;
+                  if(warning) warning.classList.add('hidden');
               }
           }
 
@@ -377,6 +389,7 @@
 
           function renderLibrary() {
               const list = document.getElementById('library-list');
+              if(!list) return;
               list.innerHTML = '';
               if (allUploadedDocs.length === 0) {
                   list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
@@ -426,9 +439,7 @@
                   } else {
                       text = await file.text();
                   }
-
                   attachedFile.content = text;
-                  // SAVE TO RAG LIBRARY
                   allUploadedDocs.push({ name: file.name, date: Date.now(), content: text });
                   saveLibrary();
               } catch (err) { alert("File Error: " + err.message); }
@@ -436,19 +447,14 @@
 
           function clearFile() { attachedFile = { name: '', content: '' }; document.getElementById('file-preview').classList.add('hidden'); }
 
-          // --- RAG ENGINE ---
           function retrieveContext(query) {
               if (allUploadedDocs.length === 0) return "";
-
               const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length > 3);
               let relevantSnippets = [];
-
               allUploadedDocs.forEach(doc => {
                   const content = doc.content.toLowerCase();
                   const matchCount = keywords.reduce((acc, kw) => acc + (content.includes(kw) ? 1 : 0), 0);
-
                   if (matchCount > 0) {
-                      // Simple logic: find the first 1000 characters around the first keyword match
                       const firstKeyword = keywords.find(kw => content.includes(kw));
                       const index = content.indexOf(firstKeyword);
                       const start = Math.max(0, index - 500);
@@ -456,10 +462,7 @@
                       relevantSnippets.push(`From [${doc.name}]: ${doc.content.substring(start, end)}`);
                   }
               });
-
-              return relevantSnippets.length > 0
-                  ? "\n\n--- REFERENCE KNOWLEDGE FROM LIBRARY ---\n" + relevantSnippets.join("\n\n") + "\n------------------------------------"
-                  : "";
+              return relevantSnippets.length > 0 ? "\n\n--- REFERENCE KNOWLEDGE FROM LIBRARY ---\n" + relevantSnippets.join("\n\n") + "\n------------------------------------" : "";
           }
 
           async function typeWriter(element, text) {
@@ -483,9 +486,9 @@
 
           function appendMessage(role, text, save = true) {
               const container = document.getElementById('messages');
+              if(!container) return;
               const msgDiv = document.createElement('div');
               msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
-
               if (role === 'user') {
                   msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
               } else {
@@ -499,7 +502,6 @@
               }
               container.appendChild(msgDiv);
               scrollToBottom();
-
               if (save) {
                   const chat = allChats.find(c => c.id === currentChatId);
                   if (chat) {
@@ -512,7 +514,7 @@
 
           function scrollToBottom() {
               const win = document.getElementById('chat-window');
-              win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
+              if(win) win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
           }
 
           function stopResponse() {
@@ -525,6 +527,7 @@
           function updateInputButtons() {
               const sendBtn = document.getElementById('send-btn');
               const stopBtn = document.getElementById('stop-btn');
+              if (!sendBtn || !stopBtn) return;
               if (isGenerating || isTyping) {
                   sendBtn.classList.add('hidden');
                   stopBtn.classList.remove('hidden');
@@ -537,33 +540,26 @@
           async function handleSend() {
               const input = document.getElementById('user-input');
               const text = input.value.trim();
-
               if (!OR_API_KEY) return alert("Set OpenRouter Key first!");
               if (!text && !attachedFile.content) return;
               if (isGenerating) return;
-
               if (!currentChatId) startNewChat();
-
               document.getElementById('welcome-screen').classList.add('hidden');
 
-              // --- RAG INTEGRATION ---
               const libraryContext = retrieveContext(text);
-
               let fullPrompt = "";
               if (attachedFile.content) {
                   const userQuestion = text || "Please summarize this document and highlight the key points.";
                   fullPrompt = `SYSTEM: You are analyzing a provided document. Use the context below to answer the user's request.\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n\nUSER REQUEST:
   ${userQuestion}`;
               } else {
-                  // Inject Library RAG context if found
                   fullPrompt = `${text}${libraryContext}`;
               }
 
               const displayUserText = text || (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!");
               appendMessage('user', displayUserText);
-
               input.value = '';
-              input.style.height = 'auto';
+              autoResize(input);
               clearFile();
 
               isGenerating = true;
@@ -596,6 +592,13 @@
                   currentAbortController = new AbortController();
                   const timeoutId = setTimeout(() => currentAbortController.abort(), 60000);
 
+                  // Safe array construction to avoid spread-operator crashes
+                  const finalMessages = [];
+                  finalMessages.push({ role: 'system', content: 'You are Yanai AI. You have access to a document library. If reference knowledge is provided in the prompt, use it to provide an accurate,
+  grounded answer.' });
+                  for(let i=0; i<history.length; i++) { finalMessages.push(history[i]); }
+                  finalMessages.push({ role: 'user', content: fullPrompt });
+
                   const response = await fetch(API_PROXY_URL, {
                       method: 'POST',
                       signal: currentAbortController.signal,
@@ -603,23 +606,16 @@
                       body: JSON.stringify({
                           headers: { Authorization: `Bearer ${OR_API_KEY}` },
                           model: MODEL,
-                          messages: [
-                              { role: 'system', content: 'You are Yanai AI. You have access to a document library. If reference knowledge is provided in the prompt, use it to provide an accurate, grounded
-  answer. If no reference is found, answer from your general knowledge.' },
-                              ...history,
-                              { role: 'user', content: fullPrompt }
-                          ]
+                          messages: finalMessages
                       })
                   });
 
                   clearTimeout(timeoutId);
                   const data = await response.json();
-
                   if (data.error) throw new Error(data.error.message || "API Error occurred");
                   if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
 
                   loadingDiv.remove();
-
                   isTyping = true;
                   appendMessage('ai', data.choices[0].message.content);
               } catch (e) {
@@ -627,9 +623,7 @@
                   if (e.name === 'AbortError') {
                       loadingDiv.innerHTML = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl text-slate-500 dark:text-slate-400 text-sm">Response stopped by user.</div>`;
                   } else {
-                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
-                          ${e.message || 'An unexpected error occurred.'}
-                      </div>`;
+                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">${e.message || 'An unexpected error occurred.'}</div>`;
                   }
               } finally {
                   clearInterval(timerInterval);
