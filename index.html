@@ -30,11 +30,8 @@
           .chat-container::-webkit-scrollbar { width: 5px; }
           .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
           .dark .chat-container::-webkit-scrollbar-thumb { background: #334155; }
-
           .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
           @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-          /* --- Authentic AI Content --- */
           .prose-ai { line-height: 1.7; color: inherit; }
           .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
           .dark .prose-ai h1 { color: #fdba74; }
@@ -50,28 +47,9 @@
           .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: #f97316; font-weight: 800; }
           .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
           .dark .prose-ai code { background: rgba(255,255,255,0.1); }
-
-          /* --- Chat Bubbles --- */
-          .user-msg {
-              background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-              color: white;
-              border-radius: 22px 22px 4px 22px;
-              box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
-          }
-          .ai-msg {
-              background: #ffffff;
-              color: #334155;
-              border: 1px solid #e2e8f0;
-              border-radius: 22px 22px 22px 4px;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-          }
-          .dark .ai-msg {
-              background: #1e293b;
-              color: #f1f5f9;
-              border: 1px solid #334155;
-          }
-
-          /* --- Enhanced Thinking Animation --- */
+          .user-msg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2); }
+          .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+          .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
           .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
           .core-center { width: 8px; height: 8px; background: #f97316; border-radius: 50%; z-index: 10; box-shadow: 0 0 12px #f97316; animation: pulse-glow 1.5s infinite ease-in-out; }
           .core-ring { position: absolute; border: 2px solid #f97316; border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -79,7 +57,6 @@
           .ring-2 { width: 20px; height: 20px; animation-delay: 0.6s; }
           @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px #f97316; } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px #f97316; } }
           @keyframes orbit { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
-
           .glass-input { backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(0, 0, 0, 0.05); }
           .dark .glass-input { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); }
           .chat-item.active { background: rgba(249, 115, 22, 0.1); border-color: #f97316; color: #f97316; }
@@ -198,7 +175,7 @@
           <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-0">
               <div id="welcome-screen" class="max-w-2xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
                   <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
-                  <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload a document, ask a complex question, or simply start a conversation.</p>
+                  <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload documents to your library, ask a complex question, or simply start a conversation.</p>
               </div>
               <div id="messages" class="max-w-3xl mx-auto space-y-8 pb-32"></div>
           </div>
@@ -256,7 +233,7 @@
 
           let allChats = [];
           let currentChatId = null;
-          let allUploadedDocs = [];
+          let allUploadedDocs = []; // These are now saved as {name, date, content}
 
           function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
           function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
@@ -405,13 +382,25 @@
                   list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
                   return;
               }
-              allUploadedDocs.forEach(doc => {
+              allUploadedDocs.forEach((doc, index) => {
                   const div = document.createElement('div');
-                  div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800";
-                  div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
-                                    <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>`;
+                  div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group";
+                  div.innerHTML = `
+                      <div class="flex items-center gap-3 truncate">
+                          <span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span>
+                      </div>
+                      <div class="flex items-center gap-3">
+                          <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>
+                          <button onclick="deleteDoc(${index})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-all">✕</button>
+                      </div>`;
                   list.appendChild(div);
               });
+          }
+
+          function deleteDoc(index) {
+              allUploadedDocs.splice(index, 1);
+              saveLibrary();
+              renderLibrary();
           }
 
           async function handleFileUpload(e) {
@@ -421,29 +410,57 @@
               document.getElementById('preview-name').innerText = file.name;
               document.getElementById('file-preview').classList.remove('hidden');
               try {
+                  let text = "";
                   if (file.type === 'application/pdf') {
                       const arrayBuffer = await file.arrayBuffer();
                       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                      let text = "";
                       for (let i = 1; i <= pdf.numPages; i++) {
                           const page = await pdf.getPage(i);
                           const content = await page.getTextContent();
                           text += content.items.map(s => s.str).join(" ") + "\n";
                       }
-                      attachedFile.content = text;
                   } else if (file.name.endsWith('.docx')) {
                       const arrayBuffer = await file.arrayBuffer();
                       const result = await mammoth.extractRawText({ arrayBuffer });
-                      attachedFile.content = result.value;
+                      text = result.value;
                   } else {
-                      attachedFile.content = await file.text();
+                      text = await file.text();
                   }
-                  allUploadedDocs.push({ name: file.name, date: Date.now() });
+
+                  attachedFile.content = text;
+                  // SAVE TO RAG LIBRARY
+                  allUploadedDocs.push({ name: file.name, date: Date.now(), content: text });
                   saveLibrary();
               } catch (err) { alert("File Error: " + err.message); }
           }
 
           function clearFile() { attachedFile = { name: '', content: '' }; document.getElementById('file-preview').classList.add('hidden'); }
+
+          // --- RAG ENGINE ---
+          function retrieveContext(query) {
+              if (allUploadedDocs.length === 0) return "";
+
+              const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+              let relevantSnippets = [];
+
+              allUploadedDocs.forEach(doc => {
+                  const content = doc.content.toLowerCase();
+                  const matchCount = keywords.reduce((acc, kw) => acc + (content.includes(kw) ? 1 : 0), 0);
+
+                  if (matchCount > 0) {
+                      // Simple logic: find the first 1000 characters around the first keyword match
+                      const firstKeyword = keywords.find(kw => content.includes(kw));
+                      const index = content.indexOf(firstKeyword);
+                      const start = Math.max(0, index - 500);
+                      const end = Math.min(doc.content.length, index + 500);
+                      relevantSnippets.push(`From [${doc.name}]: ${doc.content.substring(start, end)}`);
+                  }
+              });
+
+              return relevantSnippets.length > 0
+                  ? "\n\n--- REFERENCE KNOWLEDGE FROM LIBRARY ---\n" + relevantSnippets.join("\n\n") + "\n------------------------------------"
+                  : "";
+          }
 
           async function typeWriter(element, text) {
               let i = 0;
@@ -472,15 +489,11 @@
               if (role === 'user') {
                   msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
               } else {
-                  // Using class instead of ID to avoid duplication issues when loading history
                   msgDiv.innerHTML = `<div class="max-w-[90%] p-4 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
                   const target = msgDiv.querySelector('.typing-target');
-
                   if (!save) {
-                      // Load from history: render immediately
                       target.innerHTML = marked.parse(text);
                   } else {
-                      // New response: use typewriter
                       typeWriter(target, text);
                   }
               }
@@ -503,9 +516,7 @@
           }
 
           function stopResponse() {
-              if (currentAbortController) {
-                  currentAbortController.abort();
-              }
+              if (currentAbortController) currentAbortController.abort();
               isGenerating = false;
               isTyping = false;
               updateInputButtons();
@@ -535,13 +546,17 @@
 
               document.getElementById('welcome-screen').classList.add('hidden');
 
+              // --- RAG INTEGRATION ---
+              const libraryContext = retrieveContext(text);
+
               let fullPrompt = "";
               if (attachedFile.content) {
                   const userQuestion = text || "Please summarize this document and highlight the key points.";
                   fullPrompt = `SYSTEM: You are analyzing a provided document. Use the context below to answer the user's request.\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n\nUSER REQUEST:
   ${userQuestion}`;
               } else {
-                  fullPrompt = text;
+                  // Inject Library RAG context if found
+                  fullPrompt = `${text}${libraryContext}`;
               }
 
               const displayUserText = text || (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!");
@@ -588,7 +603,12 @@
                       body: JSON.stringify({
                           headers: { Authorization: `Bearer ${OR_API_KEY}` },
                           model: MODEL,
-                          messages: [...history, { role: 'user', content: fullPrompt }]
+                          messages: [
+                              { role: 'system', content: 'You are Yanai AI. You have access to a document library. If reference knowledge is provided in the prompt, use it to provide an accurate, grounded
+  answer. If no reference is found, answer from your general knowledge.' },
+                              ...history,
+                              { role: 'user', content: fullPrompt }
+                          ]
                       })
                   });
 
