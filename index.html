@@ -428,22 +428,41 @@
 
           function retrieveContext(query) {
               if (!allUploadedDocs || allUploadedDocs.length === 0) return "";
-              const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+
+              // Lowered length to 3 to catch more keywords
+              const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
               let relevantSnippets = [];
+
               allUploadedDocs.forEach(doc => {
-                  // SAFETY CHECK: ensure doc.content exists before calling toLowerCase
                   if (!doc.content) return;
                   const content = doc.content.toLowerCase();
-                  const matchCount = keywords.reduce((acc, kw) => acc + (content.includes(kw) ? 1 : 0), 0);
-                  if (matchCount > 0) {
-                      const firstKeyword = keywords.find(kw => content.includes(kw));
-                      const index = content.indexOf(firstKeyword);
+
+                  // Check if any keyword exists in this document
+                  const foundKeywords = keywords.filter(kw => content.includes(kw));
+
+                  if (foundKeywords.length > 0) {
+                      // Grab a larger window (1000 chars) around the first match for better AI context
+                      const firstKw = foundKeywords[0];
+                      const index = content.indexOf(firstKw);
                       const start = Math.max(0, index - 500);
                       const end = Math.min(doc.content.length, index + 500);
-                      relevantSnippets.push(`From [${doc.name}]: ${doc.content.substring(start, end)}`);
+                      relevantSnippets.push(`[Source: ${doc.name}]\n${doc.content.substring(start, end)}`);
                   }
               });
-              return relevantSnippets.length > 0 ? "\n\n--- REFERENCE KNOWLEDGE FROM LIBRARY ---\n" + relevantSnippets.join("\n\n") + "\n------------------------------------" : "";
+
+              if (relevantSnippets.length === 0 && allUploadedDocs.length > 0) {
+                  // FALLBACK: If no keywords match, but we have a library, send a small sample of the first doc
+                  // just in case the user is asking a general question about their library.
+                  const firstDoc = allUploadedDocs[0];
+                  if (firstDoc.content) {
+                      relevantSnippets.push(`[Source: ${firstDoc.name} - General Overview]\n${firstDoc.content.substring(0, 1500)}`);
+                  }
+              }
+
+              return relevantSnippets.length > 0
+                  ? "\n\n### MANDATORY REFERENCE KNOWLEDGE ###\nUse the following excerpts from the user's library to answer the question. If the answer is not in the excerpts, say you don't know based on the
+  library, but offer a general answer.\n\n" + relevantSnippets.join("\n\n") + "\n### END OF REFERENCE ###"
+                  : "";
           }
 
           async function typeWriter(element, text) {
@@ -587,7 +606,8 @@
                           headers: { Authorization: `Bearer ${OR_API_KEY}` },
                           model: MODEL,
                           messages: [
-                              { role: 'system', content: 'You are Yanai AI. Use provided reference knowledge if available to answer grounded questions.' },
+                              { role: 'system', content: 'You are Yanai AI. You have a document library. ALWAYS prioritize the "MANDATORY REFERENCE KNOWLEDGE" provided in the prompt. Use it to ground your
+  answers. If the information is missing, be honest, but try to use the provided context first.' },
                               ...history,
                               { role: 'user', content: fullPrompt }
                           ]
