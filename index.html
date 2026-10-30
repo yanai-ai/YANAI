@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -175,7 +175,7 @@
           <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-0">
               <div id="welcome-screen" class="max-w-2xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
                   <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
-                  <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload documents to your library, ask a complex question, or simply start a conversation.</p>
+                  <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload a document, ask a complex question, or simply start a conversation.</p>
               </div>
               <div id="messages" class="max-w-3xl mx-auto space-y-8 pb-32"></div>
           </div>
@@ -199,7 +199,7 @@
                           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                       </button>
                       <textarea id="user-input" rows="1" placeholder="Message Yanai..." class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-2 text-slate-700 dark:text-slate-200 text-sm
-  leading-relaxed max-h-40" oninput="autoResize(this)"></textarea>
+  leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
 
                       <div class="flex items-center gap-2">
                           <button id="send-btn" onclick="handleSend()" class="p-3 bg-brand-500 text-white rounded-2xl shadow-lg shadow-brand-900/20 hover:bg-brand-600 disabled:opacity-50 transition-all
@@ -221,12 +221,6 @@
       <input type="file" id="file-input" class="hidden" onchange="handleFileUpload(event)">
 
       <script>
-          // Global Error Catcher to prevent "freezing"
-          window.onerror = function(msg, url, line) {
-              alert("A JavaScript error occurred: " + msg + "\nLine: " + line);
-              return false;
-          };
-
           const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
 
           let OR_API_KEY = "";
@@ -257,15 +251,8 @@
               renderChatList();
           }
 
-          function autoResize(textarea) {
-              if(!textarea) return;
-              textarea.style.height = 'auto';
-              textarea.style.height = textarea.scrollHeight + 'px';
-          }
-
           function renderChatList() {
               const listContainer = document.getElementById('recent-chats-list');
-              if(!listContainer) return;
               listContainer.innerHTML = '';
               const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
               sortedChats.forEach(chat => {
@@ -329,7 +316,7 @@
           function setModel(modelId, btn) {
               MODEL = modelId;
               const display = document.getElementById('current-model-display');
-              if(display) display.innerText = btn.querySelector('.font-semibold').innerText;
+              display.innerText = btn.querySelector('.font-semibold').innerText;
               document.querySelectorAll('.model-btn').forEach(b => {
                   b.classList.remove('bg-brand-500', 'text-white', 'shadow-sm');
                   b.classList.add('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
@@ -341,8 +328,8 @@
           function toggleTheme() {
               const html = document.documentElement;
               const icon = document.getElementById('theme-icon');
-              if (html.classList.contains('dark')) { html.classList.remove('dark'); if(icon) icon.innerText = '🌙'; }
-              else { html.classList.add('dark'); if(icon) icon.innerText = '☀️'; }
+              if (html.classList.contains('dark')) { html.classList.remove('dark'); icon.innerText = '🌙'; }
+              else { html.classList.add('dark'); icon.innerText = '☀️'; }
           }
 
           function checkApiKeyStatus() {
@@ -350,15 +337,11 @@
               const btn = document.getElementById('send-btn');
               const warning = document.getElementById('api-warning');
               if (!OR_API_KEY) {
-                  if(input) input.disabled = true;
-                  if(input) input.placeholder = "API Key required to chat...";
-                  if(btn) btn.disabled = true;
-                  if(warning) warning.classList.remove('hidden');
+                  input.disabled = true; input.placeholder = "API Key required to chat...";
+                  btn.disabled = true; warning.classList.remove('hidden');
               } else {
-                  if(input) input.disabled = false;
-                  if(input) input.placeholder = "Message Yanai...";
-                  if(btn) btn.disabled = false;
-                  if(warning) warning.classList.add('hidden');
+                  input.disabled = false; input.placeholder = "Message Yanai...";
+                  btn.disabled = false; warning.classList.add('hidden');
               }
           }
 
@@ -389,7 +372,6 @@
 
           function renderLibrary() {
               const list = document.getElementById('library-list');
-              if(!list) return;
               list.innerHTML = '';
               if (allUploadedDocs.length === 0) {
                   list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
@@ -398,14 +380,11 @@
               allUploadedDocs.forEach((doc, index) => {
                   const div = document.createElement('div');
                   div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group";
-                  div.innerHTML = `
-                      <div class="flex items-center gap-3 truncate">
-                          <span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span>
-                      </div>
-                      <div class="flex items-center gap-3">
-                          <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>
-                          <button onclick="deleteDoc(${index})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-all">✕</button>
-                      </div>`;
+                  div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
+                                    <div class="flex items-center gap-3">
+                                      <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>
+                                      <button onclick="deleteDoc(${index})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-all">✕</button>
+                                    </div>`;
                   list.appendChild(div);
               });
           }
@@ -486,12 +465,13 @@
 
           function appendMessage(role, text, save = true) {
               const container = document.getElementById('messages');
-              if(!container) return;
               const msgDiv = document.createElement('div');
               msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+
               if (role === 'user') {
                   msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
               } else {
+                  // Use a class instead of an ID to fix history loading bug
                   msgDiv.innerHTML = `<div class="max-w-[90%] p-4 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
                   const target = msgDiv.querySelector('.typing-target');
                   if (!save) {
@@ -502,6 +482,7 @@
               }
               container.appendChild(msgDiv);
               scrollToBottom();
+
               if (save) {
                   const chat = allChats.find(c => c.id === currentChatId);
                   if (chat) {
@@ -514,11 +495,13 @@
 
           function scrollToBottom() {
               const win = document.getElementById('chat-window');
-              if(win) win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
+              win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
           }
 
           function stopResponse() {
-              if (currentAbortController) currentAbortController.abort();
+              if (currentAbortController) {
+                  currentAbortController.abort();
+              }
               isGenerating = false;
               isTyping = false;
               updateInputButtons();
@@ -527,7 +510,6 @@
           function updateInputButtons() {
               const sendBtn = document.getElementById('send-btn');
               const stopBtn = document.getElementById('stop-btn');
-              if (!sendBtn || !stopBtn) return;
               if (isGenerating || isTyping) {
                   sendBtn.classList.add('hidden');
                   stopBtn.classList.remove('hidden');
@@ -540,10 +522,13 @@
           async function handleSend() {
               const input = document.getElementById('user-input');
               const text = input.value.trim();
+
               if (!OR_API_KEY) return alert("Set OpenRouter Key first!");
               if (!text && !attachedFile.content) return;
               if (isGenerating) return;
+
               if (!currentChatId) startNewChat();
+
               document.getElementById('welcome-screen').classList.add('hidden');
 
               const libraryContext = retrieveContext(text);
@@ -558,8 +543,9 @@
 
               const displayUserText = text || (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!");
               appendMessage('user', displayUserText);
+
               input.value = '';
-              autoResize(input);
+              input.style.height = '';
               clearFile();
 
               isGenerating = true;
@@ -592,13 +578,6 @@
                   currentAbortController = new AbortController();
                   const timeoutId = setTimeout(() => currentAbortController.abort(), 60000);
 
-                  // Safe array construction to avoid spread-operator crashes
-                  const finalMessages = [];
-                  finalMessages.push({ role: 'system', content: 'You are Yanai AI. You have access to a document library. If reference knowledge is provided in the prompt, use it to provide an accurate,
-  grounded answer.' });
-                  for(let i=0; i<history.length; i++) { finalMessages.push(history[i]); }
-                  finalMessages.push({ role: 'user', content: fullPrompt });
-
                   const response = await fetch(API_PROXY_URL, {
                       method: 'POST',
                       signal: currentAbortController.signal,
@@ -606,16 +585,22 @@
                       body: JSON.stringify({
                           headers: { Authorization: `Bearer ${OR_API_KEY}` },
                           model: MODEL,
-                          messages: finalMessages
+                          messages: [
+                              { role: 'system', content: 'You are Yanai AI. Use provided reference knowledge if available to answer grounded questions.' },
+                              ...history,
+                              { role: 'user', content: fullPrompt }
+                          ]
                       })
                   });
 
                   clearTimeout(timeoutId);
                   const data = await response.json();
+
                   if (data.error) throw new Error(data.error.message || "API Error occurred");
                   if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
 
                   loadingDiv.remove();
+
                   isTyping = true;
                   appendMessage('ai', data.choices[0].message.content);
               } catch (e) {
@@ -623,7 +608,9 @@
                   if (e.name === 'AbortError') {
                       loadingDiv.innerHTML = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl text-slate-500 dark:text-slate-400 text-sm">Response stopped by user.</div>`;
                   } else {
-                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">${e.message || 'An unexpected error occurred.'}</div>`;
+                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
+                          ${e.name === 'AbortError' ? 'Request timed out.' : 'Error: ' + e.message}
+                      </div>`;
                   }
               } finally {
                   clearInterval(timerInterval);
