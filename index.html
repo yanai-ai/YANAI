@@ -1,627 +1,660 @@
 <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Yanai AI | Intelligence</title>
-      <script src="https://cdn.tailwindcss.com"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-      <script>
-          tailwind.config = {
-              darkMode: 'class',
-              theme: {
-                  extend: {
-                      colors: {
-                          brand: {
-                              50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
-                              400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c',
-                              800: '#9a3412', 900: '#7c2d12',
-                          }
-                      }
-                  }
-              }
-          }
-      </script>
-      <style>
-          body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; }
-          .chat-container::-webkit-scrollbar { width: 5px; }
-          .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-          .dark .chat-container::-webkit-scrollbar-thumb { background: #334155; }
-          .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-          @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-          .prose-ai { line-height: 1.7; color: inherit; }
-          .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
-          .dark .prose-ai h1 { color: #fdba74; }
-          .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(249,115,22,0.2); padding-bottom: 0.25rem; }
-          .prose-ai p { margin-bottom: 1.25rem; }
-          .prose-ai strong { font-weight: 700; color: #1e293b; }
-          .dark .prose-ai strong { color: #f1f5f9; }
-          .prose-ai ul { list-style-type: none; margin-left: 0.5rem; margin-bottom: 1.25rem; }
-          .prose-ai ul li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; }
-          .prose-ai ul li::before { content: "•"; position: absolute; left: 0; color: #f97316; font-weight: bold; }
-          .prose-ai ol { list-style-type: none; margin-left: 0.5rem; margin-bottom: 1.25rem; counter-reset: item; }
-          .prose-ai ol li { position: relative; padding-left: 2rem; margin-bottom: 0.5rem; counter-increment: item; }
-          .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: #f97316; font-weight: 800; }
-          .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
-          .dark .prose-ai code { background: rgba(255,255,255,0.1); }
-          .user-msg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2); }
-          .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-          .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
-          .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-          .core-center { width: 8px; height: 8px; background: #f97316; border-radius: 50%; z-index: 10; box-shadow: 0 0 12px #f97316; animation: pulse-glow 1.5s infinite ease-in-out; }
-          .core-ring { position: absolute; border: 2px solid #f97316; border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-          .ring-1 { width: 12px; height: 12px; animation-delay: 0s; }
-          .ring-2 { width: 20px; height: 20px; animation-delay: 0.6s; }
-          @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px #f97316; } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px #f97316; } }
-          @keyframes orbit { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
-          .glass-input { backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(0, 0, 0, 0.05); }
-          .dark .glass-input { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); }
-          .chat-item.active { background: rgba(249, 115, 22, 0.1); border-color: #f97316; color: #f97316; }
-          .dark .chat-item.active { background: rgba(249, 115, 22, 0.2); border-color: #f97316; color: #fdba74; }
-      </style>
-  </head>
-  <body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-100">
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Yanai AI | Intelligence</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <script>
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            brand: {
+                                50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
+                                400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c',
+                                800: '#9a3412', 900: '#7c2d12',
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+        <style>
+            body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; }
+            .chat-container::-webkit-scrollbar { width: 5px; }
+            .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+            .dark .chat-container::-webkit-scrollbar-thumb { background: #334155; }
+            .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+            @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .prose-ai { line-height: 1.7; color: inherit; }
+            .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
+            .dark .prose-ai h1 { color: #fdba74; }
+            .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(249,115,22,0.2); padding-bottom: 0.25rem; }
+            .prose-ai p { margin-bottom: 1.25rem; }
+            .prose-ai strong { font-weight: 700; color: #1e293b; }
+            .dark .prose-ai strong { color: #f1f5f9; }
+            .prose-ai ul { list-style-type: none; margin-left: 0.5rem; margin-bottom: 1.25rem; }
+            .prose-ai ul li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+            .prose-ai ul li::before { content: "•"; position: absolute; left: 0; color: #f97316; font-weight: bold; }
+            .prose-ai ol { list-style-type: none; margin-left: 0.5rem; margin-bottom: 1.25rem; counter-reset: item; }
+            .prose-ai ol li { position: relative; padding-left: 2rem; margin-bottom: 0.5rem; counter-increment: item; }
+            .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: #f97316; font-weight: 800; }
+            .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
+            .dark .prose-ai code { background: rgba(255,255,255,0.1); }
+            .user-msg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2); }
+            .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+            .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
+            .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+            .core-center { width: 8px; height: 8px; background: #f97316; border-radius: 50%; z-index: 10; box-shadow: 0 0 12px #f97316; animation: pulse-glow 1.5s infinite ease-in-out; }
+            .core-ring { position: absolute; border: 2px solid #f97316; border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+            .ring-1 { width: 12px; height: 12px; animation-delay: 0s; }
+            .ring-2 { width: 20px; height: 20px; animation-delay: 0.6s; }
+            @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px #f97316; } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px #f97316; } }
+            @keyframes orbit { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
+            .glass-input { backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(0, 0, 0, 0.05); }
+            .dark .glass-input { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); }
+            .chat-item.active { background: rgba(249, 115, 22, 0.1); border-color: #f97316; color: #f97316; }
+            .dark .chat-item.active { background: rgba(249, 115, 22, 0.2); border-color: #f97316; color: #fdba74; }
+        </style>
+    </head>
+    <body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-100">
 
-      <!-- Sidebar -->
-      <aside class="w-72 bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col hidden md:flex transition-colors duration-300">
-          <div class="p-6 flex flex-col h-full">
-              <div class="flex items-center gap-3 mb-10">
-                  <div class="w-9 h-9 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800">
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M18 10C18 10 19 8 20 8C21 8 22 9 22 11C22 13 20 13 20 13C20 13 20 15 18 16C16 17 14 16 14 16" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M12 7C12 7 11 4 8 4C5 4 4 6 4 9C4 12 6 13 8 13C10 13 11 11 11 11L12 13C12 15 11 17 9 18C7 19 5 18 5 18" stroke="#f97316" stroke-width="2" stroke-linecap="round"
-  stroke-linejoin="round"/>
-                          <path d="M12 7L14 7C16 7 17 8 17 10C17 12 15 13 13 13" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-                          <circle cx="16" cy="9" r="1" fill="#f97316"/>
-                      </svg>
-                  </div>
-                  <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Yanai AI</h1>
-              </div>
+        <!-- Sidebar -->
+        <aside class="w-72 bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col hidden md:flex transition-colors duration-300">
+            <div class="p-6 flex flex-col h-full">
+                <div class="flex items-center gap-3 mb-10">
+                    <div class="w-9 h-9 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 10C18 10 19 8 20 8C21 8 22 9 22 11C22 13 20 13 20 13C20 13 20 15 18 16C16 17 14 16 14 16" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 7C12 7 11 4 8 4C5 4 4 6 4 9C4 12 6 13 8 13C10 13 11 11 11 11L12 13C12 15 11 17 9 18C7 19 5 18 5 18" stroke="#f97316" stroke-width="2" stroke-linecap="round"
+    stroke-linejoin="round"/>
+                            <path d="M12 7L14 7C16 7 17 8 17 10C17 12 15 13 13 13" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="16" cy="9" r="1" fill="#f97316"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Yanai AI</h1>
+                </div>
 
-              <div class="space-y-3 mb-6">
-                  <button onclick="startNewChat()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700
-  dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
-                      <span class="text-lg">＋</span> New Chat
-                  </button>
-                  <button onclick="toggleLibrary()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700
-  dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
-                      <span>📚</span> Library
-                  </button>
-              </div>
+                <div class="space-y-3 mb-6">
+                    <button onclick="startNewChat()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700
+    dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
+                        <span class="text-lg">＋</span> New Chat
+                    </button>
+                    <button onclick="toggleLibrary()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700
+    dark:text-slate-300 rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm">
+                        <span>📚</span> Library
+                    </button>
+                </div>
 
-              <div class="mb-6">
-                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
-                  <div class="space-y-2" id="model-selector">
-                      <button onclick="setModel('nvidia/nemotron-3.5-super-vl', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500
-  text-white shadow-sm" data-model="nvidia/nemotron-3.5-super-vl">
-                          <div class="font-semibold">Nvidia Nemotron 3.5 Super VL</div>
-                          <div class="text-[10px] opacity-80">Vision, documents & complex logic</div>
-                      </button>
-                      <button onclick="setModel('nvidia/nemotron-3.5-lightning', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200
-  dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-model="nvidia/nemotron-3.5-lightning">
-                          <div class="font-semibold">Nvidia Nemotron 3.5 Lightning</div>
-                          <div class="text-[10px] opacity-70">Ultra-fast responses & efficiency</div>
-                      </button>
-                  </div>
-              </div>
+                <div class="mb-6">
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
+                    <div class="space-y-2" id="model-selector">
+                        <button onclick="setModel('nvidia/nemotron-3.5-super-vl', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500
+    text-white shadow-sm" data-model="nvidia/nemotron-3.5-super-vl">
+                            <div class="font-semibold">Nvidia Nemotron 3.5 Super VL</div>
+                            <div class="text-[10px] opacity-80">Vision, documents & complex logic</div>
+                        </button>
+                        <button onclick="setModel('nvidia/nemotron-3.5-lightning', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200
+    dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-model="nvidia/nemotron-3.5-lightning">
+                            <div class="font-semibold">Nvidia Nemotron 3.5 Lightning</div>
+                            <div class="text-[10px] opacity-70">Ultra-fast responses & efficiency</div>
+                        </button>
+                    </div>
+                </div>
 
-              <div class="flex-1 overflow-hidden flex flex-col">
-                  <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
-                  <div id="recent-chats-list" class="space-y-1 overflow-y-auto chat-container px-2 pb-4"></div>
-              </div>
+                <div class="flex-1 overflow-hidden flex flex-col">
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
+                    <div id="recent-chats-list" class="space-y-1 overflow-y-auto chat-container px-2 pb-4"></div>
+                </div>
 
-              <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800">
-                  <button onclick="toggleKeyModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
-  transition-all">
-                      <span>🔑</span> API Key
-                  </button>
-              </div>
-          </div>
-      </aside>
+                <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <button onclick="toggleKeyModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
+    transition-all">
+                        <span>🔑</span> API Key
+                    </button>
+                </div>
+            </div>
+        </aside>
 
-      <!-- Library Overlay -->
-      <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
-          <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
-  translate-x-full" id="library-panel">
-              <div class="flex items-center justify-between mb-8">
-                  <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Document Library</h3>
-                  <button onclick="toggleLibrary()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-all">✕</button>
-              </div>
-              <div id="library-list" class="space-y-3"></div>
-          </div>
-      </div>
+        <!-- Library Overlay -->
+        <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
+            <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
+    translate-x-full" id="library-panel">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Document Library</h3>
+                    <button onclick="toggleLibrary()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-all">✕</button>
+                </div>
 
-      <!-- API Key Modal -->
-      <div id="key-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-200 dark:border-slate-800 overflow-y-auto max-h-[90vh]">
-              <div class="text-center space-y-2">
-                  <h3 class="text-2xl font-bold text-slate-900 dark:text-white">API Configuration</h3>
-                  <p class="text-sm text-slate-500 dark:text-slate-400">Enter your OpenRouter key to start chatting</p>
-              </div>
-              <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-                  <p class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">How to get a key:</p>
-                  <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
-                      <li class="flex gap-2"><span class="font-bold text-brand-500">1.</span> <span>Go to <a href="https://openrouter.ai/" target="_blank" class="text-brand-600 dark:text-brand-400 underline
-  font-medium">openrouter.ai</a> and create an account.</span></li>
-                      <li class="flex gap-2"><span class="font-bold text-brand-500">2.</span> <span>Navigate to <span class="font-medium">Keys</span> in your dashboard settings.</span></li>
-                      <li class="flex gap-2"><span class="font-bold text-brand-500">3.</span> <span>Click <span class="font-medium">Create Key</span>, copy it.</span></li>
-                      <li class="flex gap-2"><span class="font-bold text-brand-500">4.</span> <span>Paste it into the box below and save.</span></li>
-                  </ul>
-              </div>
-              <input type="password" id="api-key-input" placeholder="sk-or-..." class="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none
-  focus:ring-2 focus:ring-brand-500 transition-all dark:text-white">
-              <div class="flex gap-3">
-                  <button onclick="toggleKeyModal()" class="flex-1 py-3 text-slate-500 dark:text-slate-400 font-medium rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Cancel</button>
-                  <button onclick="saveKey()" class="flex-1 py-3 bg-brand-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-brand-600 transition-all">Save Key</button>
-              </div>
-          </div>
-      </div>
+                <!-- NEW: Add Document Button and Hidden Input -->
+                <div class="mb-6">
+                    <button onclick="document.getElementById('library-file-input').click()" class="w-full py-3 px-4 bg-brand-500 text-white rounded-2xl font-semibold hover:bg-brand-600 transition-all text-sm
+  shadow-md flex items-center justify-center gap-2">
+                        <span>＋</span> Add Document to Library
+                    </button>
+                    <input type="file" id="library-file-input" class="hidden" onchange="handleLibraryFileUpload(event)">
+                </div>
 
-      <!-- Main Chat Area -->
-      <main class="flex-1 flex flex-col relative bg-slate-50 dark:bg-black">
-          <header class="h-16 flex items-center justify-between px-8 border-b border-slate-200 dark:border-slate-900 bg-white/80 dark:bg-black/50 backdrop-blur-md z-10">
-              <div class="flex items-center gap-4">
-                  <span id="current-model-display" class="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Nvidia Nemotron 3.5 Super VL</span>
-              </div>
-              <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all
-  hover:scale-110">
-                  <span id="theme-icon">🌙</span>
-              </button>
-          </header>
+                <div id="library-list" class="space-y-3"></div>
+            </div>
+        </div>
 
-          <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-0">
-              <div id="welcome-screen" class="max-w-2xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
-                  <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
-                  <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload a document, ask a complex question, or simply start a conversation.</p>
-              </div>
-              <div id="messages" class="max-w-3xl mx-auto space-y-8 pb-32"></div>
-          </div>
+        <!-- API Key Modal -->
+        <div id="key-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-200 dark:border-slate-800 overflow-y-auto max-h-[90vh]">
+                <div class="text-center space-y-2">
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white">API Configuration</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Enter your OpenRouter key to start chatting</p>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+                    <p class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">How to get a key:</p>
+                    <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
+                        <li class="flex gap-2"><span class="font-bold text-brand-500">1.</span> <span>Go to <a href="https://openrouter.ai/" target="_blank" class="text-brand-600 dark:text-brand-400 underline
+    font-medium">openrouter.ai</a> and create an account.</span></li>
+                        <li class="flex gap-2"><span class="font-bold text-brand-500">2.</span> <span>Navigate to <span class="font-medium">Keys</span> in your dashboard settings.</span></li>
+                        <li class="flex gap-2"><span class="font-bold text-brand-500">3.</span> <span>Click <span class="font-medium">Create Key</span>, copy it.</span></li>
+                        <li class="flex gap-2"><span class="font-bold text-brand-500">4.</span> <span>Paste it into the box below and save.</span></li>
+                    </ul>
+                </div>
+                <input type="password" id="api-key-input" placeholder="sk-or-..." class="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none
+    focus:ring-2 focus:ring-brand-500 transition-all dark:text-white">
+                <div class="flex gap-3">
+                    <button onclick="toggleKeyModal()" class="flex-1 py-3 text-slate-500 dark:text-slate-400 font-medium rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Cancel</button>
+                    <button onclick="saveKey()" class="flex-1 py-3 bg-brand-500 text-white font-semibold rounded-2xl shadow-lg hover:bg-brand-600 transition-all">Save Key</button>
+                </div>
+            </div>
+        </div>
 
-          <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50 dark:from-black via-slate-50 dark:via-black to-transparent">
-              <div class="max-w-3xl mx-auto relative">
-                  <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
-                      <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-full text-xs
-  font-semibold shadow-sm animate-pulse">
-                          <span>🔑</span> API Key required to chat
-                      </div>
-                  </div>
+        <!-- Main Chat Area -->
+        <main class="flex-1 flex flex-col relative bg-slate-50 dark:bg-black">
+            <header class="h-16 flex items-center justify-between px-8 border-b border-slate-200 dark:border-slate-900 bg-white/80 dark:bg-black/50 backdrop-blur-md z-10">
+                <div class="flex items-center gap-4">
+                    <span id="current-model-display" class="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Nvidia Nemotron 3.5 Super VL</span>
+                </div>
+                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all
+    hover:scale-110">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </header>
 
-                  <div id="file-preview" class="hidden absolute -top-14 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 flex items-center gap-3 shadow-lg
-  text-xs animate-bounce">
-                      <span class="text-lg">📄</span> <span id="preview-name" class="font-semibold dark:text-white">doc.pdf</span>
-                      <button onclick="clearFile()" class="text-slate-400 hover:text-red-500 transition-colors">✕</button>
-                  </div>
-                  <div class="glass-input flex items-center gap-3 p-4 rounded-[32px] bg-white/50 dark:bg-slate-900/50">
-                      <button onclick="document.getElementById('file-input').click()" class="p-3 text-slate-400 dark:text-slate-500 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                      </button>
-                      <textarea id="user-input" rows="1" placeholder="Message Yanai..." class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-2 text-slate-700 dark:text-slate-200 text-sm
-  leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+            <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-0">
+                <div id="welcome-screen" class="max-w-2xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
+                    <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload a document, ask a complex question, or simply start a conversation.</p>
+                </div>
+                <div id="messages" class="max-w-3xl mx-auto space-y-8 pb-32"></div>
+            </div>
 
-                      <div class="flex items-center gap-2">
-                          <button id="send-btn" onclick="handleSend()" class="p-3 bg-brand-500 text-white rounded-2xl shadow-lg shadow-brand-900/20 hover:bg-brand-600 disabled:opacity-50 transition-all
-  active:scale-95">
-                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7
-  7m-7-7v18"></path></svg>
-                          </button>
-                          <button id="stop-btn" onclick="stopResponse()" class="hidden p-3 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl shadow-sm hover:bg-slate-300
-  dark:hover:bg-slate-700 transition-all active:scale-95">
-                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-  12"></path></svg>
-                          </button>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </main>
+            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50 dark:from-black via-slate-50 dark:via-black to-transparent">
+                <div class="max-w-3xl mx-auto relative">
+                    <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-full
+  text-xs
+    font-semibold shadow-sm animate-pulse">
+                            <span>🔑</span> API Key required to chat
+                        </div>
+                    </div>
 
-      <input type="file" id="file-input" class="hidden" onchange="handleFileUpload(event)">
+                    <div id="file-preview" class="hidden absolute -top-14 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 flex items-center gap-3 shadow-lg
+    text-xs animate-bounce">
+                        <span class="text-lg">📄</span> <span id="preview-name" class="font-semibold dark:text-white">doc.pdf</span>
+                        <button onclick="clearFile()" class="text-slate-400 hover:text-red-500 transition-colors">✕</button>
+                    </div>
+                    <div class="glass-input flex items-center gap-3 p-4 rounded-[32px] bg-white/50 dark:bg-slate-900/50">
+                        <button onclick="document.getElementById('file-input').click()" class="p-3 text-slate-400 dark:text-slate-500 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        </button>
+                        <textarea id="user-input" rows="1" placeholder="Message Yanai..." class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-2 text-slate-700 dark:text-slate-200 text-sm
+    leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
 
-      <script>
-          const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
+                        <div class="flex items-center gap-2">
+                            <button id="send-btn" onclick="handleSend()" class="p-3 bg-brand-500 text-white rounded-2xl shadow-lg shadow-brand-900/20 hover:bg-brand-600 disabled:opacity-50 transition-all
+    active:scale-95">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7
+    7m-7-7v18"></path></svg>
+                            </button>
+                            <button id="stop-btn" onclick="stopResponse()" class="hidden p-3 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl shadow-sm hover:bg-slate-300
+    dark:hover:bg-slate-700 transition-all active:scale-95">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
+    12"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
 
-          let OR_API_KEY = "";
-          let MODEL = "nvidia/nemotron-3.5-super-vl";
-          let attachedFile = { name: '', content: '' };
-          let isGenerating = false;
-          let isTyping = false;
-          let timerInterval = null;
-          let currentAbortController = null;
+        <input type="file" id="file-input" class="hidden" onchange="handleFileUpload(event)">
 
-          let allChats = [];
-          let currentChatId = null;
-          let allUploadedDocs = [];
+        <script>
+            const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
 
-          function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
-          function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
+            let OR_API_KEY = "";
+            let MODEL = "nvidia/nemotron-3.5-super-vl";
+            let attachedFile = { name: '', content: '' };
+            let isGenerating = false;
+            let isTyping = false;
+            let timerInterval = null;
+            let currentAbortController = null;
 
-          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            let allChats = [];
+            let currentChatId = null;
+            let allUploadedDocs = [];
 
-          function init() {
-              const savedKey = safeStorageGet('yanai_or_key');
-              if (savedKey) OR_API_KEY = savedKey;
-              const savedChats = safeStorageGet('yanai_all_chats');
-              if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
-              const savedDocs = safeStorageGet('yanai_library');
-              if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
-              checkApiKeyStatus();
-              renderChatList();
-          }
+            function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+            function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
-          function renderChatList() {
-              const listContainer = document.getElementById('recent-chats-list');
-              listContainer.innerHTML = '';
-              const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
-              sortedChats.forEach(chat => {
-                  const item = document.createElement('div');
-                  item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
-  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
-                  item.onclick = () => loadChat(chat.id);
-                  item.innerHTML = `
-                      <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
-                      <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-  12"></path></svg>
-                      </button>`;
-                  listContainer.appendChild(item);
-              });
-          }
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-          function startNewChat() {
-              currentChatId = 'chat_' + Date.now();
-              allChats.push({ id: currentChatId, title: 'New Conversation', timestamp: Date.now(), messages: [] });
-              document.getElementById('messages').innerHTML = '';
-              document.getElementById('welcome-screen').classList.remove('hidden');
-              saveAllChats();
-              renderChatList();
-          }
+            function init() {
+                const savedKey = safeStorageGet('yanai_or_key');
+                if (savedKey) OR_API_KEY = savedKey;
+                const savedChats = safeStorageGet('yanai_all_chats');
+                if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
+                const savedDocs = safeStorageGet('yanai_library');
+                if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
+                checkApiKeyStatus();
+                renderChatList();
+            }
 
-          function loadChat(id) {
-              currentChatId = id;
-              const chat = allChats.find(c => c.id === id);
-              if (!chat) return;
-              document.getElementById('messages').innerHTML = '';
-              if (chat.messages.length === 0) {
-                  document.getElementById('welcome-screen').classList.remove('hidden');
-              } else {
-                  document.getElementById('welcome-screen').classList.add('hidden');
-                  chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
-              }
-              renderChatList();
-              scrollToBottom();
-          }
+            function renderChatList() {
+                const listContainer = document.getElementById('recent-chats-list');
+                listContainer.innerHTML = '';
+                const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
+                sortedChats.forEach(chat => {
+                    const item = document.createElement('div');
+                    item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
+    dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
+                    item.onclick = () => loadChat(chat.id);
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
+                        <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
+    12"></path></svg>
+                        </button>`;
+                    listContainer.appendChild(item);
+                });
+            }
 
-          function deleteChat(id) {
-              allChats = allChats.filter(c => c.id !== id);
-              saveAllChats();
-              renderChatList();
-              if (currentChatId === id) { currentChatId = null; document.getElementById('messages').innerHTML = ''; document.getElementById('welcome-screen').classList.remove('hidden'); }
-          }
+            function startNewChat() {
+                currentChatId = 'chat_' + Date.now();
+                allChats.push({ id: currentChatId, title: 'New Conversation', timestamp: Date.now(), messages: [] });
+                document.getElementById('messages').innerHTML = '';
+                document.getElementById('welcome-screen').classList.remove('hidden');
+                saveAllChats();
+                renderChatList();
+            }
 
-          function saveAllChats() { safeStorageSet('yanai_all_chats', JSON.stringify(allChats)); }
-          function saveLibrary() { safeStorageSet('yanai_library', JSON.stringify(allUploadedDocs)); }
+            function loadChat(id) {
+                currentChatId = id;
+                const chat = allChats.find(c => c.id === id);
+                if (!chat) return;
+                document.getElementById('messages').innerHTML = '';
+                if (chat.messages.length === 0) {
+                    document.getElementById('welcome-screen').classList.remove('hidden');
+                } else {
+                    document.getElementById('welcome-screen').classList.add('hidden');
+                    chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
+                }
+                renderChatList();
+                scrollToBottom();
+            }
 
-          function updateChatTitle(text) {
-              const chat = allChats.find(c => c.id === currentChatId);
-              if (chat && chat.title === 'New Conversation') {
-                  chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
-                  saveAllChats();
-                  renderChatList();
-              }
-          }
+            function deleteChat(id) {
+                allChats = allChats.filter(c => c.id !== id);
+                saveAllChats();
+                renderChatList();
+                if (currentChatId === id) { currentChatId = null; document.getElementById('messages').innerHTML = ''; document.getElementById('welcome-screen').classList.remove('hidden'); }
+            }
 
-          function setModel(modelId, btn) {
-              MODEL = modelId;
-              const display = document.getElementById('current-model-display');
-              display.innerText = btn.querySelector('.font-semibold').innerText;
-              document.querySelectorAll('.model-btn').forEach(b => {
-                  b.classList.remove('bg-brand-500', 'text-white', 'shadow-sm');
-                  b.classList.add('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
-              });
-              btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
-              btn.classList.add('bg-brand-500', 'text-white', 'shadow-sm');
-          }
+            function saveAllChats() { safeStorageSet('yanai_all_chats', JSON.stringify(allChats)); }
+            function saveLibrary() { safeStorageSet('yanai_library', JSON.stringify(allUploadedDocs)); }
 
-          function toggleTheme() {
-              const html = document.documentElement;
-              const icon = document.getElementById('theme-icon');
-              if (html.classList.contains('dark')) { html.classList.remove('dark'); icon.innerText = '🌙'; }
-              else { html.classList.add('dark'); icon.innerText = '☀️'; }
-          }
+            function updateChatTitle(text) {
+                const chat = allChats.find(c => c.id === currentChatId);
+                if (chat && chat.title === 'New Conversation') {
+                    chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
+                    saveAllChats();
+                    renderChatList();
+                }
+            }
 
-          function checkApiKeyStatus() {
-              const input = document.getElementById('user-input');
-              const btn = document.getElementById('send-btn');
-              const warning = document.getElementById('api-warning');
-              if (!OR_API_KEY) {
-                  input.disabled = true; input.placeholder = "API Key required to chat...";
-                  btn.disabled = true; warning.classList.remove('hidden');
-              } else {
-                  input.disabled = false; input.placeholder = "Message Yanai...";
-                  btn.disabled = false; warning.classList.add('hidden');
-              }
-          }
+            function setModel(modelId, btn) {
+                MODEL = modelId;
+                const display = document.getElementById('current-model-display');
+                display.innerText = btn.querySelector('.font-semibold').innerText;
+                document.querySelectorAll('.model-btn').forEach(b => {
+                    b.classList.remove('bg-brand-500', 'text-white', 'shadow-sm');
+                    b.classList.add('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
+                });
+                btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
+                btn.classList.add('bg-brand-500', 'text-white', 'shadow-sm');
+            }
 
-          function toggleKeyModal() {
-              document.getElementById('key-modal').classList.toggle('hidden');
-              document.getElementById('api-key-input').value = OR_API_KEY;
-          }
+            function toggleTheme() {
+                const html = document.documentElement;
+                const icon = document.getElementById('theme-icon');
+                if (html.classList.contains('dark')) { html.classList.remove('dark'); icon.innerText = '🌙'; }
+                else { html.classList.add('dark'); icon.innerText = '☀️'; }
+            }
 
-          function saveKey() {
-              OR_API_KEY = document.getElementById('api-key-input').value.trim();
-              safeStorageSet('yanai_or_key', OR_API_KEY);
-              toggleKeyModal();
-              checkApiKeyStatus();
-          }
+            function checkApiKeyStatus() {
+                const input = document.getElementById('user-input');
+                const btn = document.getElementById('send-btn');
+                const warning = document.getElementById('api-warning');
+                if (!OR_API_KEY) {
+                    input.disabled = true; input.placeholder = "API Key required to chat...";
+                    btn.disabled = true; warning.classList.remove('hidden');
+                } else {
+                    input.disabled = false; input.placeholder = "Message Yanai...";
+                    btn.disabled = false; warning.classList.add('hidden');
+                }
+            }
 
-          function toggleLibrary() {
-              const overlay = document.getElementById('library-overlay');
-              const panel = document.getElementById('library-panel');
-              if (overlay.classList.contains('hidden')) {
-                  overlay.classList.remove('hidden');
-                  setTimeout(() => panel.classList.remove('translate-x-full'), 10);
-                  renderLibrary();
-              } else {
-                  panel.classList.add('translate-x-full');
-                  setTimeout(() => overlay.classList.add('hidden'), 300);
-              }
-          }
+            function toggleKeyModal() {
+                document.getElementById('key-modal').classList.toggle('hidden');
+                document.getElementById('api-key-input').value = OR_API_KEY;
+            }
 
-          function renderLibrary() {
-              const list = document.getElementById('library-list');
-              list.innerHTML = '';
-              if (allUploadedDocs.length === 0) {
-                  list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
-                  return;
-              }
-              allUploadedDocs.forEach((doc, index) => {
-                  const div = document.createElement('div');
-                  div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group";
-                  div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
-                                    <div class="flex items-center gap-3">
-                                      <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>
-                                      <button onclick="deleteDoc(${index})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-all">✕</button>
-                                    </div>`;
-                  list.appendChild(div);
-              });
-          }
+            function saveKey() {
+                OR_API_KEY = document.getElementById('api-key-input').value.trim();
+                safeStorageSet('yanai_or_key', OR_API_KEY);
+                toggleKeyModal();
+                checkApiKeyStatus();
+            }
 
-          function deleteDoc(index) {
-              allUploadedDocs.splice(index, 1);
-              saveLibrary();
-              renderLibrary();
-          }
+            function toggleLibrary() {
+                const overlay = document.getElementById('library-overlay');
+                const panel = document.getElementById('library-panel');
+                if (overlay.classList.contains('hidden')) {
+                    overlay.classList.remove('hidden');
+                    setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+                    renderLibrary();
+                } else {
+                    panel.classList.add('translate-x-full');
+                    setTimeout(() => overlay.classList.add('hidden'), 300);
+                }
+            }
 
-          async function handleFileUpload(e) {
-              const file = e.target.files[0];
-              if (!file) return;
-              attachedFile.name = file.name;
-              document.getElementById('preview-name').innerText = file.name;
-              document.getElementById('file-preview').classList.remove('hidden');
-              try {
-                  let text = "";
-                  if (file.type === 'application/pdf') {
-                      const arrayBuffer = await file.arrayBuffer();
-                      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                      for (let i = 1; i <= pdf.numPages; i++) {
-                          const page = await pdf.getPage(i);
-                          const content = await page.getTextContent();
-                          text += content.items.map(s => s.str).join(" ") + "\n";
-                      }
-                  } else if (file.name.endsWith('.docx')) {
-                      const arrayBuffer = await file.arrayBuffer();
-                      const result = await mammoth.extractRawText({ arrayBuffer });
-                      text = result.value;
-                  } else {
-                      text = await file.text();
-                  }
-                  attachedFile.content = text;
-                  allUploadedDocs.push({ name: file.name, date: Date.now(), content: text });
-                  saveLibrary();
-              } catch (err) { alert("File Error: " + err.message); }
-          }
+            function renderLibrary() {
+                const list = document.getElementById('library-list');
+                list.innerHTML = '';
+                if (allUploadedDocs.length === 0) {
+                    list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
+                    return;
+                }
+                allUploadedDocs.forEach((doc, index) => {
+                    const div = document.createElement('div');
+                    div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group";
+                    div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
+                                      <div class="flex items-center gap-3">
+                                        <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>
+                                        <button onclick="deleteDoc(${index})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-all">✕</button>
+                                      </div>`;
+                    list.appendChild(div);
+                });
+            }
 
-          function clearFile() { attachedFile = { name: '', content: '' }; document.getElementById('file-preview').classList.add('hidden'); }
+            function deleteDoc(index) {
+                allUploadedDocs.splice(index, 1);
+                saveLibrary();
+                renderLibrary();
+            }
 
-          function retrieveContext(query) {
-              if (!allUploadedDocs || allUploadedDocs.length === 0) return "";
-              const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
-              let relevantSnippets = [];
-              allUploadedDocs.forEach(doc => {
-                  if (!doc || !doc.content) return;
-                  const content = doc.content.toLowerCase();
-                  const foundKeywords = keywords.filter(kw => content.includes(kw));
-                  if (foundKeywords.length > 0) {
-                      const firstKw = foundKeywords[0];
-                      const index = content.indexOf(firstKw);
-                      const start = Math.max(0, index - 500);
-                      const end = Math.min(doc.content.length, index + 500);
-                      relevantSnippets.push(`[Source: ${doc.name}]\n${doc.content.substring(start, end)}`);
-                  }
-              });
-              return relevantSnippets.length > 0
-                  ? "\n\n### REFERENCE KNOWLEDGE ###\n" + relevantSnippets.join("\n\n") + "\n### END REFERENCE ###"
-                  : "";
-          }
+            // Utility function for extracting text (Shared by both upload methods)
+            async function extractTextFromFile(file) {
+                if (file.type === 'application/pdf') {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    let text = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const content = await page.getTextContent();
+                        text += content.items.map(s => s.str).join(" ") + "\n";
+                    }
+                    return text;
+                } else if (file.name.endsWith('.docx')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer });
+                    return result.value;
+                } else {
+                    return await file.text();
+                }
+            }
 
-          async function typeWriter(element, text) {
-              let i = 0;
-              const speed = 5;
-              function type() {
-                  if (i < text.length && isTyping) {
-                      element.innerHTML = marked.parse(text.substring(0, i + 1));
-                      i++;
-                      setTimeout(type, speed);
-                      scrollToBottom();
-                  } else {
-                      if (i >= text.length) {
-                          isTyping = false;
-                          updateInputButtons();
-                      }
-                  }
-              }
-              type();
-          }
+            async function handleFileUpload(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                attachedFile.name = file.name;
+                document.getElementById('preview-name').innerText = file.name;
+                document.getElementById('file-preview').classList.remove('hidden');
+                try {
+                    const text = await extractTextFromFile(file);
+                    attachedFile.content = text;
+                    // Also add to library automatically when uploaded via chat
+                    allUploadedDocs.push({ name: file.name, date: Date.now(), content: text });
+                    saveLibrary();
+                } catch (err) { alert("File Error: " + err.message); }
+            }
 
-          function appendMessage(role, text, save = true) {
-              const container = document.getElementById('messages');
-              const msgDiv = document.createElement('div');
-              msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+            // NEW: Handle upload specifically for the Library tab
+            async function handleLibraryFileUpload(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    const text = await extractTextFromFile(file);
+                    allUploadedDocs.push({ name: file.name, date: Date.now(), content: text });
+                    saveLibrary();
+                    renderLibrary();
+                    alert(`Successfully added ${file.name} to your library!`);
+                } catch (err) {
+                    alert("File Error: " + err.message);
+                }
+            }
 
-              if (role === 'user') {
-                  msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
-              } else {
-                  msgDiv.innerHTML = `<div class="max-w-[90%] p-4 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
-                  const target = msgDiv.querySelector('.typing-target');
-                  if (!save) {
-                      target.innerHTML = marked.parse(text);
-                  } else {
-                      typeWriter(target, text);
-                  }
-              }
-              container.appendChild(msgDiv);
-              scrollToBottom();
+            function clearFile() { attachedFile = { name: '', content: '' }; document.getElementById('file-preview').classList.add('hidden'); }
 
-              if (save) {
-                  const chat = allChats.find(c => c.id === currentChatId);
-                  if (chat) {
-                      chat.messages.push({ role, content: text });
-                      if (role === 'user') updateChatTitle(text);
-                      saveAllChats();
-                  }
-              }
-          }
+            function retrieveContext(query) {
+                if (!allUploadedDocs || allUploadedDocs.length === 0) return "";
+                const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
+                let relevantSnippets = [];
+                allUploadedDocs.forEach(doc => {
+                    if (!doc || !doc.content) return;
+                    const content = doc.content.toLowerCase();
+                    const foundKeywords = keywords.filter(kw => content.includes(kw));
+                    if (foundKeywords.length > 0) {
+                        const firstKw = foundKeywords[0];
+                        const index = content.indexOf(firstKw);
+                        const start = Math.max(0, index - 500);
+                        const end = Math.min(doc.content.length, index + 500);
+                        relevantSnippets.push(`[Source: ${doc.name}]\n${doc.content.substring(start, end)}`);
+                    }
+                });
+                return relevantSnippets.length > 0
+                    ? "\n\n### REFERENCE KNOWLEDGE ###\n" + relevantSnippets.join("\n\n") + "\n### END REFERENCE ###"
+                    : "";
+            }
 
-          function scrollToBottom() {
-              const win = document.getElementById('chat-window');
-              win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
-          }
+            async function typeWriter(element, text) {
+                let i = 0;
+                const speed = 5;
+                function type() {
+                    if (i < text.length && isTyping) {
+                        element.innerHTML = marked.parse(text.substring(0, i + 1));
+                        i++;
+                        setTimeout(type, speed);
+                        scrollToBottom();
+                    } else {
+                        if (i >= text.length) {
+                            isTyping = false;
+                            updateInputButtons();
+                        }
+                    }
+                }
+                type();
+            }
 
-          function stopResponse() {
-              if (currentAbortController) {
-                  currentAbortController.abort();
-              }
-              isGenerating = false;
-              isTyping = false;
-              updateInputButtons();
-          }
+            function appendMessage(role, text, save = true) {
+                const container = document.getElementById('messages');
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
 
-          function updateInputButtons() {
-              const sendBtn = document.getElementById('send-btn');
-              const stopBtn = document.getElementById('stop-btn');
-              if (isGenerating || isTyping) {
-                  sendBtn.classList.add('hidden');
-                  stopBtn.classList.remove('hidden');
-              } else {
-                  sendBtn.classList.remove('hidden');
-                  stopBtn.classList.add('hidden');
-              }
-          }
+                if (role === 'user') {
+                    msgDiv.innerHTML = `<div class="max-w-[80%] p-4 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
+                } else {
+                    msgDiv.innerHTML = `<div class="max-w-[90%] p-4 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
+                    const target = msgDiv.querySelector('.typing-target');
+                    if (!save) {
+                        target.innerHTML = marked.parse(text);
+                    } else {
+                        typeWriter(target, text);
+                    }
+                }
+                container.appendChild(msgDiv);
+                scrollToBottom();
 
-          async function handleSend() {
-              const input = document.getElementById('user-input');
-              const text = input.value.trim();
+                if (save) {
+                    const chat = allChats.find(c => c.id === currentChatId);
+                    if (chat) {
+                        chat.messages.push({ role, content: text });
+                        if (role === 'user') updateChatTitle(text);
+                        saveAllChats();
+                    }
+                }
+            }
 
-              if (!OR_API_KEY) return alert("Set OpenRouter Key first!");
-              if (!text && !attachedFile.content) return;
-              if (isGenerating) return;
+            function scrollToBottom() {
+                const win = document.getElementById('chat-window');
+                win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
+            }
 
-              if (!currentChatId) startNewChat();
+            function stopResponse() {
+                if (currentAbortController) {
+                    currentAbortController.abort();
+                }
+                isGenerating = false;
+                isTyping = false;
+                updateInputButtons();
+            }
 
-              document.getElementById('welcome-screen').classList.add('hidden');
+            function updateInputButtons() {
+                const sendBtn = document.getElementById('send-btn');
+                const stopBtn = document.getElementById('stop-btn');
+                if (isGenerating || isTyping) {
+                    sendBtn.classList.add('hidden');
+                    stopBtn.classList.remove('hidden');
+                } else {
+                    sendBtn.classList.remove('hidden');
+                    stopBtn.classList.add('hidden');
+                }
+            }
 
-              const libraryContext = retrieveContext(text);
-              let fullPrompt = "";
-              if (attachedFile.content) {
-                  const userQuestion = text || "Please summarize this document and highlight the key points.";
-                  fullPrompt = `SYSTEM: You are analyzing a provided document. Use the context below to answer the user's request.\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n\nUSER REQUEST:
-  ${userQuestion}`;
-              } else {
-                  fullPrompt = `${text}${libraryContext}`;
-              }
+            async function handleSend() {
+                const input = document.getElementById('user-input');
+                const text = input.value.trim();
 
-              const displayUserText = text || (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!");
-              appendMessage('user', displayUserText);
+                if (!OR_API_KEY) return alert("Set OpenRouter Key first!");
+                if (!text && !attachedFile.content) return;
+                if (isGenerating) return;
 
-              input.value = '';
-              input.style.height = '';
-              clearFile();
+                if (!currentChatId) startNewChat();
 
-              isGenerating = true;
-              updateInputButtons();
+                document.getElementById('welcome-screen').classList.add('hidden');
 
-              const startTime = Date.now();
-              const loadingDiv = document.createElement('div');
-              loadingDiv.className = 'flex justify-start message-appear';
-              loadingDiv.innerHTML = `
-                  <div class="ai-msg p-4 flex items-center gap-4">
-                      <div class="ai-core">
-                          <div class="core-center"></div>
-                          <div class="core-ring ring-1"></div>
-                          <div class="core-ring ring-2"></div>
-                      </div>
-                      <span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span>
-                  </div>`;
-              document.getElementById('messages').appendChild(loadingDiv);
+                const libraryContext = retrieveContext(text);
+                let fullPrompt = "";
+                if (attachedFile.content) {
+                    const userQuestion = text || "Please summarize this document and highlight the key points.";
+                    fullPrompt = `SYSTEM: You are analyzing a provided document. Use the context below to answer the user's request.\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n\nUSER REQUEST:
+    ${userQuestion}`;
+                } else {
+                    fullPrompt = `${text}${libraryContext}`;
+                }
 
-              timerInterval = setInterval(() => {
-                  const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                  const timerSpan = document.getElementById('timer-text');
-                  if (timerSpan) timerSpan.innerText = `Yanai is thinking... ${elapsed}s`;
-              }, 1000);
+                const displayUserText = text || (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!");
+                appendMessage('user', displayUserText);
 
-              try {
-                  const chat = allChats.find(c => c.id === currentChatId);
-                  const history = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
+                input.value = '';
+                input.style.height = '';
+                clearFile();
 
-                  currentAbortController = new AbortController();
-                  const timeoutId = setTimeout(() => currentAbortController.abort(), 60000);
+                isGenerating = true;
+                updateInputButtons();
 
-                  const response = await fetch(API_PROXY_URL, {
-                      method: 'POST',
-                      signal: currentAbortController.signal,
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                          headers: { Authorization: `Bearer ${OR_API_KEY}` },
-                          model: MODEL,
-                          messages: [
-                              { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' },
-                              ...history,
-                              { role: 'user', content: fullPrompt }
-                          ]
-                      })
-                  });
+                const startTime = Date.now();
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'flex justify-start message-appear';
+                loadingDiv.innerHTML = `
+                    <div class="ai-msg p-4 flex items-center gap-4">
+                        <div class="ai-core">
+                            <div class="core-center"></div>
+                            <div class="core-ring ring-1"></div>
+                            <div class="core-ring ring-2"></div>
+                        </div>
+                        <span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span>
+                    </div>`;
+                document.getElementById('messages').appendChild(loadingDiv);
 
-                  clearTimeout(timeoutId);
-                  const data = await response.json();
+                timerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                    const timerSpan = document.getElementById('timer-text');
+                    if (timerSpan) timerSpan.innerText = `Yanai is thinking... ${elapsed}s`;
+                }, 1000);
 
-                  if (data.error) throw new Error(data.error.message || "API Error occurred");
-                  if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
+                try {
+                    const chat = allChats.find(c => c.id === currentChatId);
+                    const history = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
 
-                  loadingDiv.remove();
+                    currentAbortController = new AbortController();
+                    const timeoutId = setTimeout(() => currentAbortController.abort(), 60000);
 
-                  isTyping = true;
-                  appendMessage('ai', data.choices[0].message.content);
-              } catch (e) {
-                  console.error(e);
-                  if (e.name === 'AbortError') {
-                      loadingDiv.innerHTML = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl text-slate-500 dark:text-slate-400 text-sm">Response stopped by user.</div>`;
-                  } else {
-                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
-                          ${e.name === 'AbortError' ? 'Request timed out.' : 'Error: ' + e.message}
-                      </div>`;
-                  }
-              } finally {
-                  clearInterval(timerInterval);
-                  isGenerating = false;
-                  currentAbortController = null;
-              }
-          }
+                    const response = await fetch(API_PROXY_URL, {
+                        method: 'POST',
+                        signal: currentAbortController.signal,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            headers: { Authorization: `Bearer ${OR_API_KEY}` },
+                            model: MODEL,
+                            messages: [
+                                { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' },
+                                ...history,
+                                { role: 'user', content: fullPrompt }
+                            ]
+                        })
+                    });
 
-          init();
-      </script>
-  </body>
-  </html>
+                    clearTimeout(timeoutId);
+                    const data = await response.json();
+
+                    if (data.error) throw new Error(data.error.message || "API Error occurred");
+                    if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
+
+                    loadingDiv.remove();
+
+                    isTyping = true;
+                    appendMessage('ai', data.choices[0].message.content);
+                } catch (e) {
+                    console.error(e);
+                    if (e.name === 'AbortError') {
+                        loadingDiv.innerHTML = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl text-slate-500 dark:text-slate-400 text-sm">Response stopped by user.</div>`;
+                    } else {
+                        loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
+                            ${e.name === 'AbortError' ? 'Request timed out.' : 'Error: ' + e.message}
+                        </div>`;
+                    }
+                } finally {
+                    clearInterval(timerInterval);
+                    isGenerating = false;
+                    currentAbortController = null;
+                }
+            }
+
+            init();
+        </script>
+    </body>
+    </html>
