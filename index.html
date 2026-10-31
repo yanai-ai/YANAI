@@ -141,9 +141,11 @@
                 <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1">
                     <button onclick="toggleSettingsModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
     transition-all group overflow-hidden">
-                        <svg class="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
-    stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.457 3.043.72 3.043 2.466v10.5c0 1.746-1.5 2.924-3.043 2.466a1.724 1.724 0
-    00-2.573-1.066c-1.543.457-3.043-.72-3.043-2.466v-10.5c0-1.746 1.5-2.924 3.043-2.466z"></path></svg>
+                        <svg class="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.457 3.043.72 3.043 2.466v10.5c0
+  1.746-1.5 2.924-3.043 2.466a1.724 1.724 0 00-2.573-1.066c-1.543.457-3.043-.72-3.043-2.466v-10.5c0-1.746 1.5-2.924 3.043-2.466z"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12v.01M12 8v.01M12 16v.01"></path>
+                        </svg>
                         <span class="whitespace-nowrap">Settings</span>
                     </button>
                 </div>
@@ -326,6 +328,7 @@
 
         <script>
             const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
+            const VISION_MODELS = ['nvidia/nemotron-3.5-super-vl'];
 
             let OR_API_KEY = "";
             let MODEL = "nvidia/nemotron-3.5-super-vl";
@@ -387,7 +390,6 @@
                 checkApiKeyStatus();
                 renderChatList();
 
-                // Setup clipboard paste listener
                 window.addEventListener('paste', handlePaste);
             }
 
@@ -612,7 +614,6 @@
                 }
             }
 
-            // Image Logic
             async function handleImageUpload(e) {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -625,8 +626,6 @@
                     reader.onload = (e) => {
                         const base64 = e.target.result;
                         attachedImages.push({ name: file.name, base64: base64 });
-
-                        // Update preview
                         document.getElementById('preview-name').innerText =
                             attachedImages.length === 1 ? file.name : `${attachedImages.length} images`;
                         document.getElementById('file-preview').classList.remove('hidden');
@@ -659,7 +658,6 @@
                 menu.classList.toggle('hidden');
             }
 
-            // Close menu when clicking outside
             window.addEventListener('click', (e) => {
                 if (!e.target.closest('#attach-btn') && !e.target.closest('#attach-menu')) {
                     document.getElementById('attach-menu').classList.add('hidden');
@@ -775,50 +773,35 @@
                 if (!text && !attachedFile.content && attachedImages.length === 0) return;
                 if (isGenerating) return;
 
-                if (!currentChatId) startNewChat();
+                // Vision Guard
+                if (attachedImages.length > 0 && !VISION_MODELS.includes(MODEL)) {
+                    const confirmSwitch = confirm(
+                        `The current model (${MODEL.split('/').pop()}) does not support images. \n\nWould you like to switch to the Vision model (Super VL) to analyze these images?`
+                    );
+                    if (confirmSwitch) {
+                        const vlBtn = document.querySelector(`[data-model="nvidia/nemotron-3.5-super-vl"]`);
+                        if (vlBtn) setModel('nvidia/nemotron-3.5-super-vl', vlBtn);
+                        else return alert("Vision model not found.");
+                    } else return;
+                }
 
+                if (!currentChatId) startNewChat();
                 document.getElementById('welcome-screen').classList.add('hidden');
 
                 const libraryContext = retrieveContext(text);
-
-                // Construct the multi-modal prompt
                 let userContent = [];
-
-                if (text) {
-                    userContent.push({ type: "text", text: text || "Analyze this." });
-                }
-
-                // Add images as content blocks
-                attachedImages.forEach(img => {
-                    userContent.push({
-                        type: "image_url",
-                        image_url: { url: img.base64 }
-                    });
-                });
-
-                // Handle document content
+                if (text) userContent.push({ type: "text", text: text });
+                attachedImages.forEach(img => userContent.push({ type: "image_url", image_url: { url: img.base64 } }));
                 if (attachedFile.content) {
                     const docText = `\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n`;
-                    if (userContent.length > 0 && userContent[0].type === "text") {
-                        userContent[0].text = docText + userContent[0].text;
-                    } else {
-                        userContent.unshift({ type: "text", text: docText });
-                    }
+                    if (userContent.length > 0 && userContent[0].type === "text") userContent[0].text = docText + userContent[0].text;
+                    else userContent.unshift({ type: "text", text: docText });
                 }
-
-                // If nothing was added to content, add a default
-                if (userContent.length === 0) {
-                    userContent.push({ type: "text", text: "Hello!" });
-                }
-
-                // Merge library context into the first text block
+                if (userContent.length === 0) userContent.push({ type: "text", text: "Hello!" });
                 if (libraryContext) {
                     const firstText = userContent.find(c => c.type === "text");
-                    if (firstText) {
-                        firstText.text += libraryContext;
-                    } else {
-                        userContent.push({ type: "text", text: libraryContext });
-                    }
+                    if (firstText) firstText.text += libraryContext;
+                    else userContent.push({ type: "text", text: libraryContext });
                 }
 
                 const displayUserText = text || (attachedImages.length > 0 ? `${attachedImages.length} images` : (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!"));
@@ -854,7 +837,6 @@
                 try {
                     const chat = allChats.find(c => c.id === currentChatId);
                     const history = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
-
                     currentAbortController = new AbortController();
                     const timeoutId = setTimeout(() => currentAbortController.abort(), 60000);
 
@@ -875,12 +857,10 @@
 
                     clearTimeout(timeoutId);
                     const data = await response.json();
-
                     if (data.error) throw new Error(data.error.message || "API Error occurred");
                     if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
 
                     loadingDiv.remove();
-
                     isTyping = true;
                     appendMessage('ai', data.choices[0].message.content);
                 } catch (e) {
@@ -896,6 +876,7 @@
                     clearInterval(timerInterval);
                     isGenerating = false;
                     currentAbortController = null;
+                    updateInputButtons(); // Fixed Bug: Ensures X button reverts to Send button on error
                 }
             }
 
