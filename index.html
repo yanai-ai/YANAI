@@ -16,9 +16,10 @@
                     extend: {
                         colors: {
                             brand: {
-                                50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
-                                400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c',
-                                800: '#9a3412', 900: '#7c2d12',
+                                DEFAULT: 'var(--brand-color)',
+                                50: 'var(--brand-50)', 100: 'var(--brand-100)', 200: 'var(--brand-200)',
+                                300: 'var(--brand-300)', 400: 'var(--brand-400)', 500: 'var(--brand-500)',
+                                600: 'var(--brand-600)', 700: 'var(--brand-700)', 800: 'var(--brand-800)', 900: 'var(--brand-900)',
                             }
                         }
                     }
@@ -26,6 +27,13 @@
             }
         </script>
         <style>
+            :root {
+                --brand-color: #f97316;
+                --brand-50: #fff7ed; --brand-100: #ffedd5; --brand-200: #fed7aa; --brand-300: #fdba74;
+                --brand-400: #fb923c; --brand-500: #f97316; --brand-600: #ea580c; --brand-700: #c2410c;
+                --brand-800: #9a3412; --brand-900: #7c2d12;
+            }
+
             body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; }
             .chat-container::-webkit-scrollbar { width: 5px; }
             .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -35,50 +43,42 @@
 
             /* AI Prose Styling */
             .prose-ai { line-height: 1.7; color: inherit; font-size: 1.05rem; }
-            .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #f97316; letter-spacing: -0.02em; }
-            .dark .prose-ai h1 { color: #fdba74; }
-            .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(249,115,22,0.2); padding-bottom: 0.25rem; }
+            .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: var(--brand-color); letter-spacing: -0.02em; }
+            .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(var(--brand-rgb), 0.2); padding-bottom: 0.25rem; }
             .prose-ai p { margin-bottom: 1.25rem; }
             .prose-ai strong { font-weight: 700; color: #1e293b; }
             .dark .prose-ai strong { color: #f1f5f9; }
             .prose-ai ul { list-style-type: none; margin-left: 0.5rem; margin-bottom: 1.25rem; }
             .prose-ai ul li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; }
-            .prose-ai ul li::before { content: "•"; position: absolute; left: 0; color: #f97316; font-weight: bold; }
+            .prose-ai ul li::before { content: "•"; position: absolute; left: 0; color: var(--brand-color); font-weight: bold; }
             .prose-ai ol { list-style-type: none; margin-left: 0.5rem; margin-bottom: 1.25rem; counter-reset: item; }
             .prose-ai ol li { position: relative; padding-left: 2rem; margin-bottom: 0.5rem; counter-increment: item; }
-            .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: #f97316; font-weight: 800; }
+            .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: var(--brand-color); font-weight: 800; }
             .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
             .dark .prose-ai code { background: rgba(255,255,255,0.1); }
 
             /* Message Bubbles */
-            .user-msg { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2); font-size: 1.05rem; }
+            .user-msg { background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-700) 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); font-size:
+  1.05rem; }
             .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 1.05rem; }
             .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
 
             /* AI Core Animation */
             .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-            .core-center { width: 8px; height: 8px; background: #f97316; border-radius: 50%; z-index: 10; box-shadow: 0 0 12px #f97316; animation: pulse-glow 1.5s infinite ease-in-out; }
-            .core-ring { position: absolute; border: 2px solid #f97316; border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+            .core-center { width: 8px; height: 8px; background: var(--brand-color); border-radius: 50%; z-index: 10; box-shadow: 0 0 12px var(--brand-color); animation: pulse-glow 1.5s infinite ease-in-out; }
+            .core-ring { position: absolute; border: 2px solid var(--brand-color); border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
             .ring-1 { width: 12px; height: 12px; animation-delay: 0s; }
             .ring-2 { width: 20px; height: 20px; animation-delay: 0.6s; }
-            @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px #f97316; } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px #f97316; } }
+            @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px var(--brand-color); } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px var(--brand-color); } }
             @keyframes orbit { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
 
             .glass-input { backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(0, 0, 0, 0.05); }
             .dark .glass-input { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); }
-            .chat-item.active { background: rgba(249, 115, 22, 0.1); border-color: #f97316; color: #f97316; }
-            .dark .chat-item.active { background: rgba(249, 115, 22, 0.2); border-color: #f97316; color: #fdba74; }
+            .chat-item.active { background: rgba(var(--brand-rgb), 0.1); border-color: var(--brand-color); color: var(--brand-color); }
+            .dark .chat-item.active { background: rgba(var(--brand-rgb), 0.2); border-color: var(--brand-color); color: var(--brand-color); }
 
-            /* Sidebar Resizer */
-            #sidebar-resizer {
-                width: 4px;
-                cursor: col-resize;
-                transition: background 0.2s;
-                z-index: 20;
-            }
-            #sidebar-resizer:hover {
-                background: #f97316;
-            }
+            #sidebar-resizer { width: 4px; cursor: col-resize; transition: background 0.2s; z-index: 20; }
+            #sidebar-resizer:hover { background: var(--brand-color); }
         </style>
     </head>
     <body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-100">
@@ -90,11 +90,11 @@
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-9 h-9 bg-white dark:bg-slate-900 rounded-xl flex-shrink-0 flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 10C18 10 19 8 20 8C21 8 22 9 22 11C22 13 20 13 20 13C20 13 20 15 18 16C16 17 14 16 14 16" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-                                <path d="M12 7C12 7 11 4 8 4C5 4 4 6 4 9C4 12 6 13 8 13C10 13 11 11 11 11L12 13C12 15 11 17 9 18C7 19 5 18 5 18" stroke="#f97316" stroke-width="2" stroke-linecap="round"
-    stroke-linejoin="round"/>
-                                <path d="M12 7L14 7C16 7 17 8 17 10C17 12 15 13 13 13" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-                                <circle cx="16" cy="9" r="1" fill="#f97316"/>
+                                <path d="M18 10C18 10 19 8 20 8C21 8 22 9 22 11C22 13 20 13 20 13C20 13 20 15 18 16C16 17 14 16 14 16" stroke="var(--brand-color)" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 7C12 7 11 4 8 4C5 4 4 6 4 9C4 12 6 13 8 13C10 13 11 11 11 11L12 13C12 15 11 17 9 18C7 19 5 18 5 18" stroke="var(--brand-color)" stroke-width="2"
+  stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 7L14 7C16 7 17 8 17 10C17 12 15 13 13 13" stroke="var(--brand-color)" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="16" cy="9" r="1" fill="var(--brand-color)"/>
                             </svg>
                         </div>
                         <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">Yanai AI</h1>
@@ -103,16 +103,16 @@
 
                 <div class="space-y-3 mb-6">
                     <button onclick="startNewChat()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
-    rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
+  rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
                         <svg class="w-4 h-4 text-brand-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
-    stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+  stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         <span class="whitespace-nowrap">New Chat</span>
                     </button>
                     <button onclick="toggleLibrary()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
-    rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
+  rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
                         <svg class="w-4 h-4 text-brand-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
-    stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477
-    4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+  stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477
+  4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                         <span class="whitespace-nowrap">Library</span>
                     </button>
                 </div>
@@ -121,12 +121,12 @@
                     <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
                     <div class="space-y-2" id="model-selector">
                         <button onclick="setModel('nvidia/nemotron-3.5-super-vl', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500
-    text-white shadow-sm overflow-hidden" data-model="nvidia/nemotron-3.5-super-vl">
+  text-white shadow-sm overflow-hidden" data-model="nvidia/nemotron-3.5-super-vl">
                             <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Super VL</div>
                             <div class="text-[10px] opacity-80 whitespace-nowrap">Vision & complex logic</div>
                         </button>
                         <button onclick="setModel('nvidia/nemotron-3.5-lightning', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200
-    dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 overflow-hidden" data-model="nvidia/nemotron-3.5-lightning">
+  dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 overflow-hidden" data-model="nvidia/nemotron-3.5-lightning">
                             <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Lightning</div>
                             <div class="text-[10px] opacity-70 whitespace-nowrap">Ultra-fast responses</div>
                         </button>
@@ -140,105 +140,131 @@
 
                 <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1">
                     <button onclick="toggleSettingsModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
-    transition-all group overflow-hidden">
-                        <svg class="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  transition-all group overflow-hidden">
+                        <!-- GEAR ICON FIX -->
+                        <svg class="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.457 3.043.72 3.043 2.466v10.5c0
   1.746-1.5 2.924-3.043 2.466a1.724 1.724 0 00-2.573-1.066c-1.543.457-3.043-.72-3.043-2.466v-10.5c0-1.746 1.5-2.924 3.043-2.466z"></path>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12v.01M12 8v.01M12 16v.01"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01"></path>
                         </svg>
                         <span class="whitespace-nowrap">Settings</span>
                     </button>
                 </div>
             </div>
-            <!-- Resizer Handle -->
             <div id="sidebar-resizer" class="absolute right-0 top-0 h-full hover:bg-brand-500"></div>
         </aside>
 
         <!-- Library Overlay -->
         <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
             <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
-    translate-x-full" id="library-panel">
+  translate-x-full" id="library-panel">
                 <div class="flex items-center justify-between mb-8">
                     <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Document Library</h3>
                     <button onclick="toggleLibrary()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-all">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-
                 <div class="mb-6">
                     <button onclick="document.getElementById('library-file-input').click()" class="w-full py-3 px-4 bg-brand-500 text-white rounded-2xl font-semibold hover:bg-brand-600 transition-all text-sm
-    shadow-md flex items-center justify-center gap-2 group">
+  shadow-md flex items-center justify-center gap-2 group">
                         <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-  stroke-width="2"
-    d="M12 4v16m8-8H4"></path></svg>
+  stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Add Document to Library
                     </button>
                     <input type="file" id="library-file-input" class="hidden" onchange="handleLibraryFileUpload(event)">
                 </div>
-
                 <div id="library-list" class="space-y-3"></div>
             </div>
         </div>
 
         <!-- Settings Modal -->
         <div id="settings-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl p-8 space-y-8 border border-slate-200 dark:border-slate-800 overflow-y-auto max-h-[90vh]">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Settings</h3>
-                    <button onclick="toggleSettingsModal()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
+            <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
+                <!-- Settings Tabs Header -->
+                <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                    <button onclick="switchSettingTab('general')" id="tab-general" class="flex-1 py-4 text-sm font-bold transition-all border-b-2 border-brand-500 text-brand-500">General</button>
+                    <button onclick="switchSettingTab('appearance')" id="tab-appearance" class="flex-1 py-4 text-sm font-bold transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700
+  dark:hover:text-slate-300">Appearance</button>
+                    <button onclick="switchSettingTab('danger')" id="tab-danger" class="flex-1 py-4 text-sm font-bold transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700
+  dark:hover:text-slate-300">Danger Zone</button>
                 </div>
 
-                <div class="bg-brand-50 dark:bg-brand-900/10 p-4 rounded-2xl border border-brand-200 dark:border-brand-800 space-y-3">
-                    <p class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider flex items-center gap-2">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0
-    11-18 0 9 9 0 0118 0z"></path></svg>
-                        Quick Start: Getting your API Key
-                    </p>
-                    <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
-                        <li class="flex gap-2"><span class="font-bold text-brand-500">1.</span> <span>Visit <a href="https://openrouter.ai/" target="_blank" class="text-brand-600 dark:text-brand-400 underline
-    font-medium">openrouter.ai</a> and create an account.</span></li>
-                        <li class="flex gap-2"><span class="font-bold text-brand-500">2.</span> <span>Navigate to <span class="font-medium">Keys</span> in your dashboard settings.</span></li>
-                        <li class="flex gap-2"><span class="font-bold text-brand-500">3.</span> <span>Click <span class="font-medium">Create Key</span> and copy the result.</span></li>
-                        <li class="flex gap-2"><span class="font-bold text-brand-500">4.</span> <span>Paste it into the field below and save.</span></li>
-                    </ul>
-                </div>
+                <div class="p-8 overflow-y-auto flex-1 space-y-8">
+                    <!-- General Tab -->
+                    <div id="panel-general" class="setting-panel space-y-8">
+                        <div class="bg-brand-50 dark:bg-brand-900/10 p-4 rounded-2xl border border-brand-200 dark:border-brand-800 space-y-3">
+                            <p class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider flex items-center gap-2">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21
+  12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Quick Start: Getting your API Key
+                            </p>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
+                                <li class="flex gap-2"><span class="font-bold text-brand-500">1.</span> <span>Visit <a href="https://openrouter.ai/" target="_blank" class="text-brand-600 dark:text-brand-400
+  underline font-medium">openrouter.ai</a> and create an account.</span></li>
+                                <li class="flex gap-2"><span class="font-bold text-brand-500">2.</span> <span>Navigate to <span class="font-medium">Keys</span> in your dashboard settings.</span></li>
+                                <li class="flex gap-2"><span class="font-bold text-brand-500">3.</span> <span>Click <span class="font-medium">Create Key</span> and copy the result.</span></li>
+                                <li class="flex gap-2"><span class="font-bold text-brand-500">4.</span> <span>Paste it into the field below and save.</span></li>
+                            </ul>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Configuration</p>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-400">OpenRouter API Key</label>
+                                <input type="password" id="settings-api-key" placeholder="sk-or-..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
+  outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="space-y-4">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Configuration</p>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-slate-600 dark:text-slate-400">OpenRouter API Key</label>
-                        <input type="password" id="settings-api-key" placeholder="sk-or-..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
-  outline-none
-    focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
+                    <!-- Appearance Tab -->
+                    <div id="panel-appearance" class="setting-panel hidden space-y-8">
+                        <div class="space-y-4">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Theme Mode</p>
+                            <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <span class="text-sm font-medium">Dark Mode</span>
+                                <button onclick="toggleTheme()" id="theme-toggle-btn" class="w-12 h-6 rounded-full bg-slate-300 dark:bg-brand-500 relative transition-colors duration-300">
+                                    <div id="theme-toggle-dot" class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 transform translate-x-0 dark:translate-x-6"></div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Brand Accent Color</p>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button onclick="setBrandColor('orange')" class="theme-option-btn p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all" data-theme="orange">
+                                    <div class="w-6 h-6 rounded-full bg-[#f97316]"></div>
+                                    <span class="text-xs font-medium">Orange</span>
+                                </button>
+                                <button onclick="setBrandColor('blue')" class="theme-option-btn p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all" data-theme="blue">
+                                    <div class="w-6 h-6 rounded-full bg-[#3b82f6]"></div>
+                                    <span class="text-xs font-medium">Blue</span>
+                                </button>
+                                <button onclick="setBrandColor('mono')" class="theme-option-btn p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all" data-theme="mono">
+                                    <div class="w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-200"></div>
+                                    <span class="text-xs font-medium">Mono</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danger Tab -->
+                    <div id="panel-danger" class="setting-panel hidden space-y-8">
+                        <div class="space-y-4">
+                            <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Data Management</p>
+                            <div class="space-y-3">
+                                <button onclick="clearAllData()" class="w-full py-3 px-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl font-semibold hover:bg-red-100
+  dark:hover:bg-red-900/40 transition-all text-sm border border-red-200 dark:border-red-800/50 flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0
+  0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Clear Entire History & Library
+                                </button>
+                                <p class="text-center text-[10px] text-slate-400">This action is permanent and cannot be undone.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Appearance</p>
-                    <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <span class="text-sm font-medium">Dark Mode</span>
-                        <button onclick="toggleTheme()" id="theme-toggle-btn" class="w-12 h-6 rounded-full bg-slate-300 dark:bg-brand-500 relative transition-colors duration-300">
-                            <div id="theme-toggle-dot" class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 transform translate-x-0 dark:translate-x-6"></div>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-                    <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Danger Zone</p>
-                    <div class="space-y-3">
-                        <button onclick="clearAllData()" class="w-full py-3 px-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl font-semibold hover:bg-red-100 dark:hover:bg-red-900/40
-    transition-all text-sm border border-red-200 dark:border-red-800/50 flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138
-    21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            Clear Entire History & Library
-                        </button>
-                        <p class="text-center text-[10px] text-slate-400">This action is permanent and cannot be undone.</p>
-                    </div>
-                </div>
-
-                <div class="flex justify-end">
+                <div class="p-6 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 flex justify-end">
                     <button onclick="saveSettings()" class="px-6 py-2 bg-brand-500 text-white font-semibold rounded-xl shadow-lg hover:bg-brand-600 transition-all text-sm">Save Changes</button>
                 </div>
             </div>
@@ -251,7 +277,7 @@
                     <span id="current-model-display" class="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Nvidia Nemotron 3.5 Super VL</span>
                 </div>
                 <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all
-    hover:scale-110">
+  hover:scale-110">
                     <span id="theme-icon">🌙</span>
                 </button>
             </header>
@@ -268,19 +294,17 @@
                 <div class="max-w-4xl mx-auto relative">
                     <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
                         <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-full
-  text-xs
-    font-semibold shadow-sm animate-pulse">
+  text-xs font-semibold shadow-sm animate-pulse">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0
-    01-7.743 5.743L11 17H9v-5.257a6 6 0 01-7.743-5.743L3 6a1 1 0 011-1h16a1 1 0 011 1z"></path></svg>
+  01-7.743 5.743L11 17H9v-5.257a6 6 0 01-7.743-5.743L3 6a1 1 0 011-1h16a1 1 0 011 1z"></path></svg>
                             API Key required to chat
                         </div>
                     </div>
 
                     <div id="file-preview" class="hidden absolute -top-14 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 flex items-center gap-3 shadow-lg
-    text-xs animate-bounce">
+  text-xs animate-bounce">
                         <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2
-  2
-    0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+  2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         <span id="preview-name" class="font-semibold dark:text-white">doc.pdf</span>
                         <button onclick="clearFile()" class="text-slate-400 hover:text-red-500 transition-colors">✕</button>
                     </div>
@@ -289,7 +313,6 @@
                             <button id="attach-btn" onclick="toggleAttachMenu()" class="p-3 text-slate-400 dark:text-slate-500 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                             </button>
-                            <!-- Attach Menu -->
                             <div id="attach-menu" class="hidden absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-2 z-20">
                                 <button onclick="triggerFileInput('doc')" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2
@@ -304,18 +327,17 @@
                             </div>
                         </div>
                         <textarea id="user-input" rows="1" placeholder="Message Yanai..." class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-2 text-slate-700 dark:text-slate-200 text-sm
-    leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
-
+  leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
                         <div class="flex items-center gap-2">
                             <button id="send-btn" onclick="handleSend()" class="p-3 bg-brand-500 text-white rounded-2xl shadow-lg shadow-brand-900/20 hover:bg-brand-600 disabled:opacity-50 transition-all
-    active:scale-95">
+  active:scale-95">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7
-    7m-7-7v18"></path></svg>
+  7m-7-7v18"></path></svg>
                             </button>
                             <button id="stop-btn" onclick="stopResponse()" class="hidden p-3 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl shadow-sm hover:bg-slate-300
-    dark:hover:bg-slate-700 transition-all active:scale-95">
+  dark:hover:bg-slate-700 transition-all active:scale-95">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-    12"></path></svg>
+  12"></path></svg>
                             </button>
                         </div>
                     </div>
@@ -330,15 +352,32 @@
             const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
             const VISION_MODELS = ['nvidia/nemotron-3.5-super-vl'];
 
+            const THEMES = {
+                orange: {
+                    color: '#f97316', rgb: '249, 115, 22',
+                    50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
+                    400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12'
+                },
+                blue: {
+                    color: '#3b82f6', rgb: '59, 130, 246',
+                    50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+                    400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
+                },
+                mono: {
+                    color: '#475569', rgb: '71, 85, 105',
+                    50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
+                    400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a'
+                }
+            };
+
             let OR_API_KEY = "";
             let MODEL = "nvidia/nemotron-3.5-super-vl";
             let attachedFile = { name: '', content: '' };
-            let attachedImages = []; // Array of { name, base64 }
+            let attachedImages = [];
             let isGenerating = false;
             let isTyping = false;
             let timerInterval = null;
             let currentAbortController = null;
-
             let allChats = [];
             let currentChatId = null;
             let allUploadedDocs = [];
@@ -348,25 +387,63 @@
 
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-            // Sidebar Logic
+            // THEME LOGIC
+            function setBrandColor(themeKey) {
+                const theme = THEMES[themeKey];
+                const root = document.documentElement;
+                root.style.setProperty('--brand-color', theme.color);
+                root.style.setProperty('--brand-rgb', theme.rgb);
+
+                Object.keys(theme).forEach(key => {
+                    if (key !== 'color' && key !== 'rgb') {
+                        root.style.setProperty(`--brand-${key}`, theme[key]);
+                    }
+                });
+
+                document.querySelectorAll('.theme-option-btn').forEach(btn => {
+                    btn.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
+                    btn.classList.add('border-slate-200', 'dark:border-slate-800');
+                    if (btn.dataset.theme === themeKey) {
+                        btn.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
+                        btn.classList.remove('border-slate-200', 'dark:border-slate-800');
+                    }
+                });
+                safeStorageSet('yanai_brand_theme', themeKey);
+            }
+
+            function applySavedTheme() {
+                const saved = safeStorageGet('yanai_brand_theme') || 'orange';
+                setBrandColor(saved);
+            }
+
+            // SETTINGS TAB LOGIC
+            function switchSettingTab(tabId) {
+                document.querySelectorAll('.setting-panel').forEach(p => p.classList.add('hidden'));
+                document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+
+                document.querySelectorAll('[id^="tab-"]').forEach(t => {
+                    t.classList.remove('border-brand-500', 'text-brand-500');
+                    t.classList.add('border-transparent', 'text-slate-500');
+                });
+                const activeTab = document.getElementById(`tab-${tabId}`);
+                activeTab.classList.add('border-brand-500', 'text-brand-500');
+                activeTab.classList.remove('border-transparent', 'text-slate-500');
+            }
+
+            // SIDEBAR RESIZER
             const sidebar = document.getElementById('sidebar');
             const resizer = document.getElementById('sidebar-resizer');
-
             let isResizing = false;
             resizer.addEventListener('mousedown', (e) => {
                 isResizing = true;
                 document.body.style.cursor = 'col-resize';
                 document.body.style.userSelect = 'none';
             });
-
             window.addEventListener('mousemove', (e) => {
                 if (!isResizing) return;
                 const newWidth = e.clientX;
-                if (newWidth > 260 && newWidth < 450) {
-                    sidebar.style.width = `${newWidth}px`;
-                }
+                if (newWidth > 260 && newWidth < 450) sidebar.style.width = `${newWidth}px`;
             });
-
             window.addEventListener('mouseup', () => {
                 isResizing = false;
                 document.body.style.cursor = 'default';
@@ -387,9 +464,10 @@
                 if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
                 const savedDocs = safeStorageGet('yanai_library');
                 if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
+
+                applySavedTheme();
                 checkApiKeyStatus();
                 renderChatList();
-
                 window.addEventListener('paste', handlePaste);
             }
 
@@ -400,13 +478,13 @@
                 sortedChats.forEach(chat => {
                     const item = document.createElement('div');
                     item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
-    dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
+  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
                     item.onclick = () => loadChat(chat.id);
                     item.innerHTML = `
                         <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
                         <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-    12"></path></svg>
+  12"></path></svg>
                         </button>`;
                     listContainer.appendChild(item);
                 });
@@ -474,8 +552,7 @@
                     html.classList.remove('dark');
                     icon.innerText = '🌙';
                     safeStorageSet('yanai_theme', 'light');
-                }
-                else {
+                } else {
                     html.classList.add('dark');
                     icon.innerText = '☀️';
                     safeStorageSet('yanai_theme', 'dark');
@@ -519,7 +596,6 @@
                     saveLibrary();
                     localStorage.removeItem('yanai_all_chats');
                     localStorage.removeItem('yanai_library');
-
                     document.getElementById('messages').innerHTML = '';
                     document.getElementById('welcome-screen').classList.remove('hidden');
                     renderChatList();
@@ -773,11 +849,8 @@
                 if (!text && !attachedFile.content && attachedImages.length === 0) return;
                 if (isGenerating) return;
 
-                // Vision Guard
                 if (attachedImages.length > 0 && !VISION_MODELS.includes(MODEL)) {
-                    const confirmSwitch = confirm(
-                        `The current model (${MODEL.split('/').pop()}) does not support images. \n\nWould you like to switch to the Vision model (Super VL) to analyze these images?`
-                    );
+                    const confirmSwitch = confirm(`The current model (${MODEL.split('/').pop()}) does not support images. \n\nSwitch to the Vision model (Super VL)?`);
                     if (confirmSwitch) {
                         const vlBtn = document.querySelector(`[data-model="nvidia/nemotron-3.5-super-vl"]`);
                         if (vlBtn) setModel('nvidia/nemotron-3.5-super-vl', vlBtn);
@@ -817,15 +890,8 @@
                 const startTime = Date.now();
                 const loadingDiv = document.createElement('div');
                 loadingDiv.className = 'flex justify-start message-appear';
-                loadingDiv.innerHTML = `
-                    <div class="ai-msg p-4 flex items-center gap-4">
-                        <div class="ai-core">
-                            <div class="core-center"></div>
-                            <div class="core-ring ring-1"></div>
-                            <div class="core-ring ring-2"></div>
-                        </div>
-                        <span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span>
-                    </div>`;
+                loadingDiv.innerHTML = `<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
+  ring-2"></div></div><span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span></div>`;
                 document.getElementById('messages').appendChild(loadingDiv);
 
                 timerInterval = setInterval(() => {
@@ -876,7 +942,7 @@
                     clearInterval(timerInterval);
                     isGenerating = false;
                     currentAbortController = null;
-                    updateInputButtons(); // Fixed Bug: Ensures X button reverts to Send button on error
+                    updateInputButtons();
                 }
             }
 
