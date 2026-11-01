@@ -163,24 +163,12 @@
               <div class="p-8 overflow-y-auto flex-1 space-y-8">
                   <div id="panel-general" class="setting-panel space-y-8">
                       <div class="space-y-4">
-                          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Provider</p>
-                          <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                              <button onclick="setProvider('openrouter')" id="prov-openrouter" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all">OpenRouter</button>
-                              <button onclick="setProvider('groq')" id="prov-groq" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all">Groq</button>
-                          </div>
-                      </div>
-                      <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Configuration</p>
                           <div class="space-y-3">
-                              <div id="key-container-openrouter" class="space-y-2">
+                              <div class="space-y-2">
                                   <label class="text-sm font-medium text-slate-600 dark:text-slate-400">OpenRouter API Key</label>
                                   <input type="password" id="settings-api-key" placeholder="sk-or-..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
   outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
-                              </div>
-                              <div id="key-container-groq" class="space-y-2 hidden">
-                                  <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Groq API Key</label>
-                                  <input type="password" id="settings-api-key-groq" placeholder="gsk_..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
-  rounded-xl outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
                               </div>
                           </div>
                       </div>
@@ -304,24 +292,20 @@
           <input type="file" id="image-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
 
           <script>
-              var API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
-              var GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+              const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
+              let OR_API_KEY = "";
+              let MODEL = "nvidia/nemotron-3.5-super-vl";
+              let attachedFile = { name: '', content: '' };
+              let attachedImages = [];
+              let isGenerating = false;
+              let isTyping = false;
+              let timerInterval = null;
+              let currentAbortController = null;
+              let allChats = [];
+              let currentChatId = null;
+              let allUploadedDocs = [];
 
-              var PROVIDER = "openrouter";
-              var OR_API_KEY = "";
-              var GROQ_API_KEY = "";
-              var MODEL = "nvidia/nemotron-3.5-super-vl";
-              var attachedFile = { name: '', content: '' };
-              var attachedImages = [];
-              var isGenerating = false;
-              var isTyping = false;
-              var timerInterval = null;
-              var currentAbortController = null;
-              var allChats = [];
-              var currentChatId = null;
-              var allUploadedDocs = [];
-
-              var THEMES = {
+              const THEMES = {
                   orange: { color: '#f97316', rgb: '249, 115, 22', '50': '#fff7ed', '100': '#ffedd5', '200': '#fed7aa', '300': '#fdba74', '400': '#fb923c', '500': '#f97316', '600': '#ea580c', '700': '#c2410c',
   '800': '#9a3412', '900': '#7c2d12' },
                   blue: { color: '#3b82f6', rgb: '59, 130, 246', '50': '#eff6ff', '100': '#dbeafe', '200': '#bfdbfe', '300': '#93c5fd', '400': '#60a5fa', '500': '#3b82f6', '600': '#2563eb', '700': '#1d4ed8',
@@ -338,135 +322,94 @@
               }
 
               function setBrandColor(themeKey) {
-                  var theme = THEMES[themeKey];
-                  var root = document.documentElement;
+                  const theme = THEMES[themeKey];
+                  const root = document.documentElement;
                   root.style.setProperty('--brand-color', theme.color);
                   root.style.setProperty('--brand-rgb', theme.rgb);
-                  for (var key in theme) { if (key !== 'color' && key !== 'rgb') root.style.setProperty('--brand-' + key, theme[key]); }
-                  var btns = document.querySelectorAll('.theme-option-btn');
-                  for (var i = 0; i < btns.length; i++) {
-                      var btn = btns[i];
+                  Object.keys(theme).forEach(key => { if (key !== 'color' && key !== 'rgb') root.style.setProperty(`--brand-${key}`, theme[key]); });
+                  document.querySelectorAll('.theme-option-btn').forEach(btn => {
                       btn.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
                       btn.classList.add('border-slate-200', 'dark:border-slate-800');
                       if (btn.dataset.theme === themeKey) { btn.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20'); btn.classList.remove('border-slate-200', 'dark:border-slate-800'); }
-                  }
+                  });
                   safeStorageSet('yanai_brand_theme', themeKey);
               }
 
               function applySavedTheme() { setBrandColor(safeStorageGet('yanai_brand_theme') || 'orange'); }
 
               function switchSettingTab(tabId) {
-                  var panels = document.querySelectorAll('.setting-panel');
-                  for (var i = 0; i < panels.length; i++) panels[i].classList.add('hidden');
-                  document.getElementById('panel-' + tabId).classList.remove('hidden');
-                  var tabs = document.querySelectorAll('[id^="tab-"]');
-                  for (var j = 0; j < tabs.length; j++) { tabs[j].classList.remove('border-brand-500', 'text-brand-500'); tabs[j].classList.add('border-transparent', 'text-slate-500'); }
-                  var activeTab = document.getElementById('tab-' + tabId);
+                  document.querySelectorAll('.setting-panel').forEach(p => p.classList.add('hidden'));
+                  document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+                  document.querySelectorAll('[id^="tab-"]').forEach(t => { t.classList.remove('border-brand-500', 'text-brand-500'); t.classList.add('border-transparent', 'text-slate-500'); });
+                  const activeTab = document.getElementById(`tab-${tabId}`);
                   activeTab.classList.add('border-brand-500', 'text-brand-500');
                   activeTab.classList.remove('border-transparent', 'text-slate-500');
               }
 
-              var sidebar = document.getElementById('sidebar');
-              var resizer = document.getElementById('sidebar-resizer');
-              var isResizing = false;
-              resizer.addEventListener('mousedown', function(e) { isResizing = true; document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none'; });
-              window.addEventListener('mousemove', function(e) { if (isResizing) { var newWidth = e.clientX; if (newWidth > 260 && newWidth < 450) sidebar.style.width = newWidth + 'px'; } });
-              window.addEventListener('mouseup', function() { isResizing = false; document.body.style.cursor = 'default'; document.body.style.userSelect = 'auto'; });
-
-              function setProvider(prov) {
-                  PROVIDER = prov;
-                  var pOR = document.getElementById('prov-openrouter');
-                  var pGR = document.getElementById('prov-groq');
-                  if(pOR) pOR.className = prov === 'openrouter' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold rounded-lg
-  transition-all text-slate-500';
-                  if(pGR) pGR.className = prov === 'groq' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold rounded-lg
-  transition-all text-slate-500';
-                  document.getElementById('key-container-openrouter').classList.toggle('hidden', prov !== 'openrouter');
-                  document.getElementById('key-container-groq').classList.toggle('hidden', prov !== 'groq');
-
-                  if (prov === 'openrouter') MODEL = "nvidia/nemotron-3.5-super-vl";
-                  else MODEL = "gemma2-9b-it";
-
-                  renderModelSelector();
-                  updateModelDisplay();
-                  safeStorageSet('yanai_provider', prov);
-              }
+              const sidebar = document.getElementById('sidebar');
+              const resizer = document.getElementById('sidebar-resizer');
+              let isResizing = false;
+              resizer.addEventListener('mousedown', (e) => { isResizing = true; document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none'; });
+              window.addEventListener('mousemove', (e) => { if (isResizing) { const newWidth = e.clientX; if (newWidth > 260 && newWidth < 450) sidebar.style.width = `${newWidth}px`; } });
+              window.addEventListener('mouseup', () => { isResizing = false; document.body.style.cursor = 'default'; document.body.style.userSelect = 'auto'; });
 
               function renderModelSelector() {
-                  var container = document.getElementById('model-selector');
-                  if(!container) return;
+                  const container = document.getElementById('model-selector');
                   container.innerHTML = '';
-                  var models = [];
-                  if (PROVIDER === 'openrouter') {
-                      models = [
-                          { id: 'nvidia/nemotron-3.5-super-vl', name: 'Nvidia Nemotron 3.5 Super VL', desc: 'Vision & complex logic' },
-                          { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
-                      ];
-                  } else {
-                      models = [
-                          { id: 'gemma2-9b-it', name: 'Gwen 3.8 27B', desc: 'High reasoning efficiency' },
-                          { id: 'llama-3.1-70b-versatile', name: 'GPT OSS 120B', desc: 'Massive scale logic' }
-                      ];
-                  }
-                  for (var i = 0; i < models.length; i++) {
-                      var m = models[i];
-                      var btn = document.createElement('button');
-                      btn.className = 'model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border ' + (MODEL === m.id ? 'bg-brand-500 text-white border-brand-500 shadow-sm' :
-  'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900');
-                      btn.onclick = function() { setModel(m.id, this); };
+                  const models = [
+                      { id: 'nvidia/nemotron-3.5-super-vl', name: 'Nvidia Nemotron 3.5 Super VL', desc: 'Vision & complex logic' },
+                      { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
+                  ];
+                  models.forEach(m => {
+                      const btn = document.createElement('button');
+                      btn.className = `model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border ${MODEL === m.id ? 'bg-brand-500 text-white border-brand-500 shadow-sm' : 'border-slate-200
+  dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900'}`;
+                      btn.onclick = () => setModel(m.id, btn);
                       btn.dataset.model = m.id;
-                      btn.innerHTML = '<div class="font-semibold whitespace-nowrap">' + m.name + '</div><div class="text-[10px] ' + (MODEL === m.id ? 'opacity-80' : 'opacity-70') + ' whitespace-nowrap">' +
-  m.desc + '</div>';
+                      btn.innerHTML = `<div class="font-semibold whitespace-nowrap">${m.name}</div><div class="text-[10px] ${MODEL === m.id ? 'opacity-80' : 'opacity-70'} whitespace-nowrap">${m.desc}</div>`;
                       container.appendChild(btn);
-                  }
+                  });
               }
 
               function updateModelDisplay() {
-                  var name = MODEL;
+                  let name = MODEL;
                   if (MODEL === 'nvidia/nemotron-3.5-super-vl') name = 'Nvidia Nemotron 3.5 Super VL';
                   else if (MODEL === 'nvidia/nemotron-3.5-lightning') name = 'Nvidia Nemotron 3.5 Lightning';
-                  else if (MODEL === 'gemma2-9b-it') name = 'Gwen 3.8 27B';
-                  else if (MODEL === 'llama-3.1-70b-versatile') name = 'GPT OSS 120B';
                   document.getElementById('current-model-display').innerText = name;
               }
 
               function setModel(modelId, btn) {
                   MODEL = modelId;
                   updateModelDisplay();
-                  var btns = document.querySelectorAll('.model-btn');
-                  for (var i = 0; i < btns.length; i++) {
-                      btns[i].classList.remove('bg-brand-500', 'text-white', 'shadow-sm', 'border-brand-500');
-                      btns[i].classList.add('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
-                  }
+                  document.querySelectorAll('.model-btn').forEach(b => {
+                      b.classList.remove('bg-brand-500', 'text-white', 'shadow-sm', 'border-brand-500');
+                      b.classList.add('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
+                  });
                   btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
                   btn.classList.add('bg-brand-500', 'text-white', 'shadow-sm', 'border-brand-500');
+                  renderModelSelector();
               }
 
               function checkApiKeyStatus() {
-                  var input = document.getElementById('user-input'), btn = document.getElementById('send-btn'), warning = document.getElementById('api-warning');
-                  var key = PROVIDER === 'openrouter' ? OR_API_KEY : GROQ_API_KEY;
-                  if (!key) { input.disabled = true; input.placeholder = "API Key required to chat..."; btn.disabled = true; warning.classList.remove('hidden'); }
+                  const input = document.getElementById('user-input'), btn = document.getElementById('send-btn'), warning = document.getElementById('api-warning');
+                  if (!OR_API_KEY) { input.disabled = true; input.placeholder = "API Key required to chat..."; btn.disabled = true; warning.classList.remove('hidden'); }
                   else { input.disabled = false; input.placeholder = "Message Yanai..."; btn.disabled = false; warning.classList.add('hidden'); }
               }
 
               function toggleSettingsModal() {
                   document.getElementById('settings-modal').classList.toggle('hidden');
                   document.getElementById('settings-api-key').value = OR_API_KEY;
-                  document.getElementById('settings-api-key-groq').value = GROQ_API_KEY;
-                  setProvider(PROVIDER);
               }
 
               function saveSettings() {
-                  var nkOr = document.getElementById('settings-api-key').value.trim();
-                  var nkGr = document.getElementById('settings-api-key-groq').value.trim();
+                  const nkOr = document.getElementById('settings-api-key').value.trim();
                   if (nkOr) { OR_API_KEY = nkOr; safeStorageSet('yanai_or_key', OR_API_KEY); }
-                  if (nkGr) { GROQ_API_KEY = nkGr; safeStorageSet('yanai_groq_key', GROQ_API_KEY); }
                   checkApiKeyStatus();
                   toggleSettingsModal();
               }
 
               function toggleTheme() {
-                  var html = document.documentElement;
+                  const html = document.documentElement;
                   if (html.classList.contains('dark')) { html.classList.remove('dark'); safeStorageSet('yanai_theme', 'light'); }
                   else { html.classList.add('dark'); safeStorageSet('yanai_theme', 'dark'); }
               }
@@ -482,23 +425,17 @@
 
               function loadChat(id) {
                   currentChatId = id;
-                  var chat = null;
-                  for (var i = 0; i < allChats.length; i++) { if (allChats[i].id === id) chat = allChats[i]; }
+                  const chat = allChats.find(c => c.id === id);
                   if (!chat) return;
                   document.getElementById('messages').innerHTML = '';
                   if (chat.messages.length === 0) document.getElementById('welcome-screen').classList.remove('hidden');
-                  else {
-                      document.getElementById('welcome-screen').classList.add('hidden');
-                      for (var j = 0; j < chat.messages.length; j++) { appendMessage(chat.messages[j].role, chat.messages[j].content, false); }
-                  }
+                  else { document.getElementById('welcome-screen').classList.add('hidden'); chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false)); }
                   renderChatList();
                   scrollToBottom();
               }
 
               function deleteChat(id) {
-                  var newChats = [];
-                  for (var i = 0; i < allChats.length; i++) { if (allChats[i].id !== id) newChats.push(allChats[i]); }
-                  allChats = newChats;
+                  allChats = allChats.filter(c => c.id !== id);
                   saveAllChats();
                   renderChatList();
                   if (currentChatId === id) { currentChatId = null; document.getElementById('messages').innerHTML = ''; document.getElementById('welcome-screen').classList.remove('hidden'); }
@@ -508,26 +445,23 @@
               function saveLibrary() { safeStorageSet('yanai_library', JSON.stringify(allUploadedDocs)); }
 
               function updateChatTitle(text) {
-                  var chat = null;
-                  for (var i = 0; i < allChats.length; i++) { if (allChats[i].id === currentChatId) chat = allChats[i]; }
+                  const chat = allChats.find(c => c.id === currentChatId);
                   if (chat && chat.title === 'New Conversation') { chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : ''); saveAllChats(); renderChatList(); }
               }
 
               function renderChatList() {
-                  var list = document.getElementById('recent-chats-list');
+                  const list = document.getElementById('recent-chats-list');
                   list.innerHTML = '';
-                  var sorted = allChats.slice().sort(function(a, b) { return b.timestamp - a.timestamp; });
-                  for (var i = 0; i < sorted.length; i++) {
-                      var chat = sorted[i];
-                      var item = document.createElement('div');
-                      item.className = 'chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
-  dark:hover:bg-slate-900 border border-transparent ' + (chat.id === currentChatId ? 'active' : '');
-                      item.onclick = function() { loadChat(chat.id); };
-                      item.innerHTML = '<div class="flex items-center gap-2 truncate"><span class="truncate font-medium">' + chat.title + '</span></div><button onclick="event.stopPropagation(); deleteChat(\''
-  + chat.id + '\')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
-  stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>';
+                  [...allChats].sort((a, b) => b.timestamp - a.timestamp).forEach(chat => {
+                      const item = document.createElement('div');
+                      item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
+  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
+                      item.onclick = () => loadChat(chat.id);
+                      item.innerHTML = `<div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div><button onclick="event.stopPropagation();
+  deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path
+  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>`;
                       list.appendChild(item);
-                  }
+                  });
               }
 
               function clearAllData() {
@@ -540,68 +474,67 @@
               }
 
               function toggleLibrary() {
-                  var o = document.getElementById('library-overlay'), p = document.getElementById('library-panel');
-                  if (o.classList.contains('hidden')) { o.classList.remove('hidden'); setTimeout(function() { p.classList.remove('translate-x-full'); }, 10); renderLibrary(); }
-                  else { p.classList.add('translate-x-full'); setTimeout(function() { o.classList.add('hidden'); }, 300); }
+                  const o = document.getElementById('library-overlay'), p = document.getElementById('library-panel');
+                  if (o.classList.contains('hidden')) { o.classList.remove('hidden'); setTimeout(() => p.classList.remove('translate-x-full'), 10); renderLibrary(); }
+                  else { p.classList.add('translate-x-full'); setTimeout(() => o.classList.add('hidden'), 300); }
               }
 
               function renderLibrary() {
-                  var list = document.getElementById('library-list');
+                  const list = document.getElementById('library-list');
                   list.innerHTML = '';
                   if (!allUploadedDocs.length) { list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>'; return; }
-                  for (var i = 0; i < allUploadedDocs.length; i++) {
-                      var doc = allUploadedDocs[i];
-                      var div = document.createElement('div');
+                  allUploadedDocs.forEach((doc, i) => {
+                      const div = document.createElement('div');
                       div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group";
-                      div.innerHTML = '<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">' + doc.name + '</span></div><div class="flex
-  items-center gap-3"><span class="text-[10px] text-slate-400">' + new Date(doc.date).toLocaleDateString() + '</span><button onclick="deleteDoc(' + i + ')" class="opacity-0 group-hover:opacity-100
-  text-slate-400 hover:text-red-500 transition-all">✕</button></div>';
+                      div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div><div class="flex
+  items-center gap-3"><span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span><button onclick="deleteDoc(${i})" class="opacity-0 group-hover:opacity-100 text-slate-400
+  hover:text-red-500 transition-all">✕</button></div>`;
                       list.appendChild(div);
-                  }
+                  });
               }
 
               function deleteDoc(i) { allUploadedDocs.splice(i, 1); saveLibrary(); renderLibrary(); }
 
               async function extractTextFromFile(file) {
                   if (file.type === 'application/pdf') {
-                      var ab = await file.arrayBuffer();
-                      var pdf = await pdfjsLib.getDocument({ data: ab }).promise;
-                      var text = "";
-                      for (var i = 1; i <= pdf.numPages; i++) {
-                          var page = await pdf.getPage(i);
-                          var content = await page.getTextContent();
-                          text += content.items.map(function(s) { return s.str; }).join(" ") + "\n";
+                      const ab = await file.arrayBuffer();
+                      const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+                      let text = "";
+                      for (let i = 1; i <= pdf.numPages; i++) {
+                          const page = await pdf.getPage(i);
+                          const content = await page.getTextContent();
+                          text += content.items.map(s => s.str).join(" ") + "\n";
                       }
                       return text;
                   } else if (file.name.endsWith('.docx')) {
-                      var ab = await file.arrayBuffer();
-                      var result = await mammoth.extractRawText({ arrayBuffer: ab });
+                      const ab = await file.arrayBuffer();
+                      const result = await mammoth.extractRawText({ arrayBuffer: ab });
                       return result.value;
                   } else return await file.text();
               }
 
               async function handleFileUpload(e) {
-                  var f = e.target.files[0]; if (!f) return;
+                  const f = e.target.files[0]; if (!f) return;
                   attachedFile.name = f.name; document.getElementById('preview-name').innerText = f.name; document.getElementById('file-preview').classList.remove('hidden');
                   try {
-                      var t = await extractTextFromFile(f); attachedFile.content = t;
+                      const t = await extractTextFromFile(f); attachedFile.content = t;
                       allUploadedDocs.push({ name: f.name, date: Date.now(), content: t }); saveLibrary();
                   } catch (err) { alert("File Error: " + err.message); }
               }
 
               async function handleLibraryFileUpload(e) {
-                  var f = e.target.files[0]; if (!f) return;
+                  const f = e.target.files[0]; if (!f) return;
                   try {
-                      var t = await extractTextFromFile(f);
+                      const t = await extractTextFromFile(f);
                       allUploadedDocs.push({ name: f.name, date: Date.now(), content: t }); saveLibrary(); renderLibrary();
-                      alert("Added " + f.name + "!");
+                      alert(`Added ${f.name}!`);
                   } catch (err) { alert("File Error: " + err.message); }
               }
 
               async function handleImageUpload(e) {
-                  var f = e.target.files[0]; if (!f) return;
-                  var reader = new FileReader();
-                  reader.onload = function(ev) {
+                  const f = e.target.files[0]; if (!f) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
                       attachedImages.push({ name: f.name, base64: ev.target.result });
                       document.getElementById('preview-name').innerText = attachedImages.length === 1 ? f.name : attachedImages.length + " images";
                       document.getElementById('file-preview').classList.remove('hidden');
@@ -610,13 +543,13 @@
               }
 
               async function handlePaste(e) {
-                  var items = e.clipboardData.items;
-                  for (var i = 0; i < items.length; i++) {
+                  const items = e.clipboardData.items;
+                  for (let i = 0; i < items.length; i++) {
                       if (items[i].type.indexOf('image') !== -1) {
-                          var blob = items[i].getAsFile();
-                          var f = new File([blob], 'pasted-' + Date.now() + '.png', { type: blob.type });
-                          var reader = new FileReader();
-                          reader.onload = function(ev) {
+                          const blob = items[i].getAsFile();
+                          const f = new File([blob], `pasted-${Date.now()}.png`, { type: blob.type });
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
                               attachedImages.push({ name: f.name, base64: ev.target.result });
                               document.getElementById('preview-name').innerText = attachedImages.length === 1 ? f.name : attachedImages.length + " images";
                               document.getElementById('file-preview').classList.remove('hidden');
@@ -634,28 +567,27 @@
 
               function toggleAttachMenu() { document.getElementById('attach-menu').classList.toggle('hidden'); }
 
-              window.addEventListener('click', function(e) { if (!e.target.closest('#attach-btn') && !e.target.closest('#attach-menu')) document.getElementById('attach-menu').classList.add('hidden'); });
+              window.addEventListener('click', (e) => { if (!e.target.closest('#attach-btn') && !e.target.closest('#attach-menu')) document.getElementById('attach-menu').classList.add('hidden'); });
 
               function clearFile() { attachedFile = { name: '', content: '' }; attachedImages = []; document.getElementById('file-preview').classList.add('hidden'); }
 
               function retrieveContext(query) {
                   if (!allUploadedDocs.length) return "";
-                  var kw = query.toLowerCase().split(/\s+/).filter(function(w) { return w.length >= 3; });
-                  var res = [];
-                  for (var i = 0; i < allUploadedDocs.length; i++) {
-                      var doc = allUploadedDocs[i];
-                      var c = doc.content.toLowerCase();
-                      var found = kw.filter(function(k) { return c.includes(k); });
+                  const kw = query.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
+                  let res = [];
+                  allUploadedDocs.forEach(doc => {
+                      const c = doc.content.toLowerCase();
+                      const found = kw.filter(k => c.includes(k));
                       if (found.length) {
-                          var idx = c.indexOf(found[0]);
-                          res.push("[Source: " + doc.name + "]\n" + doc.content.substring(Math.max(0, idx-500), Math.min(doc.content.length, idx+500)));
+                          const idx = c.indexOf(found[0]);
+                          res.push(`[Source: ${doc.name}]\n${doc.content.substring(Math.max(0, idx-500), Math.min(doc.content.length, idx+500))}`);
                       }
-                  }
+                  });
                   return res.length ? "\n\n### REFERENCE KNOWLEDGE ###\n" + res.join("\n\n") + "\n### END REFERENCE ###" : "";
               }
 
               async function typeWriter(el, text) {
-                  var i = 0;
+                  let i = 0;
                   function type() {
                       if (i < text.length && isTyping) {
                           el.innerHTML = marked.parse(text.substring(0, i + 1));
@@ -667,19 +599,18 @@
 
               function appendMessage(role, text, save) {
                   if (save === undefined) save = true;
-                  var c = document.getElementById('messages');
-                  var div = document.createElement('div');
-                  div.className = 'flex ' + (role === 'user' ? 'justify-end' : 'justify-start') + ' message-appear';
-                  if (role === 'user') div.innerHTML = '<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>' + text + '</div></div>';
+                  const c = document.getElementById('messages');
+                  const div = document.createElement('div');
+                  div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+                  if (role === 'user') div.innerHTML = `<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
                   else {
-                      div.innerHTML = '<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>';
-                      var target = div.querySelector('.typing-target');
+                      div.innerHTML = `<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
+                      const target = div.querySelector('.typing-target');
                       if (!save) target.innerHTML = marked.parse(text); else typeWriter(target, text);
                   }
                   c.appendChild(div); scrollToBottom();
                   if (save) {
-                      var chat = null;
-                      for (var i = 0; i < allChats.length; i++) { if (allChats[i].id === currentChatId) chat = allChats[i]; }
+                      const chat = allChats.find(x => x.id === currentChatId);
                       if (chat) { chat.messages.push({ role: role, content: text }); if (role === 'user') updateChatTitle(text); saveAllChats(); }
                   }
               }
@@ -689,85 +620,68 @@
               function stopResponse() { if (currentAbortController) currentAbortController.abort(); isGenerating = false; isTyping = false; updateInputButtons(); }
 
               function updateInputButtons() {
-                  var s = document.getElementById('send-btn'), st = document.getElementById('stop-btn');
+                  const s = document.getElementById('send-btn'), st = document.getElementById('stop-btn');
                   if (isGenerating || isTyping) { s.classList.add('hidden'); st.classList.remove('hidden'); }
                   else { s.classList.remove('hidden'); st.classList.add('hidden'); }
               }
 
               async function handleSend() {
-                  var input = document.getElementById('user-input');
-                  var text = input.value.trim();
-                  var activeKey = PROVIDER === 'openrouter' ? OR_API_KEY : GROQ_API_KEY;
-                  if (!activeKey) return alert("Set " + PROVIDER + " Key!");
+                  const input = document.getElementById('user-input');
+                  const text = input.value.trim();
+                  if (!OR_API_KEY) return alert(`Set API Key!`);
                   if (!text && !attachedFile.content && !attachedImages.length) return;
                   if (isGenerating) return;
 
                   if (!currentChatId) startNewChat();
                   document.getElementById('welcome-screen').classList.add('hidden');
 
-                  var ctx = retrieveContext(text);
-                  var content = [];
+                  const ctx = retrieveContext(text);
+                  let content = [];
                   if (text) content.push({ type: "text", text: text });
-                  for (var i = 0; i < attachedImages.length; i++) { content.push({ type: "image_url", image_url: { url: attachedImages[i].base64 } }); }
+                  attachedImages.forEach(img => content.push({ type: "image_url", image_url: { url: img.base64 } }));
                   if (attachedFile.content) {
-                      var d = "\n\nDOCUMENT CONTENT:\n---\n" + attachedFile.content + "\n---\n";
+                      const d = `\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n`;
                       if (content.length && content[0].type === "text") content[0].text = d + content[0].text;
                       else content.unshift({ type: "text", text: d });
                   }
                   if (!content.length) content.push({ type: "text", text: "Hello!" });
                   if (ctx) {
-                      var first = null;
-                      for (var j = 0; j < content.length; j++) { if (content[j].type === "text") first = content[j]; }
+                      const first = content.find(x => x.type === "text");
                       if (first) first.text += ctx; else content.push({ type: "text", text: ctx });
                   }
 
-                  appendMessage('user', text || (attachedImages.length ? attachedImages.length + " images" : (attachedFile.name ? "Analyze: " + attachedFile.name : "Hello!")));
+                  appendMessage('user', text || (attachedImages.length ? attachedImages.length + " images" : (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!")));
                   input.value = ''; input.style.height = ''; clearFile();
                   isGenerating = true; updateInputButtons();
 
-                  var start = Date.now();
-                  var load = document.createElement('div');
+                  const start = Date.now();
+                  const load = document.createElement('div');
                   load.className = 'flex justify-start message-appear';
-                  load.innerHTML = '<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
-  ring-2"></div></div><span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span></div>';
+                  load.innerHTML = `<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
+  ring-2"></div></div><span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span></div>`;
                   document.getElementById('messages').appendChild(load);
 
-                  timerInterval = setInterval(function() {
-                      var el = document.getElementById('timer-text');
-                      if (el) el.innerText = "Yanai is thinking... " + Math.floor((Date.now()-start)/1000) + "s";
+                  timerInterval = setInterval(() => {
+                      const el = document.getElementById('timer-text');
+                      if (el) el.innerText = `Yanai is thinking... ${Math.floor((Date.now()-start)/1000)}s`;
                   }, 1000);
 
                   try {
-                      var chat = null;
-                      for (var k = 0; k < allChats.length; k++) { if (allChats[k].id === currentChatId) chat = allChats[k]; }
-                      var hist = [];
-                      if (chat) {
-                          for (var l = 0; l < chat.messages.length; l++) { hist.push({ role: chat.messages[l].role, content: chat.messages[l].content }); }
-                      }
+                      const chat = allChats.find(x => x.id === currentChatId);
+                      const hist = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
                       currentAbortController = new AbortController();
 
-                      var res;
-                      if (PROVIDER === 'openrouter') {
-                          res = await fetch(API_PROXY_URL, {
-                              method: 'POST', signal: currentAbortController.signal,
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ headers: { Authorization: 'Bearer ' + OR_API_KEY }, model: MODEL, messages: [{ role: 'system', content: 'You are Yanai AI.' }, ...hist, { role: 'user',
-  content: content }] })
-                          });
-                      } else {
-                          var groqText = "";
-                          for (var m = 0; m < content.length; m++) { groqText += (content[m].text || "") + "\n"; }
-                          res = await fetch(GROQ_API_URL, {
-                              method: 'POST', signal: currentAbortController.signal,
-                              headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + GROQ_API_KEY },
-                              body: JSON.stringify({ model: MODEL, messages: [{ role: 'system', content: 'You are Yanai AI.' }, ...hist, { role: 'user', content: groqText }] })
-                          });
-                      }
-                      var data = await res.json();
+                      const res = await fetch(API_PROXY_URL, {
+                          method: 'POST', signal: currentAbortController.signal,
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ headers: { Authorization: `Bearer ${OR_API_KEY}` }, model: MODEL, messages: [{ role: 'system', content: 'You are Yanai AI.' }, ...hist, { role: 'user', content:
+  content }] })
+                      });
+                      const data = await res.json();
                       if (data.error) throw new Error(data.error.message);
                       load.remove(); isTyping = true; appendMessage('ai', data.choices[0].message.content);
                   } catch (e) {
-                      load.innerHTML = '<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">Error: ' + e.message + '</div>';
+                      load.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">Error: ${e.message}</div>`;
                   } finally {
                       clearInterval(timerInterval); isGenerating = false; currentAbortController = null; updateInputButtons();
                   }
@@ -777,12 +691,10 @@
                   try {
                       setupPdfWorker();
                       OR_API_KEY = safeStorageGet('yanai_or_key') || "";
-                      GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
-                      PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
                       if (safeStorageGet('yanai_theme') === 'dark') document.documentElement.classList.add('dark');
                       try { allChats = JSON.parse(safeStorageGet('yanai_all_chats') || "[]"); } catch(e) {}
                       try { allUploadedDocs = JSON.parse(safeStorageGet('yanai_library') || "[]"); } catch(e) {}
-                      applySavedTheme(); setProvider(PROVIDER); checkApiKeyStatus(); renderChatList();
+                      applySavedTheme(); renderModelSelector(); checkApiKeyStatus(); renderChatList();
                       window.addEventListener('paste', handlePaste);
                   } catch(e) { console.error("Init Error:", e); }
               }
