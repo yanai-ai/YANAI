@@ -372,8 +372,8 @@
                         { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses', detail: 'Optimized for speed and efficiency in general conversation.' }
                     ],
                     groq: [
-                        { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B', desc: 'Logic & Coding', detail: 'Highly specialized in technical reasoning and precise code output.' },
-                        { id: 'openai/gpt-oss-120b', name: 'GPT OSS 120B', desc: 'Knowledge Powerhouse', detail: 'Massive parameter count for deep nuance and comprehensive knowledge.' }
+                        { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', desc: 'Logic & Reasoning', detail: 'Groq\'s most capable high-reasoning model.' },
+                        { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B', desc: 'Fast & Balanced', detail: 'Excellent for general chat and fast responses.' }
                     ]
                 };
 
@@ -554,30 +554,24 @@
                     toggleSettingsModal();
                 }
 
-                // FULL REWRITE: Sanitize the entire message chain for Groq
                 function sanitizeMessages(messages, provider) {
                     if (provider !== 'groq') return messages;
 
                     return messages.map(msg => {
-                        // If content is already a string, it's safe
-                        if (typeof msg.content === 'string') return msg;
-
-                        // If content is an array (Multimodal), flatten it to a string
-                        let combinedText = "";
-                        if (Array.isArray(msg.content)) {
-                            msg.content.forEach(block => {
-                                if (block.type === 'text') combinedText += block.text + " ";
-                                if (block.type === 'image_url') combinedText += "[Attached Image] ";
-                            });
-                        } else {
-                            // Fallback for any other object types
-                            combinedText = JSON.stringify(msg.content);
+                        let finalContent = msg.content;
+                        if (typeof finalContent !== 'string') {
+                            let combinedText = "";
+                            if (Array.isArray(finalContent)) {
+                                finalContent.forEach(block => {
+                                    if (block.type === 'text') combinedText += block.text + " ";
+                                    if (block.type === 'image_url') combinedText += "[Attached Image] ";
+                                });
+                            } else {
+                                combinedText = JSON.stringify(finalContent);
+                            }
+                            finalContent = combinedText.trim() || "Hello!";
                         }
-
-                        return {
-                            role: msg.role,
-                            content: combinedText.trim() || "Hello!"
-                        };
+                        return { role: msg.role, content: finalContent };
                     });
                 }
 
@@ -586,7 +580,6 @@
                     const key = config.apiKeys[provider];
                     const model = config.model;
 
-                    // CRITICAL: Sanitize EVERY message in the history chain
                     const finalMessages = sanitizeMessages(messages, provider);
 
                     if (provider === 'openrouter') {
