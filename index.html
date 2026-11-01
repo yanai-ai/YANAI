@@ -24,7 +24,7 @@
                       }
                   }
               }
-          };
+          }
       </script>
       <style>
           :root {
@@ -34,14 +34,12 @@
               --brand-800: #9a3412; --brand-900: #7c2d12;
               --brand-rgb: 249, 115, 22;
           }
-
           body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; }
           .chat-container::-webkit-scrollbar { width: 5px; }
           .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
           .dark .chat-container::-webkit-scrollbar-thumb { background: #334155; }
           .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
           @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
           .prose-ai { line-height: 1.7; color: inherit; font-size: 1.05rem; }
           .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: var(--brand-color); letter-spacing: -0.02em; }
           .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(var(--brand-rgb), 0.2); padding-bottom: 0.25rem; }
@@ -56,12 +54,10 @@
           .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: var(--brand-color); font-weight: 800; }
           .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
           .dark .prose-ai code { background: rgba(255,255,255,0.1); }
-
           .user-msg { background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-700) 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); font-size:
   1.05rem; }
           .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 1.05rem; }
           .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
-
           .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
           .core-center { width: 8px; height: 8px; background: var(--brand-color); border-radius: 50%; z-index: 10; box-shadow: 0 0 12px var(--brand-color); animation: pulse-glow 1.5s infinite ease-in-out; }
           .core-ring { position: absolute; border: 2px solid var(--brand-color); border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -69,19 +65,16 @@
           .ring-2 { width: 20px; height: 20px; animation-delay: 0.6s; }
           @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px var(--brand-color); } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px var(--brand-color); } }
           @keyframes orbit { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
-
           .glass-input { backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(0, 0, 0, 0.05); }
           .dark .glass-input { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); }
           .chat-item.active { background: rgba(var(--brand-rgb), 0.1); border-color: var(--brand-color); color: var(--brand-color); }
           .dark .chat-item.active { background: rgba(var(--brand-rgb), 0.2); border-color: var(--brand-color); color: var(--brand-color); }
-
           #sidebar-resizer { width: 4px; cursor: col-resize; transition: background 0.2s; z-index: 20; }
           #sidebar-resizer:hover { background: var(--brand-color); }
       </style>
   </head>
   <body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-100">
 
-      <!-- Sidebar -->
       <aside id="sidebar" class="bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 relative overflow-x-hidden" style="width: 288px;">
           <div class="p-6 flex flex-col h-full overflow-hidden">
               <div class="flex items-center justify-between mb-10">
@@ -98,7 +91,6 @@
                       <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">Yanai AI</h1>
                   </div>
               </div>
-
               <div class="space-y-3 mb-6">
                   <button onclick="startNewChat()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
   rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
@@ -114,19 +106,16 @@
                       <span class="whitespace-nowrap">Library</span>
                   </button>
               </div>
-
               <div class="mb-6 overflow-hidden">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
                   <div class="space-y-2" id="model-selector">
-                      <!-- Models are dynamically injected here by JS -->
+                      <!-- Dynamic model buttons based on provider -->
                   </div>
               </div>
-
               <div class="flex-1 overflow-hidden flex flex-col">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
                   <div id="recent-chats-list" class="space-y-1 overflow-y-auto chat-container px-2 pb-4"></div>
               </div>
-
               <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1">
                   <button onclick="toggleSettingsModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
   transition-all group overflow-hidden">
@@ -142,7 +131,6 @@
           <div id="sidebar-resizer" class="absolute right-0 top-0 h-full hover:bg-brand-500"></div>
       </aside>
 
-      <!-- Library Overlay -->
       <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
           <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
   translate-x-full" id="library-panel">
@@ -165,7 +153,6 @@
           </div>
       </div>
 
-      <!-- Settings Modal -->
       <div id="settings-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
               <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
@@ -175,7 +162,6 @@
                   <button onclick="switchSettingTab('danger')" id="tab-danger" class="flex-1 py-4 text-sm font-bold transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700
   dark:hover:text-slate-300">Danger Zone</button>
               </div>
-
               <div class="p-8 overflow-y-auto flex-1 space-y-8">
                   <div id="panel-general" class="setting-panel space-y-8">
                       <div class="space-y-4">
@@ -185,7 +171,6 @@
                               <button onclick="setProvider('groq')" id="prov-groq" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all">Groq</button>
                           </div>
                       </div>
-
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Configuration</p>
                           <div class="space-y-3">
@@ -202,7 +187,6 @@
                           </div>
                       </div>
                   </div>
-
                   <div id="panel-appearance" class="setting-panel hidden space-y-8">
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Theme Mode</p>
@@ -213,7 +197,6 @@
                               </button>
                           </div>
                       </div>
-
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Brand Accent Color</p>
                           <div class="grid grid-cols-3 gap-3">
@@ -232,7 +215,6 @@
                           </div>
                       </div>
                   </div>
-
                   <div id="panel-danger" class="setting-panel hidden space-y-8">
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Data Management</p>
@@ -248,21 +230,18 @@
                       </div>
                   </div>
               </div>
-
               <div class="p-6 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 flex justify-end">
                   <button onclick="saveSettings()" class="px-6 py-2 bg-brand-500 text-white font-semibold rounded-xl shadow-lg hover:bg-brand-600 transition-all text-sm">Save Changes</button>
               </div>
           </div>
       </div>
 
-      <!-- Main Chat Area -->
       <main class="flex-1 flex flex-col relative bg-slate-50 dark:bg-black overflow-hidden">
           <header class="h-16 flex items-center justify-between px-8 border-b border-slate-200 dark:border-slate-900 bg-white/80 dark:bg-black/50 backdrop-blur-md z-10">
               <div class="flex items-center gap-4">
                   <span id="current-model-display" class="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">...</span>
               </div>
           </header>
-
           <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-8">
               <div id="welcome-screen" class="max-w-3xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
                   <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
@@ -270,7 +249,6 @@
               </div>
               <div id="messages" class="max-w-4xl mx-auto space-y-10 pb-32"></div>
           </div>
-
           <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50 dark:from-black via-slate-50 dark:via-black to-transparent">
               <div class="max-w-4xl mx-auto relative">
                   <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
@@ -281,7 +259,6 @@
                           API Key required to chat
                       </div>
                   </div>
-
                   <div id="file-preview" class="hidden absolute -top-14 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 flex items-center gap-3 shadow-lg
   text-xs animate-bounce">
                       <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2
@@ -329,40 +306,29 @@
           <input type="file" id="image-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
 
           <script>
-              // --- CONSTANTS (Defined first) ---
               const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
               const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
               const MODEL_CONFIG = {
                   openrouter: [
-                      { id: 'nvidia/nemotron-3.5-super-vl', name: 'Nvidia Nemotron 3.5 Super VL', desc: 'Vision & complex logic', vision: true },
-                      { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses', vision: false }
+                      { id: 'nvidia/nemotron-3.5-super-vl', name: 'Nvidia Nemotron 3.5 Super VL', desc: 'Vision & complex logic' },
+                      { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
                   ],
                   groq: [
-                      { id: 'gemma2-9b-it', name: 'Gwen 3.8 27B (Simulated)', desc: 'High reasoning efficiency', vision: false },
-                      { id: 'llama-3.1-70b-versatile', name: 'GPT OSS 120B (Simulated)', desc: 'Massive scale logic', vision: false }
+                      { id: 'gemma2-9b-it', name: 'Gwen 3.8 27B', desc: 'High reasoning efficiency' },
+                      { id: 'llama-3.1-70b-versatile', name: 'GPT OSS 120B', desc: 'Massive scale logic' }
                   ]
               };
 
               const THEMES = {
-                  orange: {
-                      color: '#f97316', rgb: '249, 115, 22',
-                      50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
-                      400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12'
-                  },
-                  blue: {
-                      color: '#3b82f6', rgb: '59, 130, 246',
-                      50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
-                      400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
-                  },
-                  mono: {
-                      color: '#475569', rgb: '71, 85, 105',
-                      50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
-                      400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a'
-                  }
+                  orange: { color: '#f97316', rgb: '249, 115, 22', 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412',
+  900: '#7c2d12' },
+                  blue: { color: '#3b82f6', rgb: '59, 130, 246', 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af',
+  900: '#1e3a8a' },
+                  mono: { color: '#475569', rgb: '71, 85, 105', 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b',
+  900: '#0f172a' }
               };
 
-              // --- STATE ---
               let PROVIDER = "openrouter";
               let OR_API_KEY = "";
               let GROQ_API_KEY = "";
@@ -377,70 +343,52 @@
               let currentChatId = null;
               let allUploadedDocs = [];
 
-              // --- UTILS ---
               function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
               function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
-              // --- UI LOGIC ---
+              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
               function setBrandColor(themeKey) {
                   const theme = THEMES[themeKey];
                   const root = document.documentElement;
-                  if (!root) return;
                   root.style.setProperty('--brand-color', theme.color);
                   root.style.setProperty('--brand-rgb', theme.rgb);
-                  Object.keys(theme).forEach(key => {
-                      if (key !== 'color' && key !== 'rgb') root.style.setProperty(`--brand-${key}`, theme[key]);
-                  });
+                  Object.keys(theme).forEach(key => { if (key !== 'color' && key !== 'rgb') root.style.setProperty(`--brand-${key}`, theme[key]); });
                   document.querySelectorAll('.theme-option-btn').forEach(btn => {
                       btn.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
                       btn.classList.add('border-slate-200', 'dark:border-slate-800');
-                      if (btn.dataset.theme === themeKey) {
-                          btn.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
-                          btn.classList.remove('border-slate-200', 'dark:border-slate-800');
-                      }
+                      if (btn.dataset.theme === themeKey) { btn.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20'); btn.classList.remove('border-slate-200', 'dark:border-slate-800'); }
                   });
                   safeStorageSet('yanai_brand_theme', themeKey);
               }
 
-              function applySavedTheme() {
-                  const saved = safeStorageGet('yanai_brand_theme') || 'orange';
-                  setBrandColor(saved);
-              }
+              function applySavedTheme() { setBrandColor(safeStorageGet('yanai_brand_theme') || 'orange'); }
 
               function switchSettingTab(tabId) {
                   document.querySelectorAll('.setting-panel').forEach(p => p.classList.add('hidden'));
-                  const panel = document.getElementById(`panel-${tabId}`);
-                  if (panel) panel.classList.remove('hidden');
-                  document.querySelectorAll('[id^="tab-"]').forEach(t => {
-                      t.classList.remove('border-brand-500', 'text-brand-500');
-                      t.classList.add('border-transparent', 'text-slate-500');
-                  });
+                  document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+                  document.querySelectorAll('[id^="tab-"]').forEach(t => { t.classList.remove('border-brand-500', 'text-brand-500'); t.classList.add('border-transparent', 'text-slate-500'); });
                   const activeTab = document.getElementById(`tab-${tabId}`);
-                  if (activeTab) {
-                      activeTab.classList.add('border-brand-500', 'text-brand-500');
-                      activeTab.classList.remove('border-transparent', 'text-slate-500');
-                  }
+                  activeTab.classList.add('border-brand-500', 'text-brand-500');
+                  activeTab.classList.remove('border-transparent', 'text-slate-500');
               }
+
+              const sidebar = document.getElementById('sidebar');
+              const resizer = document.getElementById('sidebar-resizer');
+              let isResizing = false;
+              resizer.addEventListener('mousedown', (e) => { isResizing = true; document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none'; });
+              window.addEventListener('mousemove', (e) => { if (isResizing) { const newWidth = e.clientX; if (newWidth > 260 && newWidth < 450) sidebar.style.width = `${newWidth}px`; } });
+              window.addEventListener('mouseup', () => { isResizing = false; document.body.style.cursor = 'default'; document.body.style.userSelect = 'auto'; });
 
               function setProvider(prov) {
                   PROVIDER = prov;
-                  const pOR = document.getElementById('prov-openrouter');
-                  const pGR = document.getElementById('prov-groq');
-                  if (pOR) pOR.className = prov === 'openrouter' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold rounded-lg
-  transition-all text-slate-500';
-                  if (pGR) pGR.className = prov === 'groq' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold rounded-lg
-  transition-all text-slate-500';
-
-                  const cOR = document.getElementById('key-container-openrouter');
-                  const cGR = document.getElementById('key-container-groq');
-                  if (cOR) cOR.classList.toggle('hidden', prov !== 'openrouter');
-                  if (cGR) cGR.classList.toggle('hidden', prov !== 'groq');
-
-                  const models = MODEL_CONFIG[prov];
-                  if (models && models.length > 0) {
-                      MODEL = models[0].id;
-                  }
-
+                  document.getElementById('prov-openrouter').className = prov === 'openrouter' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2
+  text-xs font-bold rounded-lg transition-all text-slate-500';
+                  document.getElementById('prov-groq').className = prov === 'groq' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold
+  rounded-lg transition-all text-slate-500';
+                  document.getElementById('key-container-openrouter').classList.toggle('hidden', prov !== 'openrouter');
+                  document.getElementById('key-container-groq').classList.toggle('hidden', prov !== 'groq');
+                  MODEL = MODEL_CONFIG[prov][0].id;
                   renderModelSelector();
                   updateModelDisplay();
                   safeStorageSet('yanai_provider', prov);
@@ -448,10 +396,8 @@
 
               function renderModelSelector() {
                   const container = document.getElementById('model-selector');
-                  if (!container) return;
                   container.innerHTML = '';
-                  const models = MODEL_CONFIG[PROVIDER] || [];
-                  models.forEach(m => {
+                  MODEL_CONFIG[PROVIDER].forEach(m => {
                       const btn = document.createElement('button');
                       btn.className = `model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border ${MODEL === m.id ? 'bg-brand-500 text-white border-brand-500 shadow-sm' : 'border-slate-200
   dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900'}`;
@@ -463,11 +409,9 @@
               }
 
               function updateModelDisplay() {
-                  const display = document.getElementById('current-model-display');
-                  if (!display) return;
-                  const allModels = [...MODEL_CONFIG.openrouter, ...MODEL_CONFIG.groq];
-                  const modelObj = allModels.find(m => m.id === MODEL);
-                  display.innerText = modelObj ? modelObj.name : MODEL;
+                  const all = [...MODEL_CONFIG.openrouter, ...MODEL_CONFIG.groq];
+                  const m = all.find(x => x.id === MODEL);
+                  document.getElementById('current-model-display').innerText = m ? m.name : MODEL;
               }
 
               function setModel(modelId, btn) {
@@ -482,65 +426,39 @@
               }
 
               function checkApiKeyStatus() {
-                  const input = document.getElementById('user-input');
-                  const btn = document.getElementById('send-btn');
-                  const warning = document.getElementById('api-warning');
-                  if (!input || !btn || !warning) return;
+                  const input = document.getElementById('user-input'), btn = document.getElementById('send-btn'), warning = document.getElementById('api-warning');
                   const key = PROVIDER === 'openrouter' ? OR_API_KEY : GROQ_API_KEY;
-                  if (!key) {
-                      input.disabled = true; input.placeholder = "API Key required to chat...";
-                      btn.disabled = true; warning.classList.remove('hidden');
-                  } else {
-                      input.disabled = false; input.placeholder = "Message Yanai...";
-                      btn.disabled = false; warning.classList.add('hidden');
-                  }
+                  if (!key) { input.disabled = true; input.placeholder = "API Key required to chat..."; btn.disabled = true; warning.classList.remove('hidden'); }
+                  else { input.disabled = false; input.placeholder = "Message Yanai..."; btn.disabled = false; warning.classList.add('hidden'); }
               }
 
               function toggleSettingsModal() {
-                  const modal = document.getElementById('settings-modal');
-                  if (!modal) return;
-                  modal.classList.toggle('hidden');
-                  const keyOR = document.getElementById('settings-api-key-openrouter');
-                  const keyGR = document.getElementById('settings-api-key-groq');
-                  if (keyOR) keyOR.value = OR_API_KEY;
-                  if (keyGR) keyGR.value = GROQ_API_KEY;
+                  document.getElementById('settings-modal').classList.toggle('hidden');
+                  document.getElementById('settings-api-key-openrouter').value = OR_API_KEY;
+                  document.getElementById('settings-api-key-groq').value = GROQ_API_KEY;
                   setProvider(PROVIDER);
               }
 
               function saveSettings() {
-                  const keyOR = document.getElementById('settings-api-key-openrouter');
-                  const keyGR = document.getElementById('settings-api-key-groq');
-                  if (keyOR) {
-                      const val = keyOR.value.trim();
-                      if (val) { OR_API_KEY = val; safeStorageSet('yanai_or_key', OR_API_KEY); }
-                  }
-                  if (keyGR) {
-                      const val = keyGR.value.trim();
-                      if (val) { GROQ_API_KEY = val; safeStorageSet('yanai_groq_key', GROQ_API_KEY); }
-                  }
+                  const nkOr = document.getElementById('settings-api-key-openrouter').value.trim();
+                  const nkGr = document.getElementById('settings-api-key-groq').value.trim();
+                  if (nkOr) { OR_API_KEY = nkOr; safeStorageSet('yanai_or_key', OR_API_KEY); }
+                  if (nkGr) { GROQ_API_KEY = nkGr; safeStorageSet('yanai_groq_key', GROQ_API_KEY); }
                   checkApiKeyStatus();
                   toggleSettingsModal();
               }
 
               function toggleTheme() {
                   const html = document.documentElement;
-                  if (!html) return;
-                  if (html.classList.contains('dark')) {
-                      html.classList.remove('dark');
-                      safeStorageSet('yanai_theme', 'light');
-                  } else {
-                      html.classList.add('dark');
-                      safeStorageSet('yanai_theme', 'dark');
-                  }
+                  if (html.classList.contains('dark')) { html.classList.remove('dark'); safeStorageSet('yanai_theme', 'light'); }
+                  else { html.classList.add('dark'); safeStorageSet('yanai_theme', 'dark'); }
               }
 
               function startNewChat() {
                   currentChatId = 'chat_' + Date.now();
                   allChats.push({ id: currentChatId, title: 'New Conversation', timestamp: Date.now(), messages: [] });
-                  const msgDiv = document.getElementById('messages');
-                  if (msgDiv) msgDiv.innerHTML = '';
-                  const welcome = document.getElementById('welcome-screen');
-                  if (welcome) welcome.classList.remove('hidden');
+                  document.getElementById('messages').innerHTML = '';
+                  document.getElementById('welcome-screen').classList.remove('hidden');
                   saveAllChats();
                   renderChatList();
               }
@@ -549,16 +467,9 @@
                   currentChatId = id;
                   const chat = allChats.find(c => c.id === id);
                   if (!chat) return;
-                  const msgDiv = document.getElementById('messages');
-                  if (!msgDiv) return;
-                  msgDiv.innerHTML = '';
-                  const welcome = document.getElementById('welcome-screen');
-                  if (chat.messages.length === 0) {
-                      if (welcome) welcome.classList.remove('hidden');
-                  } else {
-                      if (welcome) welcome.classList.add('hidden');
-                      chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
-                  }
+                  document.getElementById('messages').innerHTML = '';
+                  if (chat.messages.length === 0) document.getElementById('welcome-screen').classList.remove('hidden');
+                  else { document.getElementById('welcome-screen').classList.add('hidden'); chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false)); }
                   renderChatList();
                   scrollToBottom();
               }
@@ -567,13 +478,7 @@
                   allChats = allChats.filter(c => c.id !== id);
                   saveAllChats();
                   renderChatList();
-                  if (currentChatId === id) {
-                      currentChatId = null;
-                      const msgDiv = document.getElementById('messages');
-                      if (msgDiv) msgDiv.innerHTML = '';
-                      const welcome = document.getElementById('welcome-screen');
-                      if (welcome) welcome.classList.remove('hidden');
-                  }
+                  if (currentChatId === id) { currentChatId = null; document.getElementById('messages').innerHTML = ''; document.getElementById('welcome-screen').classList.remove('hidden'); }
               }
 
               function saveAllChats() { safeStorageSet('yanai_all_chats', JSON.stringify(allChats)); }
@@ -581,95 +486,59 @@
 
               function updateChatTitle(text) {
                   const chat = allChats.find(c => c.id === currentChatId);
-                  if (chat && chat.title === 'New Conversation') {
-                      chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
-                      saveAllChats();
-                      renderChatList();
-                  }
+                  if (chat && chat.title === 'New Conversation') { chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : ''); saveAllChats(); renderChatList(); }
               }
 
               function renderChatList() {
-                  const listContainer = document.getElementById('recent-chats-list');
-                  if (!listContainer) return;
-                  listContainer.innerHTML = '';
-                  const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
-                  sortedChats.forEach(chat => {
+                  const list = document.getElementById('recent-chats-list');
+                  list.innerHTML = '';
+                  [...allChats].sort((a, b) => b.timestamp - a.timestamp).forEach(chat => {
                       const item = document.createElement('div');
                       item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
   dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
                       item.onclick = () => loadChat(chat.id);
-                      item.innerHTML = `
-                          <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
-                          <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
-                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-  12"></path></svg>
-                          </button>`;
-                      listContainer.appendChild(item);
+                      item.innerHTML = `<div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div><button onclick="event.stopPropagation();
+  deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path
+  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>`;
+                      list.appendChild(item);
                   });
               }
 
               function clearAllData() {
-                  if (confirm("Are you absolutely sure? This will delete all your conversations and your document library. This cannot be undone.")) {
-                      allChats = [];
-                      allUploadedDocs = [];
-                      saveAllChats();
-                      saveLibrary();
-                      localStorage.removeItem('yanai_all_chats');
-                      localStorage.removeItem('yanai_library');
-                      const msgDiv = document.getElementById('messages');
-                      if (msgDiv) msgDiv.innerHTML = '';
-                      const welcome = document.getElementById('welcome-screen');
-                      if (welcome) welcome.classList.remove('hidden');
-                      renderChatList();
-                      renderLibrary();
-                      alert("All data has been cleared.");
+                  if (confirm("Are you absolutely sure?")) {
+                      allChats = []; allUploadedDocs = []; saveAllChats(); saveLibrary();
+                      localStorage.removeItem('yanai_all_chats'); localStorage.removeItem('yanai_library');
+                      document.getElementById('messages').innerHTML = ''; document.getElementById('welcome-screen').classList.remove('hidden');
+                      renderChatList(); renderLibrary();
                   }
               }
 
               function toggleLibrary() {
-                  const overlay = document.getElementById('library-overlay');
-                  const panel = document.getElementById('library-panel');
-                  if (!overlay || !panel) return;
-                  if (overlay.classList.contains('hidden')) {
-                      overlay.classList.remove('hidden');
-                      setTimeout(() => panel.classList.remove('translate-x-full'), 10);
-                      renderLibrary();
-                  } else {
-                      panel.classList.add('translate-x-full');
-                      setTimeout(() => overlay.classList.add('hidden'), 300);
-                  }
+                  const o = document.getElementById('library-overlay'), p = document.getElementById('library-panel');
+                  if (o.classList.contains('hidden')) { o.classList.remove('hidden'); setTimeout(() => p.classList.remove('translate-x-full'), 10); renderLibrary(); }
+                  else { p.classList.add('translate-x-full'); setTimeout(() => o.classList.add('hidden'), 300); }
               }
 
               function renderLibrary() {
                   const list = document.getElementById('library-list');
-                  if (!list) return;
                   list.innerHTML = '';
-                  if (allUploadedDocs.length === 0) {
-                      list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
-                      return;
-                  }
-                  allUploadedDocs.forEach((doc, index) => {
+                  if (!allUploadedDocs.length) { list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>'; return; }
+                  allUploadedDocs.forEach((doc, i) => {
                       const div = document.createElement('div');
                       div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group";
-                      div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
-                                      <div class="flex items-center gap-3">
-                                        <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>
-                                        <button onclick="deleteDoc(${index})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-all">✕</button>
-                                      </div>`;
+                      div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div><div class="flex
+  items-center gap-3"><span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span><button onclick="deleteDoc(${i})" class="opacity-0 group-hover:opacity-100 text-slate-400
+  hover:text-red-500 transition-all">✕</button></div>`;
                       list.appendChild(div);
                   });
               }
 
-              function deleteDoc(index) {
-                  allUploadedDocs.splice(index, 1);
-                  saveLibrary();
-                  renderLibrary();
-              }
+              function deleteDoc(i) { allUploadedDocs.splice(i, 1); saveLibrary(); renderLibrary(); }
 
               async function extractTextFromFile(file) {
                   if (file.type === 'application/pdf') {
-                      const arrayBuffer = await file.arrayBuffer();
-                      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                      const ab = await file.arrayBuffer();
+                      const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
                       let text = "";
                       for (let i = 1; i <= pdf.numPages; i++) {
                           const page = await pdf.getPage(i);
@@ -678,67 +547,39 @@
                       }
                       return text;
                   } else if (file.name.endsWith('.docx')) {
-                      const arrayBuffer = await file.arrayBuffer();
-                      const result = await mammoth.extractRawText({ arrayBuffer });
+                      const ab = await file.arrayBuffer();
+                      const result = await mammoth.extractRawText({ arrayBuffer: ab });
                       return result.value;
-                  } else {
-                      return await file.text();
-                  }
+                  } else return await file.text();
               }
 
               async function handleFileUpload(e) {
-                  const file = e.target.files[0];
-                  if (!file) return;
-                  attachedFile.name = file.name;
-                  const previewName = document.getElementById('preview-name');
-                  if (previewName) previewName.innerText = file.name;
-                  const previewDiv = document.getElementById('file-preview');
-                  if (previewDiv) previewDiv.classList.remove('hidden');
+                  const f = e.target.files[0]; if (!f) return;
+                  attachedFile.name = f.name; document.getElementById('preview-name').innerText = f.name; document.getElementById('file-preview').classList.remove('hidden');
                   try {
-                      const text = await extractTextFromFile(file);
-                      attachedFile.content = text;
-                      allUploadedDocs.push({ name: file.name, date: Date.now(), content: text });
-                      saveLibrary();
+                      const t = await extractTextFromFile(f); attachedFile.content = t;
+                      allUploadedDocs.push({ name: f.name, date: Date.now(), content: t }); saveLibrary();
                   } catch (err) { alert("File Error: " + err.message); }
               }
 
               async function handleLibraryFileUpload(e) {
-                  const file = e.target.files[0];
-                  if (!file) return;
+                  const f = e.target.files[0]; if (!f) return;
                   try {
-                      const text = await extractTextFromFile(file);
-                      allUploadedDocs.push({ name: file.name, date: Date.now(), content: text });
-                      saveLibrary();
-                      renderLibrary();
-                      alert(`Successfully added ${file.name} to your library!`);
-                  } catch (err) {
-                      alert("File Error: " + err.message);
-                  }
+                      const t = await extractTextFromFile(f);
+                      allUploadedDocs.push({ name: f.name, date: Date.now(), content: t }); saveLibrary(); renderLibrary();
+                      alert(`Added ${f.name}!`);
+                  } catch (err) { alert("File Error: " + err.message); }
               }
 
               async function handleImageUpload(e) {
-                  const file = e.target.files[0];
-                  if (!file) return;
-                  await processImageFile(file);
-              }
-
-              async function processImageFile(file) {
-                  return new Promise((resolve, reject) => {
-                      const reader = new FileReader();
-                      reader.onload = (e) => {
-                          const base64 = e.target.result;
-                          attachedImages.push({ name: file.name, base64: base64 });
-                          const previewName = document.getElementById('preview-name');
-                          if (previewName) {
-                              previewName.innerText = attachedImages.length === 1 ? file.name : `${attachedImages.length} images`;
-                          }
-                          const previewDiv = document.getElementById('file-preview');
-                          if (previewDiv) previewDiv.classList.remove('hidden');
-                          resolve();
-                      };
-                      reader.onerror = reject;
-                      reader.readAsDataURL(file);
-                  });
+                  const f = e.target.files[0]; if (!f) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                      attachedImages.push({ name: f.name, base64: ev.target.result });
+                      document.getElementById('preview-name').innerText = attachedImages.length === 1 ? f.name : `${attachedImages.length} images`;
+                      document.getElementById('file-preview').classList.remove('hidden');
+                  };
+                  reader.readAsDataURL(f);
               }
 
               async function handlePaste(e) {
@@ -746,304 +587,166 @@
                   for (let i = 0; i < items.length; i++) {
                       if (items[i].type.indexOf('image') !== -1) {
                           const blob = items[i].getAsFile();
-                          const file = new File([blob], `pasted-image-${Date.now()}.png`, { type: blob.type });
-                          await processImageFile(file);
+                          const f = new File([blob], `pasted-${Date.now()}.png`, { type: blob.type });
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
+                              attachedImages.push({ name: f.name, base64: ev.target.result });
+                              document.getElementById('preview-name').innerText = attachedImages.length === 1 ? f.name : `${attachedImages.length} images`;
+                              document.getElementById('file-preview').classList.remove('hidden');
+                          };
+                          reader.readAsDataURL(f);
                       }
                   }
               }
 
-              function triggerFileInput(type) {
+              function triggerFileInput(t) {
                   toggleAttachMenu();
-                  if (type === 'doc') {
-                      const el = document.getElementById('file-input');
-                      if (el) el.click();
-                  }
-                  if (type === 'img') {
-                      const el = document.getElementById('image-input');
-                      if (el) el.click();
-                  }
+                  if (t === 'doc') document.getElementById('file-input').click();
+                  if (t === 'img') document.getElementById('image-input').click();
               }
 
-              function toggleAttachMenu() {
-                  const menu = document.getElementById('attach-menu');
-                  if (menu) menu.classList.toggle('hidden');
-              }
+              function toggleAttachMenu() { document.getElementById('attach-menu').classList.toggle('hidden'); }
 
-              window.addEventListener('click', (e) => {
-                  if (!e.target.closest('#attach-btn') && !e.target.closest('#attach-menu')) {
-                      const menu = document.getElementById('attach-menu');
-                      if (menu) menu.classList.add('hidden');
-                  }
-              });
+              window.addEventListener('click', (e) => { if (!e.target.closest('#attach-btn') && !e.target.closest('#attach-menu')) document.getElementById('attach-menu').classList.add('hidden'); });
 
-              function clearFile() {
-                  attachedFile = { name: '', content: '' };
-                  attachedImages = [];
-                  const previewDiv = document.getElementById('file-preview');
-                  if (previewDiv) previewDiv.classList.add('hidden');
-              }
+              function clearFile() { attachedFile = { name: '', content: '' }; attachedImages = []; document.getElementById('file-preview').classList.add('hidden'); }
 
               function retrieveContext(query) {
-                  if (!allUploadedDocs || allUploadedDocs.length === 0) return "";
-                  const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
-                  let relevantSnippets = [];
+                  if (!allUploadedDocs.length) return "";
+                  const kw = query.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
+                  let res = [];
                   allUploadedDocs.forEach(doc => {
-                      if (!doc || !doc.content) return;
-                      const content = doc.content.toLowerCase();
-                      const foundKeywords = keywords.filter(kw => content.includes(kw));
-                      if (foundKeywords.length > 0) {
-                          const firstKw = foundKeywords[0];
-                          const index = content.indexOf(firstKw);
-                          const start = Math.max(0, index - 500);
-                          const end = Math.min(doc.content.length, index + 500);
-                          relevantSnippets.push(`[Source: ${doc.name}]\n${doc.content.substring(start, end)}`);
+                      const c = doc.content.toLowerCase();
+                      const found = kw.filter(k => c.includes(k));
+                      if (found.length) {
+                          const idx = c.indexOf(found[0]);
+                          res.push(`[Source: ${doc.name}]\n${doc.content.substring(Math.max(0, idx-500), Math.min(doc.content.length, idx+500))}`);
                       }
                   });
-                  return relevantSnippets.length > 0
-                      ? "\n\n### REFERENCE KNOWLEDGE ###\n" + relevantSnippets.join("\n\n") + "\n### END REFERENCE ###"
-                      : "";
+                  return res.length ? "\n\n### REFERENCE KNOWLEDGE ###\n" + res.join("\n\n") + "\n### END REFERENCE ###" : "";
               }
 
-              async function typeWriter(element, text) {
+              async function typeWriter(el, text) {
                   let i = 0;
-                  const speed = 5;
                   function type() {
                       if (i < text.length && isTyping) {
-                          element.innerHTML = marked.parse(text.substring(0, i + 1));
-                          i++;
-                          setTimeout(type, speed);
-                          scrollToBottom();
-                      } else {
-                          if (i >= text.length) {
-                              isTyping = false;
-                              updateInputButtons();
-                          }
-                      }
+                          el.innerHTML = marked.parse(text.substring(0, i + 1));
+                          i++; setTimeout(type, 5); scrollToBottom();
+                      } else if (i >= text.length) { isTyping = false; updateInputButtons(); }
                   }
                   type();
               }
 
               function appendMessage(role, text, save = true) {
-                  const container = document.getElementById('messages');
-                  if (!container) return;
-                  const msgDiv = document.createElement('div');
-                  msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
-
-                  if (role === 'user') {
-                      msgDiv.innerHTML = `<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
-                  } else {
-                      msgDiv.innerHTML = `<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
-                      const target = msgDiv.querySelector('.typing-target');
-                      if (!save) {
-                          if (target) target.innerHTML = marked.parse(text);
-                      } else {
-                          if (target) typeWriter(target, text);
-                      }
+                  const c = document.getElementById('messages');
+                  const div = document.createElement('div');
+                  div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+                  if (role === 'user') div.innerHTML = `<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
+                  else {
+                      div.innerHTML = `<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
+                      const target = div.querySelector('.typing-target');
+                      if (!save) target.innerHTML = marked.parse(text); else typeWriter(target, text);
                   }
-                  container.appendChild(msgDiv);
-                  scrollToBottom();
-
+                  c.appendChild(div); scrollToBottom();
                   if (save) {
-                      const chat = allChats.find(c => c.id === currentChatId);
-                      if (chat) {
-                          chat.messages.push({ role, content: text });
-                          if (role === 'user') updateChatTitle(text);
-                          saveAllChats();
-                      }
+                      const chat = allChats.find(x => x.id === currentChatId);
+                      if (chat) { chat.messages.push({ role, content: text }); if (role === 'user') updateChatTitle(text); saveAllChats(); }
                   }
               }
 
-              function scrollToBottom() {
-                  const win = document.getElementById('chat-window');
-                  if (win) win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
-              }
+              function scrollToBottom() { document.getElementById('chat-window').scrollTo({ top: document.getElementById('chat-window').scrollHeight, behavior: 'smooth' }); }
 
-              function stopResponse() {
-                  if (currentAbortController) {
-                      currentAbortController.abort();
-                  }
-                  isGenerating = false;
-                  isTyping = false;
-                  updateInputButtons();
-              }
+              function stopResponse() { if (currentAbortController) currentAbortController.abort(); isGenerating = false; isTyping = false; updateInputButtons(); }
 
               function updateInputButtons() {
-                  const sendBtn = document.getElementById('send-btn');
-                  const stopBtn = document.getElementById('stop-btn');
-                  if (!sendBtn || !stopBtn) return;
-                  if (isGenerating || isTyping) {
-                      sendBtn.classList.add('hidden');
-                      stopBtn.classList.remove('hidden');
-                  } else {
-                      sendBtn.classList.remove('hidden');
-                      stopBtn.classList.add('hidden');
-                  }
+                  const s = document.getElementById('send-btn'), st = document.getElementById('stop-btn');
+                  if (isGenerating || isTyping) { s.classList.add('hidden'); st.classList.remove('hidden'); }
+                  else { s.classList.remove('hidden'); st.classList.add('hidden'); }
               }
 
               async function handleSend() {
                   const input = document.getElementById('user-input');
-                  if (!input) return;
                   const text = input.value.trim();
                   const activeKey = PROVIDER === 'openrouter' ? OR_API_KEY : GROQ_API_KEY;
-
-                  if (!activeKey) return alert(`Set ${PROVIDER === 'openrouter' ? 'OpenRouter' : 'Groq'} Key first!`);
-                  if (!text && !attachedFile.content && attachedImages.length === 0) return;
+                  if (!activeKey) return alert(`Set ${PROVIDER} Key!`);
+                  if (!text && !attachedFile.content && !attachedImages.length) return;
                   if (isGenerating) return;
 
-                  const currentModelObj = [...MODEL_CONFIG.openrouter, ...MODEL_CONFIG.groq].find(m => m.id === MODEL);
-                  if (attachedImages.length > 0 && (!currentModelObj || !currentModelObj.vision)) {
-                      const confirmSwitch = confirm(`The current model (${currentModelObj?.name || MODEL}) does not support images. \n\nSwitch to Nvidia Nemotron Super VL?`);
-                      if (confirmSwitch) {
-                          if (PROVIDER !== 'openrouter') setProvider('openrouter');
-                          const btn = document.querySelector(`[data-model="nvidia/nemotron-3.5-super-vl"]`);
-                          if (btn) setModel('nvidia/nemotron-3.5-super-vl', btn);
-                      } else return;
-                  }
-
                   if (!currentChatId) startNewChat();
-                  const welcome = document.getElementById('welcome-screen');
-                  if (welcome) welcome.classList.add('hidden');
+                  document.getElementById('welcome-screen').classList.add('hidden');
 
-                  const libraryContext = retrieveContext(text);
-                  let userContent = [];
-                  if (text) userContent.push({ type: "text", text: text });
-                  attachedImages.forEach(img => userContent.push({ type: "image_url", image_url: { url: img.base64 } }));
+                  const ctx = retrieveContext(text);
+                  let content = [];
+                  if (text) content.push({ type: "text", text: text });
+                  attachedImages.forEach(img => content.push({ type: "image_url", image_url: { url: img.base64 } }));
                   if (attachedFile.content) {
-                      const docText = `\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n`;
-                      if (userContent.length > 0 && userContent[0].type === "text") userContent[0].text = docText + userContent[0].text;
-                      else userContent.unshift({ type: "text", text: docText });
+                      const d = `\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n`;
+                      if (content.length && content[0].type === "text") content[0].text = d + content[0].text;
+                      else content.unshift({ type: "text", text: d });
                   }
-                  if (userContent.length === 0) userContent.push({ type: "text", text: "Hello!" });
-                  if (libraryContext) {
-                      const firstText = userContent.find(c => c.type === "text");
-                      if (firstText) firstText.text += libraryContext;
-                      else userContent.push({ type: "text", text: libraryContext });
+                  if (!content.length) content.push({ type: "text", text: "Hello!" });
+                  if (ctx) {
+                      const first = content.find(x => x.type === "text");
+                      if (first) first.text += ctx; else content.push({ type: "text", text: ctx });
                   }
 
-                  const displayUserText = text || (attachedImages.length > 0 ? `${attachedImages.length} images` : (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!"));
-                  appendMessage('user', displayUserText);
+                  appendMessage('user', text || (attachedImages.length ? `${attachedImages.length} images` : (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!")));
+                  input.value = ''; input.style.height = ''; clearFile();
+                  isGenerating = true; updateInputButtons();
 
-                  input.value = '';
-                  input.style.height = '';
-                  clearFile();
-
-                  isGenerating = true;
-                  updateInputButtons();
-
-                  const startTime = Date.now();
-                  const loadingDiv = document.createElement('div');
-                  loadingDiv.className = 'flex justify-start message-appear';
-                  loadingDiv.innerHTML = `<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
+                  const start = Date.now();
+                  const load = document.createElement('div');
+                  load.className = 'flex justify-start message-appear';
+                  load.innerHTML = `<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
   ring-2"></div></div><span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span></div>`;
-                  const messagesContainer = document.getElementById('messages');
-                  if (messagesContainer) messagesContainer.appendChild(loadingDiv);
+                  document.getElementById('messages').appendChild(load);
 
                   timerInterval = setInterval(() => {
-                      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                      const timerSpan = document.getElementById('timer-text');
-                      if (timerSpan) timerSpan.innerText = `Yanai is thinking... ${elapsed}s`;
+                      const el = document.getElementById('timer-text');
+                      if (el) el.innerText = `Yanai is thinking... ${Math.floor((Date.now()-start)/1000)}s`;
                   }, 1000);
 
                   try {
-                      const chat = allChats.find(c => c.id === currentChatId);
-                      const history = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
+                      const chat = allChats.find(x => x.id === currentChatId);
+                      const hist = chat ? chat.messages.map(m => ({ role: m.role, content: m.content })) : [];
                       currentAbortController = new AbortController();
-                      const timeoutId = setTimeout(() => currentAbortController.abort(), 60000);
 
-                      let response;
+                      let res;
                       if (PROVIDER === 'openrouter') {
-                          response = await fetch(API_PROXY_URL, {
-                              method: 'POST',
-                              signal: currentAbortController.signal,
+                          res = await fetch(API_PROXY_URL, {
+                              method: 'POST', signal: currentAbortController.signal,
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                  headers: { Authorization: `Bearer ${OR_API_KEY}` },
-                                  model: MODEL,
-                                  messages: [
-                                      { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' },
-                                      ...history,
-                                      { role: 'user', content: userContent }
-                                  ]
-                              })
+                              body: JSON.stringify({ headers: { Authorization: `Bearer ${OR_API_KEY}` }, model: MODEL, messages: [{ role: 'system', content: 'You are Yanai AI.' }, ...hist, { role: 'user',
+  content: content }] })
                           });
                       } else {
-                          const groqMessages = [
-                              { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' },
-                              ...history,
-                              { role: 'user', content: userContent.map(c => c.type === 'text' ? c.text : '').join("\n") }
-                          ];
-                          response = await fetch(GROQ_API_URL, {
-                              method: 'POST',
-                              signal: currentAbortController.signal,
-                              headers: {
-                                  'Content-Type': 'application/json',
-                                  'Authorization': `Bearer ${GROQ_API_KEY}`
-                              },
-                              body: JSON.stringify({
-                                  model: MODEL,
-                                  messages: groqMessages
-                              })
+                          res = await fetch(GROQ_API_URL, {
+                              method: 'POST', signal: currentAbortController.signal,
+                              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${GROQ_API_KEY}` },
+                              body: JSON.stringify({ model: MODEL, messages: [{ role: 'system', content: 'You are Yanai AI.' }, ...hist, { role: 'user', content: content.map(c => c.text || "").join("\n") }] })
                           });
                       }
-
-                      clearTimeout(timeoutId);
-                      const data = await response.json();
-                      if (data.error) throw new Error(data.error.message || "API Error occurred");
-                      if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
-
-                      loadingDiv.remove();
-                      isTyping = true;
-                      appendMessage('ai', data.choices[0].message.content);
+                      const data = await res.json();
+                      if (data.error) throw new Error(data.error.message);
+                      load.remove(); isTyping = true; appendMessage('ai', data.choices[0].message.content);
                   } catch (e) {
-                      console.error(e);
-                      if (e.name === 'AbortError') {
-                          loadingDiv.innerHTML = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl text-slate-500 dark:text-slate-400 text-sm">Response stopped by user.</div>`;
-                      } else {
-                          loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
-                              ${e.name === 'AbortError' ? 'Request timed out.' : 'Error: ' + e.message}
-                          </div>`;
-                      }
+                      load.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">Error: ${e.message}</div>`;
                   } finally {
-                      clearInterval(timerInterval);
-                      isGenerating = false;
-                      currentAbortController = null;
-                      updateInputButtons();
+                      clearInterval(timerInterval); isGenerating = false; currentAbortController = null; updateInputButtons();
                   }
               }
 
-              // --- STARTUP ---
               function init() {
-                  try {
-                      // Safely init libraries
-                      if (typeof pdfjsLib !== 'undefined') {
-                          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                      }
-
-                      OR_API_KEY = safeStorageGet('yanai_or_key') || "";
-                      GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
-                      PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
-
-                      const savedTheme = safeStorageGet('yanai_theme');
-                      if (savedTheme === 'dark') {
-                          document.documentElement.classList.add('dark');
-                      }
-
-                      const savedChats = safeStorageGet('yanai_all_chats');
-                      if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
-                      const savedDocs = safeStorageGet('yanai_library');
-                      if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
-
-                      applySavedTheme();
-                      setProvider(PROVIDER);
-                      checkApiKeyStatus();
-                      renderChatList();
-                      window.addEventListener('paste', handlePaste);
-                  } catch (criticalErr) {
-                      console.error("Critical Init Error:", criticalErr);
-                  }
+                  OR_API_KEY = safeStorageGet('yanai_or_key') || "";
+                  GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
+                  PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
+                  if (safeStorageGet('yanai_theme') === 'dark') document.documentElement.classList.add('dark');
+                  try { allChats = JSON.parse(safeStorageGet('yanai_all_chats') || "[]"); } catch(e) {}
+                  try { allUploadedDocs = JSON.parse(safeStorageGet('yanai_library') || "[]"); } catch(e) {}
+                  applySavedTheme(); setProvider(PROVIDER); checkApiKeyStatus(); renderChatList();
+                  window.addEventListener('paste', handlePaste);
               }
-
-              window.onload = init;
+              init();
           </script>
   </body>
   </html>
