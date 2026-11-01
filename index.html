@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -163,9 +163,8 @@
                 <div class="mb-6">
                     <button onclick="document.getElementById('library-file-input').click()" class="w-full py-3 px-4 bg-brand-500 text-white rounded-2xl font-semibold hover:bg-brand-600 transition-all text-sm
     shadow-md flex items-center justify-center gap-2 group">
-                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-  stroke-width="2"
-    d="M12 4v16m8-8H4"></path></svg>
+                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
+    stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Add Document to Library
                     </button>
                     <input type="file" id="library-file-input" class="hidden" onchange="handleLibraryFileUpload(event)">
@@ -372,8 +371,8 @@
                         { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses', detail: 'Optimized for speed and efficiency in general conversation.' }
                     ],
                     groq: [
-                        { id: 'GPT OSS 120B', name: 'GPT OSS 120B', desc: 'Knowledge Powerhouse', detail: 'Massive parameter count for deep nuance and comprehensive knowledge.' },
-                        { id: 'Qwen 3.8 27B', name: 'Qwen 3.8 27B', desc: 'Logic & Coding', detail: 'Highly specialized in technical reasoning and precise code output.' }
+                        { id: 'openai/gpt-oss-120b', name: 'GPT OSS 120B', desc: 'Knowledge Powerhouse', detail: 'Massive parameter count for deep nuance and comprehensive knowledge.' },
+                        { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B', desc: 'Logic & Coding', detail: 'Highly specialized in technical reasoning and precise code output.' }
                     ]
                 };
 
@@ -554,7 +553,6 @@
                     toggleSettingsModal();
                 }
 
-                // FINAL FIX: Purely flatten all messages to strings for Groq/Proxies
                 function sanitizeMessages(messages, provider) {
                     if (provider !== 'groq') return messages;
 
