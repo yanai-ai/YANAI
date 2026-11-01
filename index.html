@@ -108,9 +108,7 @@
               </div>
               <div class="mb-6 overflow-hidden">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
-                  <div class="space-y-2" id="model-selector">
-                      <!-- Dynamic based on provider -->
-                  </div>
+                  <div class="space-y-2" id="model-selector"></div>
               </div>
               <div class="flex-1 overflow-hidden flex flex-col">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
@@ -309,26 +307,6 @@
               const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
               const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-              const MODEL_CONFIG = {
-                  openrouter: [
-                      { id: 'nvidia/nemotron-3.5-super-vl', name: 'Nvidia Nemotron 3.5 Super VL', desc: 'Vision & complex logic' },
-                      { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
-                  ],
-                  groq: [
-                      { id: 'gemma2-9b-it', name: 'Gwen 3.8 27B', desc: 'High reasoning efficiency' },
-                      { id: 'llama-3.1-70b-versatile', name: 'GPT OSS 120B', desc: 'Massive scale logic' }
-                  ]
-              };
-
-              const THEMES = {
-                  orange: { color: '#f97316', rgb: '249, 115, 22', 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412',
-  900: '#7c2d12' },
-                  blue: { color: '#3b82f6', rgb: '59, 130, 246', 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af',
-  900: '#1e3a8a' },
-                  mono: { color: '#475569', rgb: '71, 85, 105', 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b',
-  900: '#0f172a' }
-              };
-
               let PROVIDER = "openrouter";
               let OR_API_KEY = "";
               let GROQ_API_KEY = "";
@@ -343,6 +321,15 @@
               let currentChatId = null;
               let allUploadedDocs = [];
 
+              const THEMES = {
+                  orange: { color: '#f97316', rgb: '249, 115, 22', 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412',
+  900: '#7c2d12' },
+                  blue: { color: '#3b82f6', rgb: '59, 130, 246', 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af',
+  900: '#1e3a8a' },
+                  mono: { color: '#475569', rgb: '71, 85, 105', 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b',
+  900: '#0f172a' }
+              };
+
               function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
               function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
@@ -353,7 +340,7 @@
                   const root = document.documentElement;
                   root.style.setProperty('--brand-color', theme.color);
                   root.style.setProperty('--brand-rgb', theme.rgb);
-                  Object.keys(theme).forEach(key => { if (key !== 'color' && key !== 'rgb') root.style.setProperty(`--brand-${key}`, theme[key]); });
+                  for (let key in theme) { if (key !== 'color' && key !== 'rgb') root.style.setProperty('--brand-' + key, theme[key]); }
                   document.querySelectorAll('.theme-option-btn').forEach(btn => {
                       btn.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
                       btn.classList.add('border-slate-200', 'dark:border-slate-800');
@@ -366,9 +353,9 @@
 
               function switchSettingTab(tabId) {
                   document.querySelectorAll('.setting-panel').forEach(p => p.classList.add('hidden'));
-                  document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+                  document.getElementById('panel-' + tabId).classList.remove('hidden');
                   document.querySelectorAll('[id^="tab-"]').forEach(t => { t.classList.remove('border-brand-500', 'text-brand-500'); t.classList.add('border-transparent', 'text-slate-500'); });
-                  const activeTab = document.getElementById(`tab-${tabId}`);
+                  const activeTab = document.getElementById('tab-' + tabId);
                   activeTab.classList.add('border-brand-500', 'text-brand-500');
                   activeTab.classList.remove('border-transparent', 'text-slate-500');
               }
@@ -377,7 +364,7 @@
               const resizer = document.getElementById('sidebar-resizer');
               let isResizing = false;
               resizer.addEventListener('mousedown', (e) => { isResizing = true; document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none'; });
-              window.addEventListener('mousemove', (e) => { if (isResizing) { const newWidth = e.clientX; if (newWidth > 260 && newWidth < 450) sidebar.style.width = `${newWidth}px`; } });
+              window.addEventListener('mousemove', (e) => { if (isResizing) { const newWidth = e.clientX; if (newWidth > 260 && newWidth < 450) sidebar.style.width = newWidth + 'px'; } });
               window.addEventListener('mouseup', () => { isResizing = false; document.body.style.cursor = 'default'; document.body.style.userSelect = 'auto'; });
 
               function setProvider(prov) {
@@ -388,7 +375,13 @@
   rounded-lg transition-all text-slate-500';
                   document.getElementById('key-container-openrouter').classList.toggle('hidden', prov !== 'openrouter');
                   document.getElementById('key-container-groq').classList.toggle('hidden', prov !== 'groq');
-                  MODEL = MODEL_CONFIG[prov][0].id;
+
+                  if (prov === 'openrouter') {
+                      MODEL = "nvidia/nemotron-3.5-super-vl";
+                  } else {
+                      MODEL = "gemma2-9b-it";
+                  }
+
                   renderModelSelector();
                   updateModelDisplay();
                   safeStorageSet('yanai_provider', prov);
@@ -397,11 +390,25 @@
               function renderModelSelector() {
                   const container = document.getElementById('model-selector');
                   container.innerHTML = '';
-                  MODEL_CONFIG[PROVIDER].forEach(m => {
+
+                  let models = [];
+                  if (PROVIDER === 'openrouter') {
+                      models = [
+                          { id: 'nvidia/nemotron-3.5-super-vl', name: 'Nvidia Nemotron 3.5 Super VL', desc: 'Vision & complex logic' },
+                          { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
+                      ];
+                  } else {
+                      models = [
+                          { id: 'gemma2-9b-it', name: 'Gwen 3.8 27B', desc: 'High reasoning efficiency' },
+                          { id: 'llama-3.1-70b-versatile', name: 'GPT OSS 120B', desc: 'Massive scale logic' }
+                      ];
+                  }
+
+                  models.forEach(m => {
                       const btn = document.createElement('button');
                       btn.className = `model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border ${MODEL === m.id ? 'bg-brand-500 text-white border-brand-500 shadow-sm' : 'border-slate-200
   dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900'}`;
-                      btn.onclick = () => setModel(m.id, btn);
+                      btn.onclick = function() { setModel(m.id, this); };
                       btn.dataset.model = m.id;
                       btn.innerHTML = `<div class="font-semibold whitespace-nowrap">${m.name}</div><div class="text-[10px] ${MODEL === m.id ? 'opacity-80' : 'opacity-70'} whitespace-nowrap">${m.desc}</div>`;
                       container.appendChild(btn);
@@ -409,9 +416,12 @@
               }
 
               function updateModelDisplay() {
-                  const all = [...MODEL_CONFIG.openrouter, ...MODEL_CONFIG.groq];
-                  const m = all.find(x => x.id === MODEL);
-                  document.getElementById('current-model-display').innerText = m ? m.name : MODEL;
+                  let name = MODEL;
+                  if (MODEL === 'nvidia/nemotron-3.5-super-vl') name = 'Nvidia Nemotron 3.5 Super VL';
+                  else if (MODEL === 'nvidia/nemotron-3.5-lightning') name = 'Nvidia Nemotron 3.5 Lightning';
+                  else if (MODEL === 'gemma2-9b-it') name = 'Gwen 3.8 27B';
+                  else if (MODEL === 'llama-3.1-70b-versatile') name = 'GPT OSS 120B';
+                  document.getElementById('current-model-display').innerText = name;
               }
 
               function setModel(modelId, btn) {
@@ -485,18 +495,19 @@
               function saveLibrary() { safeStorageSet('yanai_library', JSON.stringify(allUploadedDocs)); }
 
               function updateChatTitle(text) {
-                  const chat = allChats.find(c => c.id === currentChatId);
+                  const chat = allChats.find(x => x.id === currentChatId);
                   if (chat && chat.title === 'New Conversation') { chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : ''); saveAllChats(); renderChatList(); }
               }
 
               function renderChatList() {
                   const list = document.getElementById('recent-chats-list');
                   list.innerHTML = '';
-                  [...allChats].sort((a, b) => b.timestamp - a.timestamp).forEach(chat => {
+                  const sorted = allChats.slice().sort((a, b) => b.timestamp - a.timestamp);
+                  sorted.forEach(chat => {
                       const item = document.createElement('div');
                       item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
   dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
-                      item.onclick = () => loadChat(chat.id);
+                      item.onclick = function() { loadChat(chat.id); };
                       item.innerHTML = `<div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div><button onclick="event.stopPropagation();
   deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path
   stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>`;
@@ -515,15 +526,15 @@
 
               function toggleLibrary() {
                   const o = document.getElementById('library-overlay'), p = document.getElementById('library-panel');
-                  if (o.classList.contains('hidden')) { o.classList.remove('hidden'); setTimeout(() => p.classList.remove('translate-x-full'), 10); renderLibrary(); }
-                  else { p.classList.add('translate-x-full'); setTimeout(() => o.classList.add('hidden'), 300); }
+                  if (o.classList.contains('hidden')) { o.classList.remove('hidden'); setTimeout(function() { p.classList.remove('translate-x-full'); }, 10); renderLibrary(); }
+                  else { p.classList.add('translate-x-full'); setTimeout(function() { o.classList.add('hidden'); }, 300); }
               }
 
               function renderLibrary() {
                   const list = document.getElementById('library-list');
                   list.innerHTML = '';
                   if (!allUploadedDocs.length) { list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>'; return; }
-                  allUploadedDocs.forEach((doc, i) => {
+                  allUploadedDocs.forEach(function(doc, i) {
                       const div = document.createElement('div');
                       div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group";
                       div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div><div class="flex
@@ -567,16 +578,16 @@
                   try {
                       const t = await extractTextFromFile(f);
                       allUploadedDocs.push({ name: f.name, date: Date.now(), content: t }); saveLibrary(); renderLibrary();
-                      alert(`Added ${f.name}!`);
+                      alert("Added " + f.name + "!");
                   } catch (err) { alert("File Error: " + err.message); }
               }
 
               async function handleImageUpload(e) {
                   const f = e.target.files[0]; if (!f) return;
                   const reader = new FileReader();
-                  reader.onload = (ev) => {
+                  reader.onload = function(ev) {
                       attachedImages.push({ name: f.name, base64: ev.target.result });
-                      document.getElementById('preview-name').innerText = attachedImages.length === 1 ? f.name : `${attachedImages.length} images`;
+                      document.getElementById('preview-name').innerText = attachedImages.length === 1 ? f.name : attachedImages.length + " images";
                       document.getElementById('file-preview').classList.remove('hidden');
                   };
                   reader.readAsDataURL(f);
@@ -587,11 +598,11 @@
                   for (let i = 0; i < items.length; i++) {
                       if (items[i].type.indexOf('image') !== -1) {
                           const blob = items[i].getAsFile();
-                          const f = new File([blob], `pasted-${Date.now()}.png`, { type: blob.type });
+                          const f = new File([blob], 'pasted-' + Date.now() + '.png', { type: blob.type });
                           const reader = new FileReader();
-                          reader.onload = (ev) => {
+                          reader.onload = function(ev) {
                               attachedImages.push({ name: f.name, base64: ev.target.result });
-                              document.getElementById('preview-name').innerText = attachedImages.length === 1 ? f.name : `${attachedImages.length} images`;
+                              document.getElementById('preview-name').innerText = attachedImages.length === 1 ? f.name : attachedImages.length + " images";
                               document.getElementById('file-preview').classList.remove('hidden');
                           };
                           reader.readAsDataURL(f);
@@ -607,7 +618,7 @@
 
               function toggleAttachMenu() { document.getElementById('attach-menu').classList.toggle('hidden'); }
 
-              window.addEventListener('click', (e) => { if (!e.target.closest('#attach-btn') && !e.target.closest('#attach-menu')) document.getElementById('attach-menu').classList.add('hidden'); });
+              window.addEventListener('click', function(e) { if (!e.target.closest('#attach-btn') && !e.target.closest('#attach-menu')) document.getElementById('attach-menu').classList.add('hidden'); });
 
               function clearFile() { attachedFile = { name: '', content: '' }; attachedImages = []; document.getElementById('file-preview').classList.add('hidden'); }
 
@@ -620,7 +631,7 @@
                       const found = kw.filter(k => c.includes(k));
                       if (found.length) {
                           const idx = c.indexOf(found[0]);
-                          res.push(`[Source: ${doc.name}]\n${doc.content.substring(Math.max(0, idx-500), Math.min(doc.content.length, idx+500))}`);
+                          res.push("[Source: " + doc.name + "]\n" + doc.content.substring(Math.max(0, idx-500), Math.min(doc.content.length, idx+500)));
                       }
                   });
                   return res.length ? "\n\n### REFERENCE KNOWLEDGE ###\n" + res.join("\n\n") + "\n### END REFERENCE ###" : "";
@@ -637,20 +648,21 @@
                   type();
               }
 
-              function appendMessage(role, text, save = true) {
+              function appendMessage(role, text, save) {
+                  if (save === undefined) save = true;
                   const c = document.getElementById('messages');
                   const div = document.createElement('div');
-                  div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
-                  if (role === 'user') div.innerHTML = `<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
+                  div.className = "flex " + (role === 'user' ? 'justify-end' : 'justify-start') + " message-appear";
+                  if (role === 'user') div.innerHTML = '<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>' + text + '</div></div>';
                   else {
-                      div.innerHTML = `<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
+                      div.innerHTML = '<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>';
                       const target = div.querySelector('.typing-target');
                       if (!save) target.innerHTML = marked.parse(text); else typeWriter(target, text);
                   }
                   c.appendChild(div); scrollToBottom();
                   if (save) {
                       const chat = allChats.find(x => x.id === currentChatId);
-                      if (chat) { chat.messages.push({ role, content: text }); if (role === 'user') updateChatTitle(text); saveAllChats(); }
+                      if (chat) { chat.messages.push({ role: role, content: text }); if (role === 'user') updateChatTitle(text); saveAllChats(); }
                   }
               }
 
@@ -668,7 +680,7 @@
                   const input = document.getElementById('user-input');
                   const text = input.value.trim();
                   const activeKey = PROVIDER === 'openrouter' ? OR_API_KEY : GROQ_API_KEY;
-                  if (!activeKey) return alert(`Set ${PROVIDER} Key!`);
+                  if (!activeKey) return alert("Set " + PROVIDER + " Key!");
                   if (!text && !attachedFile.content && !attachedImages.length) return;
                   if (isGenerating) return;
 
@@ -680,7 +692,7 @@
                   if (text) content.push({ type: "text", text: text });
                   attachedImages.forEach(img => content.push({ type: "image_url", image_url: { url: img.base64 } }));
                   if (attachedFile.content) {
-                      const d = `\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n`;
+                      const d = "\n\nDOCUMENT CONTENT:\n---\n" + attachedFile.content + "\n---\n";
                       if (content.length && content[0].type === "text") content[0].text = d + content[0].text;
                       else content.unshift({ type: "text", text: d });
                   }
@@ -690,20 +702,20 @@
                       if (first) first.text += ctx; else content.push({ type: "text", text: ctx });
                   }
 
-                  appendMessage('user', text || (attachedImages.length ? `${attachedImages.length} images` : (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!")));
+                  appendMessage('user', text || (attachedImages.length ? attachedImages.length + " images" : (attachedFile.name ? "Analyze: " + attachedFile.name : "Hello!")));
                   input.value = ''; input.style.height = ''; clearFile();
                   isGenerating = true; updateInputButtons();
 
                   const start = Date.now();
                   const load = document.createElement('div');
                   load.className = 'flex justify-start message-appear';
-                  load.innerHTML = `<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
-  ring-2"></div></div><span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span></div>`;
+                  load.innerHTML = '<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
+  ring-2"></div></div><span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span></div>';
                   document.getElementById('messages').appendChild(load);
 
-                  timerInterval = setInterval(() => {
+                  timerInterval = setInterval(function() {
                       const el = document.getElementById('timer-text');
-                      if (el) el.innerText = `Yanai is thinking... ${Math.floor((Date.now()-start)/1000)}s`;
+                      if (el) el.innerText = "Yanai is thinking... " + Math.floor((Date.now()-start)/1000) + "s";
                   }, 1000);
 
                   try {
@@ -716,21 +728,22 @@
                           res = await fetch(API_PROXY_URL, {
                               method: 'POST', signal: currentAbortController.signal,
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ headers: { Authorization: `Bearer ${OR_API_KEY}` }, model: MODEL, messages: [{ role: 'system', content: 'You are Yanai AI.' }, ...hist, { role: 'user',
-  content: content }] })
+                              body: JSON.stringify({ headers: { Authorization: 'Bearer ' + OR_API_KEY }, model: MODEL, messages: [{ role: 'system', content: 'You are Yanai AI.' }, hist.concat({ role: 'user',
+  content: content })] })
                           });
                       } else {
                           res = await fetch(GROQ_API_URL, {
                               method: 'POST', signal: currentAbortController.signal,
-                              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${GROQ_API_KEY}` },
-                              body: JSON.stringify({ model: MODEL, messages: [{ role: 'system', content: 'You are Yanai AI.' }, ...hist, { role: 'user', content: content.map(c => c.text || "").join("\n") }] })
+                              headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + GROQ_API_KEY },
+                              body: JSON.stringify({ model: MODEL, messages: [{ role: 'system', content: 'You are Yanai AI.' }, hist.concat({ role: 'user', content: content.map(c => c.text || "").join("\n")
+  })] })
                           });
                       }
                       const data = await res.json();
                       if (data.error) throw new Error(data.error.message);
                       load.remove(); isTyping = true; appendMessage('ai', data.choices[0].message.content);
                   } catch (e) {
-                      load.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">Error: ${e.message}</div>`;
+                      load.innerHTML = '<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">Error: ' + e.message + '</div>';
                   } finally {
                       clearInterval(timerInterval); isGenerating = false; currentAbortController = null; updateInputButtons();
                   }
