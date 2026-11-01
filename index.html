@@ -329,7 +329,7 @@
           <input type="file" id="image-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
 
           <script>
-              // --- CONSTANTS ---
+              // --- CONSTANTS (Defined first) ---
               const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
               const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -381,12 +381,11 @@
               function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
               function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
-              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
               // --- UI LOGIC ---
               function setBrandColor(themeKey) {
                   const theme = THEMES[themeKey];
                   const root = document.documentElement;
+                  if (!root) return;
                   root.style.setProperty('--brand-color', theme.color);
                   root.style.setProperty('--brand-rgb', theme.rgb);
                   Object.keys(theme).forEach(key => {
@@ -410,47 +409,33 @@
 
               function switchSettingTab(tabId) {
                   document.querySelectorAll('.setting-panel').forEach(p => p.classList.add('hidden'));
-                  document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+                  const panel = document.getElementById(`panel-${tabId}`);
+                  if (panel) panel.classList.remove('hidden');
                   document.querySelectorAll('[id^="tab-"]').forEach(t => {
                       t.classList.remove('border-brand-500', 'text-brand-500');
                       t.classList.add('border-transparent', 'text-slate-500');
                   });
                   const activeTab = document.getElementById(`tab-${tabId}`);
-                  activeTab.classList.add('border-brand-500', 'text-brand-500');
-                  activeTab.classList.remove('border-transparent', 'text-slate-500');
+                  if (activeTab) {
+                      activeTab.classList.add('border-brand-500', 'text-brand-500');
+                      activeTab.classList.remove('border-transparent', 'text-slate-500');
+                  }
               }
-
-              // Resizer Logic
-              const sidebar = document.getElementById('sidebar');
-              const resizer = document.getElementById('sidebar-resizer');
-              let isResizing = false;
-              resizer.addEventListener('mousedown', (e) => {
-                  isResizing = true;
-                  document.body.style.cursor = 'col-resize';
-                  document.body.style.userSelect = 'none';
-              });
-              window.addEventListener('mousemove', (e) => {
-                  if (!isResizing) return;
-                  const newWidth = e.clientX;
-                  if (newWidth > 260 && newWidth < 450) sidebar.style.width = `${newWidth}px`;
-              });
-              window.addEventListener('mouseup', () => {
-                  isResizing = false;
-                  document.body.style.cursor = 'default';
-                  document.body.style.userSelect = 'auto';
-              });
 
               function setProvider(prov) {
                   PROVIDER = prov;
-                  document.getElementById('prov-openrouter').className = prov === 'openrouter' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2
-  text-xs font-bold rounded-lg transition-all text-slate-500';
-                  document.getElementById('prov-groq').className = prov === 'groq' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold
-  rounded-lg transition-all text-slate-500';
+                  const pOR = document.getElementById('prov-openrouter');
+                  const pGR = document.getElementById('prov-groq');
+                  if (pOR) pOR.className = prov === 'openrouter' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold rounded-lg
+  transition-all text-slate-500';
+                  if (pGR) pGR.className = prov === 'groq' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold rounded-lg
+  transition-all text-slate-500';
 
-                  document.getElementById('key-container-openrouter').classList.toggle('hidden', prov !== 'openrouter');
-                  document.getElementById('key-container-groq').classList.toggle('hidden', prov !== 'groq');
+                  const cOR = document.getElementById('key-container-openrouter');
+                  const cGR = document.getElementById('key-container-groq');
+                  if (cOR) cOR.classList.toggle('hidden', prov !== 'openrouter');
+                  if (cGR) cGR.classList.toggle('hidden', prov !== 'groq');
 
-                  // Default model for provider
                   const models = MODEL_CONFIG[prov];
                   if (models && models.length > 0) {
                       MODEL = models[0].id;
@@ -478,9 +463,11 @@
               }
 
               function updateModelDisplay() {
+                  const display = document.getElementById('current-model-display');
+                  if (!display) return;
                   const allModels = [...MODEL_CONFIG.openrouter, ...MODEL_CONFIG.groq];
                   const modelObj = allModels.find(m => m.id === MODEL);
-                  document.getElementById('current-model-display').innerText = modelObj ? modelObj.name : MODEL;
+                  display.innerText = modelObj ? modelObj.name : MODEL;
               }
 
               function setModel(modelId, btn) {
@@ -498,6 +485,7 @@
                   const input = document.getElementById('user-input');
                   const btn = document.getElementById('send-btn');
                   const warning = document.getElementById('api-warning');
+                  if (!input || !btn || !warning) return;
                   const key = PROVIDER === 'openrouter' ? OR_API_KEY : GROQ_API_KEY;
                   if (!key) {
                       input.disabled = true; input.placeholder = "API Key required to chat...";
@@ -510,23 +498,33 @@
 
               function toggleSettingsModal() {
                   const modal = document.getElementById('settings-modal');
+                  if (!modal) return;
                   modal.classList.toggle('hidden');
-                  document.getElementById('settings-api-key-openrouter').value = OR_API_KEY;
-                  document.getElementById('settings-api-key-groq').value = GROQ_API_KEY;
+                  const keyOR = document.getElementById('settings-api-key-openrouter');
+                  const keyGR = document.getElementById('settings-api-key-groq');
+                  if (keyOR) keyOR.value = OR_API_KEY;
+                  if (keyGR) keyGR.value = GROQ_API_KEY;
                   setProvider(PROVIDER);
               }
 
               function saveSettings() {
-                  const newOrKey = document.getElementById('settings-api-key-openrouter').value.trim();
-                  const newGroqKey = document.getElementById('settings-api-key-groq').value.trim();
-                  if (newOrKey) { OR_API_KEY = newOrKey; safeStorageSet('yanai_or_key', OR_API_KEY); }
-                  if (newGroqKey) { GROQ_API_KEY = newGroqKey; safeStorageSet('yanai_groq_key', GROQ_API_KEY); }
+                  const keyOR = document.getElementById('settings-api-key-openrouter');
+                  const keyGR = document.getElementById('settings-api-key-groq');
+                  if (keyOR) {
+                      const val = keyOR.value.trim();
+                      if (val) { OR_API_KEY = val; safeStorageSet('yanai_or_key', OR_API_KEY); }
+                  }
+                  if (keyGR) {
+                      const val = keyGR.value.trim();
+                      if (val) { GROQ_API_KEY = val; safeStorageSet('yanai_groq_key', GROQ_API_KEY); }
+                  }
                   checkApiKeyStatus();
                   toggleSettingsModal();
               }
 
               function toggleTheme() {
                   const html = document.documentElement;
+                  if (!html) return;
                   if (html.classList.contains('dark')) {
                       html.classList.remove('dark');
                       safeStorageSet('yanai_theme', 'light');
@@ -539,8 +537,10 @@
               function startNewChat() {
                   currentChatId = 'chat_' + Date.now();
                   allChats.push({ id: currentChatId, title: 'New Conversation', timestamp: Date.now(), messages: [] });
-                  document.getElementById('messages').innerHTML = '';
-                  document.getElementById('welcome-screen').classList.remove('hidden');
+                  const msgDiv = document.getElementById('messages');
+                  if (msgDiv) msgDiv.innerHTML = '';
+                  const welcome = document.getElementById('welcome-screen');
+                  if (welcome) welcome.classList.remove('hidden');
                   saveAllChats();
                   renderChatList();
               }
@@ -549,11 +549,14 @@
                   currentChatId = id;
                   const chat = allChats.find(c => c.id === id);
                   if (!chat) return;
-                  document.getElementById('messages').innerHTML = '';
+                  const msgDiv = document.getElementById('messages');
+                  if (!msgDiv) return;
+                  msgDiv.innerHTML = '';
+                  const welcome = document.getElementById('welcome-screen');
                   if (chat.messages.length === 0) {
-                      document.getElementById('welcome-screen').classList.remove('hidden');
+                      if (welcome) welcome.classList.remove('hidden');
                   } else {
-                      document.getElementById('welcome-screen').classList.add('hidden');
+                      if (welcome) welcome.classList.add('hidden');
                       chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
                   }
                   renderChatList();
@@ -564,7 +567,13 @@
                   allChats = allChats.filter(c => c.id !== id);
                   saveAllChats();
                   renderChatList();
-                  if (currentChatId === id) { currentChatId = null; document.getElementById('messages').innerHTML = ''; document.getElementById('welcome-screen').classList.remove('hidden'); }
+                  if (currentChatId === id) {
+                      currentChatId = null;
+                      const msgDiv = document.getElementById('messages');
+                      if (msgDiv) msgDiv.innerHTML = '';
+                      const welcome = document.getElementById('welcome-screen');
+                      if (welcome) welcome.classList.remove('hidden');
+                  }
               }
 
               function saveAllChats() { safeStorageSet('yanai_all_chats', JSON.stringify(allChats)); }
@@ -607,8 +616,10 @@
                       saveLibrary();
                       localStorage.removeItem('yanai_all_chats');
                       localStorage.removeItem('yanai_library');
-                      document.getElementById('messages').innerHTML = '';
-                      document.getElementById('welcome-screen').classList.remove('hidden');
+                      const msgDiv = document.getElementById('messages');
+                      if (msgDiv) msgDiv.innerHTML = '';
+                      const welcome = document.getElementById('welcome-screen');
+                      if (welcome) welcome.classList.remove('hidden');
                       renderChatList();
                       renderLibrary();
                       alert("All data has been cleared.");
@@ -618,6 +629,7 @@
               function toggleLibrary() {
                   const overlay = document.getElementById('library-overlay');
                   const panel = document.getElementById('library-panel');
+                  if (!overlay || !panel) return;
                   if (overlay.classList.contains('hidden')) {
                       overlay.classList.remove('hidden');
                       setTimeout(() => panel.classList.remove('translate-x-full'), 10);
@@ -678,8 +690,10 @@
                   const file = e.target.files[0];
                   if (!file) return;
                   attachedFile.name = file.name;
-                  document.getElementById('preview-name').innerText = file.name;
-                  document.getElementById('file-preview').classList.remove('hidden');
+                  const previewName = document.getElementById('preview-name');
+                  if (previewName) previewName.innerText = file.name;
+                  const previewDiv = document.getElementById('file-preview');
+                  if (previewDiv) previewDiv.classList.remove('hidden');
                   try {
                       const text = await extractTextFromFile(file);
                       attachedFile.content = text;
@@ -714,9 +728,12 @@
                       reader.onload = (e) => {
                           const base64 = e.target.result;
                           attachedImages.push({ name: file.name, base64: base64 });
-                          document.getElementById('preview-name').innerText =
-                              attachedImages.length === 1 ? file.name : `${attachedImages.length} images`;
-                          document.getElementById('file-preview').classList.remove('hidden');
+                          const previewName = document.getElementById('preview-name');
+                          if (previewName) {
+                              previewName.innerText = attachedImages.length === 1 ? file.name : `${attachedImages.length} images`;
+                          }
+                          const previewDiv = document.getElementById('file-preview');
+                          if (previewDiv) previewDiv.classList.remove('hidden');
                           resolve();
                       };
                       reader.onerror = reject;
@@ -737,25 +754,33 @@
 
               function triggerFileInput(type) {
                   toggleAttachMenu();
-                  if (type === 'doc') document.getElementById('file-input').click();
-                  if (type === 'img') document.getElementById('image-input').click();
+                  if (type === 'doc') {
+                      const el = document.getElementById('file-input');
+                      if (el) el.click();
+                  }
+                  if (type === 'img') {
+                      const el = document.getElementById('image-input');
+                      if (el) el.click();
+                  }
               }
 
               function toggleAttachMenu() {
                   const menu = document.getElementById('attach-menu');
-                  menu.classList.toggle('hidden');
+                  if (menu) menu.classList.toggle('hidden');
               }
 
               window.addEventListener('click', (e) => {
                   if (!e.target.closest('#attach-btn') && !e.target.closest('#attach-menu')) {
-                      document.getElementById('attach-menu').classList.add('hidden');
+                      const menu = document.getElementById('attach-menu');
+                      if (menu) menu.classList.add('hidden');
                   }
               });
 
               function clearFile() {
                   attachedFile = { name: '', content: '' };
                   attachedImages = [];
-                  document.getElementById('file-preview').classList.add('hidden');
+                  const previewDiv = document.getElementById('file-preview');
+                  if (previewDiv) previewDiv.classList.add('hidden');
               }
 
               function retrieveContext(query) {
@@ -800,6 +825,7 @@
 
               function appendMessage(role, text, save = true) {
                   const container = document.getElementById('messages');
+                  if (!container) return;
                   const msgDiv = document.createElement('div');
                   msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
 
@@ -809,9 +835,9 @@
                       msgDiv.innerHTML = `<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
                       const target = msgDiv.querySelector('.typing-target');
                       if (!save) {
-                          target.innerHTML = marked.parse(text);
+                          if (target) target.innerHTML = marked.parse(text);
                       } else {
-                          typeWriter(target, text);
+                          if (target) typeWriter(target, text);
                       }
                   }
                   container.appendChild(msgDiv);
@@ -829,7 +855,7 @@
 
               function scrollToBottom() {
                   const win = document.getElementById('chat-window');
-                  win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
+                  if (win) win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
               }
 
               function stopResponse() {
@@ -844,6 +870,7 @@
               function updateInputButtons() {
                   const sendBtn = document.getElementById('send-btn');
                   const stopBtn = document.getElementById('stop-btn');
+                  if (!sendBtn || !stopBtn) return;
                   if (isGenerating || isTyping) {
                       sendBtn.classList.add('hidden');
                       stopBtn.classList.remove('hidden');
@@ -855,6 +882,7 @@
 
               async function handleSend() {
                   const input = document.getElementById('user-input');
+                  if (!input) return;
                   const text = input.value.trim();
                   const activeKey = PROVIDER === 'openrouter' ? OR_API_KEY : GROQ_API_KEY;
 
@@ -867,12 +895,14 @@
                       const confirmSwitch = confirm(`The current model (${currentModelObj?.name || MODEL}) does not support images. \n\nSwitch to Nvidia Nemotron Super VL?`);
                       if (confirmSwitch) {
                           if (PROVIDER !== 'openrouter') setProvider('openrouter');
-                          setModel('nvidia/nemotron-3.5-super-vl', document.querySelector(`[data-model="nvidia/nemotron-3.5-super-vl"]`));
+                          const btn = document.querySelector(`[data-model="nvidia/nemotron-3.5-super-vl"]`);
+                          if (btn) setModel('nvidia/nemotron-3.5-super-vl', btn);
                       } else return;
                   }
 
                   if (!currentChatId) startNewChat();
-                  document.getElementById('welcome-screen').classList.add('hidden');
+                  const welcome = document.getElementById('welcome-screen');
+                  if (welcome) welcome.classList.add('hidden');
 
                   const libraryContext = retrieveContext(text);
                   let userContent = [];
@@ -905,7 +935,8 @@
                   loadingDiv.className = 'flex justify-start message-appear';
                   loadingDiv.innerHTML = `<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
   ring-2"></div></div><span id="timer-text" class="text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span></div>`;
-                  document.getElementById('messages').appendChild(loadingDiv);
+                  const messagesContainer = document.getElementById('messages');
+                  if (messagesContainer) messagesContainer.appendChild(loadingDiv);
 
                   timerInterval = setInterval(() => {
                       const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -982,28 +1013,37 @@
 
               // --- STARTUP ---
               function init() {
-                  OR_API_KEY = safeStorageGet('yanai_or_key') || "";
-                  GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
-                  PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
+                  try {
+                      // Safely init libraries
+                      if (typeof pdfjsLib !== 'undefined') {
+                          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                      }
 
-                  const savedTheme = safeStorageGet('yanai_theme');
-                  if (savedTheme === 'dark') {
-                      document.documentElement.classList.add('dark');
+                      OR_API_KEY = safeStorageGet('yanai_or_key') || "";
+                      GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
+                      PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
+
+                      const savedTheme = safeStorageGet('yanai_theme');
+                      if (savedTheme === 'dark') {
+                          document.documentElement.classList.add('dark');
+                      }
+
+                      const savedChats = safeStorageGet('yanai_all_chats');
+                      if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
+                      const savedDocs = safeStorageGet('yanai_library');
+                      if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
+
+                      applySavedTheme();
+                      setProvider(PROVIDER);
+                      checkApiKeyStatus();
+                      renderChatList();
+                      window.addEventListener('paste', handlePaste);
+                  } catch (criticalErr) {
+                      console.error("Critical Init Error:", criticalErr);
                   }
-
-                  const savedChats = safeStorageGet('yanai_all_chats');
-                  if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
-                  const savedDocs = safeStorageGet('yanai_library');
-                  if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
-
-                  applySavedTheme();
-                  setProvider(PROVIDER);
-                  checkApiKeyStatus();
-                  renderChatList();
-                  window.addEventListener('paste', handlePaste);
               }
 
-              window.addEventListener('DOMContentLoaded', init);
+              window.onload = init;
           </script>
   </body>
   </html>
