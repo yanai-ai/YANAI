@@ -27,7 +27,6 @@
           }
       </script>
       <style>
-          /* Base Theme Variables - Orange Default */
           :root {
               --brand-color: #f97316;
               --brand-50: #fff7ed; --brand-100: #ffedd5; --brand-200: #fed7aa; --brand-300: #fdba74;
@@ -35,15 +34,12 @@
               --brand-800: #9a3412; --brand-900: #7c2d12;
               --brand-rgb: 249, 115, 22;
           }
-
           body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; }
           .chat-container::-webkit-scrollbar { width: 5px; }
           .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
           .dark .chat-container::-webkit-scrollbar-thumb { background: #334155; }
           .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
           @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-          /* AI Prose Styling */
           .prose-ai { line-height: 1.7; color: inherit; font-size: 1.05rem; }
           .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: var(--brand-color); letter-spacing: -0.02em; }
           .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(var(--brand-rgb), 0.2); padding-bottom: 0.25rem; }
@@ -58,14 +54,10 @@
           .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: var(--brand-color); font-weight: 800; }
           .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
           .dark .prose-ai code { background: rgba(255,255,255,0.1); }
-
-          /* Message Bubbles */
           .user-msg { background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-700) 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); font-size:
   1.05rem; }
           .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 1.05rem; }
           .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
-
-          /* AI Core Animation */
           .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
           .core-center { width: 8px; height: 8px; background: var(--brand-color); border-radius: 50%; z-index: 10; box-shadow: 0 0 12px var(--brand-color); animation: pulse-glow 1.5s infinite ease-in-out; }
           .core-ring { position: absolute; border: 2px solid var(--brand-color); border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -73,19 +65,16 @@
           .ring-2 { width: 20px; height: 20px; animation-delay: 0.6s; }
           @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px var(--brand-color); } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px var(--brand-color); } }
           @keyframes orbit { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
-
           .glass-input { backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(0, 0, 0, 0.05); }
           .dark .glass-input { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); }
           .chat-item.active { background: rgba(var(--brand-rgb), 0.1); border-color: var(--brand-color); color: var(--brand-color); }
           .dark .chat-item.active { background: rgba(var(--brand-rgb), 0.2); border-color: var(--brand-color); color: var(--brand-color); }
-
           #sidebar-resizer { width: 4px; cursor: col-resize; transition: background 0.2s; z-index: 20; }
           #sidebar-resizer:hover { background: var(--brand-color); }
       </style>
   </head>
   <body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-100">
 
-      <!-- Sidebar -->
       <aside id="sidebar" class="bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 relative overflow-x-hidden" style="width: 288px;">
           <div class="p-6 flex flex-col h-full overflow-hidden">
               <div class="flex items-center justify-between mb-10">
@@ -102,7 +91,6 @@
                       <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">Yanai AI</h1>
                   </div>
               </div>
-
               <div class="space-y-3 mb-6">
                   <button onclick="startNewChat()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
   rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
@@ -118,39 +106,14 @@
                       <span class="whitespace-nowrap">Library</span>
                   </button>
               </div>
-
               <div class="mb-6 overflow-hidden">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
-                  <div class="space-y-2" id="model-selector">
-                      <button onclick="setModel('nvidia/nemotron-3.5-super-vl', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500
-  text-white shadow-sm overflow-hidden" data-model="nvidia/nemotron-3.5-super-vl">
-                          <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Super VL</div>
-                          <div class="text-[10px] opacity-80 whitespace-nowrap">Vision & complex logic</div>
-                      </button>
-                      <button onclick="setModel('nvidia/nemotron-3.5-lightning', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200
-  dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 overflow-hidden" data-model="nvidia/nemotron-3.5-lightning">
-                          <div class="font-semibold whitespace-nowrap">Nvidia Nemotron 3.5 Lightning</div>
-                          <div class="text-[10px] opacity-70 whitespace-nowrap">Ultra-fast responses</div>
-                      </button>
-                      <!-- Groq Models Added Here -->
-                      <button onclick="setModel('gemma2-9b-it', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200 dark:border-slate-800 text-slate-600
-  dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 overflow-hidden" data-model="gemma2-9b-it">
-                          <div class="font-semibold whitespace-nowrap">Gwen 3.8 27B</div>
-                          <div class="text-[10px] opacity-70 whitespace-nowrap">High reasoning efficiency (Groq)</div>
-                      </button>
-                      <button onclick="setModel('llama-3.1-70b-versatile', this)" class="model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200 dark:border-slate-800
-  text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 overflow-hidden" data-model="llama-3.1-70b-versatile">
-                          <div class="font-semibold whitespace-nowrap">GPT OSS 120B</div>
-                          <div class="text-[10px] opacity-70 whitespace-nowrap">Massive scale logic (Groq)</div>
-                      </button>
-                  </div>
+                  <div class="space-y-2" id="model-selector"></div>
               </div>
-
               <div class="flex-1 overflow-hidden flex flex-col">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
                   <div id="recent-chats-list" class="space-y-1 overflow-y-auto chat-container px-2 pb-4"></div>
               </div>
-
               <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1">
                   <button onclick="toggleSettingsModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
   transition-all group overflow-hidden">
@@ -166,7 +129,6 @@
           <div id="sidebar-resizer" class="absolute right-0 top-0 h-full hover:bg-brand-500"></div>
       </aside>
 
-      <!-- Library Overlay -->
       <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
           <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
   translate-x-full" id="library-panel">
@@ -189,7 +151,6 @@
           </div>
       </div>
 
-      <!-- Settings Modal -->
       <div id="settings-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
               <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
@@ -199,10 +160,8 @@
                   <button onclick="switchSettingTab('danger')" id="tab-danger" class="flex-1 py-4 text-sm font-bold transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700
   dark:hover:text-slate-300">Danger Zone</button>
               </div>
-
               <div class="p-8 overflow-y-auto flex-1 space-y-8">
                   <div id="panel-general" class="setting-panel space-y-8">
-                      <!-- Provider Switch Added -->
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Provider</p>
                           <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
@@ -210,7 +169,6 @@
                               <button onclick="setProvider('groq')" id="prov-groq" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all">Groq</button>
                           </div>
                       </div>
-
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Configuration</p>
                           <div class="space-y-3">
@@ -219,7 +177,6 @@
                                   <input type="password" id="settings-api-key" placeholder="sk-or-..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
   outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
                               </div>
-                              <!-- Groq Key Added -->
                               <div id="key-container-groq" class="space-y-2 hidden">
                                   <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Groq API Key</label>
                                   <input type="password" id="settings-api-key-groq" placeholder="gsk_..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
@@ -228,7 +185,6 @@
                           </div>
                       </div>
                   </div>
-
                   <div id="panel-appearance" class="setting-panel hidden space-y-8">
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Theme Mode</p>
@@ -239,7 +195,6 @@
                               </button>
                           </div>
                       </div>
-
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Brand Accent Color</p>
                           <div class="grid grid-cols-3 gap-3">
@@ -258,7 +213,6 @@
                           </div>
                       </div>
                   </div>
-
                   <div id="panel-danger" class="setting-panel hidden space-y-8">
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Data Management</p>
@@ -274,21 +228,18 @@
                       </div>
                   </div>
               </div>
-
               <div class="p-6 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 flex justify-end">
                   <button onclick="saveSettings()" class="px-6 py-2 bg-brand-500 text-white font-semibold rounded-xl shadow-lg hover:bg-brand-600 transition-all text-sm">Save Changes</button>
               </div>
           </div>
       </div>
 
-      <!-- Main Chat Area -->
       <main class="flex-1 flex flex-col relative bg-slate-50 dark:bg-black overflow-hidden">
           <header class="h-16 flex items-center justify-between px-8 border-b border-slate-200 dark:border-slate-900 bg-white/80 dark:bg-black/50 backdrop-blur-md z-10">
               <div class="flex items-center gap-4">
                   <span id="current-model-display" class="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Nvidia Nemotron 3.5 Super VL</span>
               </div>
           </header>
-
           <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-8">
               <div id="welcome-screen" class="max-w-3xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
                   <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
@@ -296,7 +247,6 @@
               </div>
               <div id="messages" class="max-w-4xl mx-auto space-y-10 pb-32"></div>
           </div>
-
           <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50 dark:from-black via-slate-50 dark:via-black to-transparent">
               <div class="max-w-4xl mx-auto relative">
                   <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
@@ -307,7 +257,6 @@
                           API Key required to chat
                       </div>
                   </div>
-
                   <div id="file-preview" class="hidden absolute -top-14 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 flex items-center gap-3 shadow-lg
   text-xs animate-bounce">
                           <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2
@@ -375,8 +324,6 @@
               function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
               function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
-              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
               function setBrandColor(themeKey) {
                   const theme = THEMES[themeKey];
                   const root = document.documentElement;
@@ -409,7 +356,6 @@
               window.addEventListener('mousemove', (e) => { if (isResizing) { const newWidth = e.clientX; if (newWidth > 260 && newWidth < 450) sidebar.style.width = `${newWidth}px`; } });
               window.addEventListener('mouseup', () => { isResizing = false; document.body.style.cursor = 'default'; document.body.style.userSelect = 'auto'; });
 
-              // --- NEW PROVIDER LOGIC ---
               function setProvider(prov) {
                   PROVIDER = prov;
                   document.getElementById('prov-openrouter').className = prov === 'openrouter' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2
@@ -419,12 +365,8 @@
                   document.getElementById('key-container-openrouter').classList.toggle('hidden', prov !== 'openrouter');
                   document.getElementById('key-container-groq').classList.toggle('hidden', prov !== 'groq');
 
-                  // Default models for each provider
-                  if (prov === 'openrouter') {
-                      MODEL = "nvidia/nemotron-3.5-super-vl";
-                  } else {
-                      MODEL = "gemma2-9b-it";
-                  }
+                  if (prov === 'openrouter') MODEL = "nvidia/nemotron-3.5-super-vl";
+                  else MODEL = "gemma2-9b-it";
 
                   updateModelDisplay();
                   safeStorageSet('yanai_provider', prov);
@@ -746,7 +688,6 @@
   content: content }] })
                           });
                       } else {
-                          // GROQ API Logic
                           const groqText = content.map(c => c.text || "").join("\n");
                           res = await fetch(GROQ_API_URL, {
                               method: 'POST', signal: currentAbortController.signal,
@@ -765,14 +706,21 @@
               }
 
               function init() {
-                  OR_API_KEY = safeStorageGet('yanai_or_key') || "";
-                  GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
-                  PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
-                  if (safeStorageGet('yanai_theme') === 'dark') document.documentElement.classList.add('dark');
-                  try { allChats = JSON.parse(safeStorageGet('yanai_all_chats') || "[]"); } catch(e) {}
-                  try { allUploadedDocs = JSON.parse(safeStorageGet('yanai_library') || "[]"); } catch(e) {}
-                  applySavedTheme(); setProvider(PROVIDER); checkApiKeyStatus(); renderChatList();
-                  window.addEventListener('paste', handlePaste);
+                  try {
+                      if (typeof pdfjsLib !== 'undefined') {
+                          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                      }
+                      OR_API_KEY = safeStorageGet('yanai_or_key') || "";
+                      GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
+                      PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
+                      if (safeStorageGet('yanai_theme') === 'dark') document.documentElement.classList.add('dark');
+                      try { allChats = JSON.parse(safeStorageGet('yanai_all_chats') || "[]"); } catch(e) {}
+                      try { allUploadedDocs = JSON.parse(safeStorageGet('yanai_library') || "[]"); } catch(e) {}
+                      applySavedTheme(); setProvider(PROVIDER); checkApiKeyStatus(); renderChatList();
+                      window.addEventListener('paste', handlePaste);
+                  } catch(e) {
+                      console.error("Init error:", e);
+                  }
               }
               init();
           </script>
