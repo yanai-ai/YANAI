@@ -445,7 +445,6 @@
                   document.getElementById('key-container-openrouter').classList.toggle('hidden', prov !== 'openrouter');
                   document.getElementById('key-container-groq').classList.toggle('hidden', prov !== 'groq');
 
-                  // Set default model for the provider
                   MODEL = MODEL_CONFIG[prov][0].id;
                   renderModelSelector();
                   updateModelDisplay();
@@ -871,7 +870,6 @@
                   if (!text && !attachedFile.content && attachedImages.length === 0) return;
                   if (isGenerating) return;
 
-                  // Vision Check
                   const currentModelObj = [...MODEL_CONFIG.openrouter, ...MODEL_CONFIG.groq].find(m => m.id === MODEL);
                   if (attachedImages.length > 0 && (!currentModelObj || !currentModelObj.vision)) {
                       const confirmSwitch = confirm(`The current model (${currentModelObj?.name || MODEL}) does not support images. \n\nSwitch to Nvidia Nemotron Super VL?`);
@@ -946,12 +944,10 @@
                               })
                           });
                       } else {
-                          // Groq API Implementation
-                          // Note: Groq does not support vision for these specific models
                           const groqMessages = [
                               { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' },
                               ...history,
-                              { role: 'user', content: userContent.map(c => c.text).join("\n") }
+                              { role: 'user', content: userContent.map(c => c.type === 'text' ? c.text : '').join("\n") }
                           ];
                           response = await fetch(GROQ_API_URL, {
                               method: 'POST',
