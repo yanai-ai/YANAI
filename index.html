@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -549,10 +549,35 @@
                   toggleSettingsModal();
               }
 
+              // NEW: Sanitizer to ensure Groq receives only strings for content
+              function sanitizeMessages(messages, provider) {
+                  if (provider !== 'groq') return messages;
+
+                  return messages.map(msg => {
+                      if (typeof msg.content === 'string') return msg;
+
+                      // Convert block-style content (used by Vision/OpenRouter) to a single string
+                      let combinedText = "";
+                      if (Array.isArray(msg.content)) {
+                          msg.content.forEach(block => {
+                              if (block.type === 'text') combinedText += block.text + " ";
+                              if (block.type === 'image_url') combinedText += "[Attached Image] ";
+                          });
+                      } else {
+                          combinedText = JSON.stringify(msg.content);
+                      }
+
+                      return { ...msg, content: combinedText.trim() };
+                  });
+              }
+
               async function callAI(messages, signal) {
                   const provider = config.provider;
                   const key = config.apiKeys[provider];
                   const model = config.model;
+
+                  // Sanitize messages before sending
+                  const finalMessages = sanitizeMessages(messages, provider);
 
                   if (provider === 'openrouter') {
                       const response = await fetch(PROXIES.openrouter, {
@@ -562,7 +587,7 @@
                           body: JSON.stringify({
                               headers: { Authorization: `Bearer ${key}` },
                               model: model,
-                              messages: messages
+                              messages: finalMessages
                           })
                       });
                       const data = await response.json();
@@ -578,7 +603,7 @@
                           },
                           body: JSON.stringify({
                               model: model,
-                              messages: messages
+                              messages: finalMessages
                           })
                       });
                       const data = await response.json();
@@ -645,7 +670,7 @@
                       const messages = [
                           { role: 'system', content: 'You are Yanai AI. Prioritize REFERENCE KNOWLEDGE provided.' },
                           ...history,
-                          { role: 'user', content: config.provider === 'openrouter' ? userContent : (typeof userContent[0]?.text === 'string' ? userContent[0].text : JSON.stringify(userContent)) }
+                          { role: 'user', content: userContent }
                       ];
 
                       const content = await callAI(messages, currentAbortController.signal);
