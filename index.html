@@ -108,9 +108,7 @@
               </div>
               <div class="mb-6 overflow-hidden">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
-                  <div class="space-y-2" id="model-selector">
-                      <!-- Dynamically populated -->
-                  </div>
+                  <div class="space-y-2" id="model-selector"></div>
               </div>
               <div class="flex-1 overflow-hidden flex flex-col">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
@@ -326,7 +324,10 @@
               function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
               function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
-              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+              // Moved to init() to prevent boot crash
+              function setupPdfWorker() {
+                  try { pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; } catch(e) {}
+              }
 
               function setBrandColor(themeKey) {
                   const theme = THEMES[themeKey];
@@ -362,14 +363,17 @@
 
               function setProvider(prov) {
                   PROVIDER = prov;
-                  document.getElementById('prov-openrouter').className = prov === 'openrouter' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2
-  text-xs font-bold rounded-lg transition-all text-slate-500';
-                  document.getElementById('prov-groq').className = prov === 'groq' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold
-  rounded-lg transition-all text-slate-500';
+                  const pOR = document.getElementById('prov-openrouter');
+                  const pGR = document.getElementById('prov-groq');
+                  if(pOR) pOR.className = prov === 'openrouter' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold rounded-lg
+  transition-all text-slate-500';
+                  if(pGR) pGR.className = prov === 'groq' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-brand-500 text-white shadow-sm' : 'flex-1 py-2 text-xs font-bold rounded-lg
+  transition-all text-slate-500';
                   document.getElementById('key-container-openrouter').classList.toggle('hidden', prov !== 'openrouter');
                   document.getElementById('key-container-groq').classList.toggle('hidden', prov !== 'groq');
 
-                  if (prov === 'openrouter') { MODEL = "nvidia/nemotron-3.5-super-vl"; } else { MODEL = "gemma2-9b-it"; }
+                  if (prov === 'openrouter') MODEL = "nvidia/nemotron-3.5-super-vl";
+                  else MODEL = "gemma2-9b-it";
 
                   renderModelSelector();
                   updateModelDisplay();
@@ -378,6 +382,7 @@
 
               function renderModelSelector() {
                   const container = document.getElementById('model-selector');
+                  if(!container) return;
                   container.innerHTML = '';
                   let models = [];
                   if (PROVIDER === 'openrouter') {
@@ -736,16 +741,20 @@
               }
 
               function init() {
-                  OR_API_KEY = safeStorageGet('yanai_or_key') || "";
-                  GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
-                  PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
-                  if (safeStorageGet('yanai_theme') === 'dark') document.documentElement.classList.add('dark');
-                  try { allChats = JSON.parse(safeStorageGet('yanai_all_chats') || "[]"); } catch(e) {}
-                  try { allUploadedDocs = JSON.parse(safeStorageGet('yanai_library') || "[]"); } catch(e) {}
-                  applySavedTheme(); setProvider(PROVIDER); checkApiKeyStatus(); renderChatList();
-                  window.addEventListener('paste', handlePaste);
+                  try {
+                      setupPdfWorker();
+                      OR_API_KEY = safeStorageGet('yanai_or_key') || "";
+                      GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
+                      PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
+                      if (safeStorageGet('yanai_theme') === 'dark') document.documentElement.classList.add('dark');
+                      try { allChats = JSON.parse(safeStorageGet('yanai_all_chats') || "[]"); } catch(e) {}
+                      try { allUploadedDocs = JSON.parse(safeStorageGet('yanai_library') || "[]"); } catch(e) {}
+                      applySavedTheme(); setProvider(PROVIDER); checkApiKeyStatus(); renderChatList();
+                      window.addEventListener('paste', handlePaste);
+                  } catch(e) { console.error("Init Error:", e); }
               }
-              init();
+
+              window.onload = init;
           </script>
   </body>
   </html>
