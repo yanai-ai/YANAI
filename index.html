@@ -24,7 +24,7 @@
                       }
                   }
               }
-          }
+          };
       </script>
       <style>
           :root {
@@ -329,6 +329,7 @@
           <input type="file" id="image-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
 
           <script>
+              // --- CONSTANTS ---
               const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
               const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -361,6 +362,7 @@
                   }
               };
 
+              // --- STATE ---
               let PROVIDER = "openrouter";
               let OR_API_KEY = "";
               let GROQ_API_KEY = "";
@@ -375,11 +377,13 @@
               let currentChatId = null;
               let allUploadedDocs = [];
 
+              // --- UTILS ---
               function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
               function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
               pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+              // --- UI LOGIC ---
               function setBrandColor(themeKey) {
                   const theme = THEMES[themeKey];
                   const root = document.documentElement;
@@ -416,6 +420,7 @@
                   activeTab.classList.remove('border-transparent', 'text-slate-500');
               }
 
+              // Resizer Logic
               const sidebar = document.getElementById('sidebar');
               const resizer = document.getElementById('sidebar-resizer');
               let isResizing = false;
@@ -445,7 +450,12 @@
                   document.getElementById('key-container-openrouter').classList.toggle('hidden', prov !== 'openrouter');
                   document.getElementById('key-container-groq').classList.toggle('hidden', prov !== 'groq');
 
-                  MODEL = MODEL_CONFIG[prov][0].id;
+                  // Default model for provider
+                  const models = MODEL_CONFIG[prov];
+                  if (models && models.length > 0) {
+                      MODEL = models[0].id;
+                  }
+
                   renderModelSelector();
                   updateModelDisplay();
                   safeStorageSet('yanai_provider', prov);
@@ -453,8 +463,9 @@
 
               function renderModelSelector() {
                   const container = document.getElementById('model-selector');
+                  if (!container) return;
                   container.innerHTML = '';
-                  const models = MODEL_CONFIG[PROVIDER];
+                  const models = MODEL_CONFIG[PROVIDER] || [];
                   models.forEach(m => {
                       const btn = document.createElement('button');
                       btn.className = `model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border ${MODEL === m.id ? 'bg-brand-500 text-white border-brand-500 shadow-sm' : 'border-slate-200
@@ -467,7 +478,8 @@
               }
 
               function updateModelDisplay() {
-                  const modelObj = [...MODEL_CONFIG.openrouter, ...MODEL_CONFIG.groq].find(m => m.id === MODEL);
+                  const allModels = [...MODEL_CONFIG.openrouter, ...MODEL_CONFIG.groq];
+                  const modelObj = allModels.find(m => m.id === MODEL);
                   document.getElementById('current-model-display').innerText = modelObj ? modelObj.name : MODEL;
               }
 
@@ -482,45 +494,46 @@
                   btn.classList.add('bg-brand-500', 'text-white', 'shadow-sm', 'border-brand-500');
               }
 
-              function init() {
-                  OR_API_KEY = safeStorageGet('yanai_or_key') || "";
-                  GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
-                  PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
-
-                  const savedTheme = safeStorageGet('yanai_theme');
-                  if (savedTheme === 'dark') {
-                      document.documentElement.classList.add('dark');
+              function checkApiKeyStatus() {
+                  const input = document.getElementById('user-input');
+                  const btn = document.getElementById('send-btn');
+                  const warning = document.getElementById('api-warning');
+                  const key = PROVIDER === 'openrouter' ? OR_API_KEY : GROQ_API_KEY;
+                  if (!key) {
+                      input.disabled = true; input.placeholder = "API Key required to chat...";
+                      btn.disabled = true; warning.classList.remove('hidden');
+                  } else {
+                      input.disabled = false; input.placeholder = "Message Yanai...";
+                      btn.disabled = false; warning.classList.add('hidden');
                   }
-
-                  const savedChats = safeStorageGet('yanai_all_chats');
-                  if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
-                  const savedDocs = safeStorageGet('yanai_library');
-                  if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
-
-                  applySavedTheme();
-                  setProvider(PROVIDER);
-                  checkApiKeyStatus();
-                  renderChatList();
-                  window.addEventListener('paste', handlePaste);
               }
 
-              function renderChatList() {
-                  const listContainer = document.getElementById('recent-chats-list');
-                  listContainer.innerHTML = '';
-                  const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
-                  sortedChats.forEach(chat => {
-                      const item = document.createElement('div');
-                      item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
-  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
-                      item.onclick = () => loadChat(chat.id);
-                      item.innerHTML = `
-                          <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
-                          <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
-                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-  12"></path></svg>
-                          </button>`;
-                      listContainer.appendChild(item);
-                  });
+              function toggleSettingsModal() {
+                  const modal = document.getElementById('settings-modal');
+                  modal.classList.toggle('hidden');
+                  document.getElementById('settings-api-key-openrouter').value = OR_API_KEY;
+                  document.getElementById('settings-api-key-groq').value = GROQ_API_KEY;
+                  setProvider(PROVIDER);
+              }
+
+              function saveSettings() {
+                  const newOrKey = document.getElementById('settings-api-key-openrouter').value.trim();
+                  const newGroqKey = document.getElementById('settings-api-key-groq').value.trim();
+                  if (newOrKey) { OR_API_KEY = newOrKey; safeStorageSet('yanai_or_key', OR_API_KEY); }
+                  if (newGroqKey) { GROQ_API_KEY = newGroqKey; safeStorageSet('yanai_groq_key', GROQ_API_KEY); }
+                  checkApiKeyStatus();
+                  toggleSettingsModal();
+              }
+
+              function toggleTheme() {
+                  const html = document.documentElement;
+                  if (html.classList.contains('dark')) {
+                      html.classList.remove('dark');
+                      safeStorageSet('yanai_theme', 'light');
+                  } else {
+                      html.classList.add('dark');
+                      safeStorageSet('yanai_theme', 'dark');
+                  }
               }
 
               function startNewChat() {
@@ -566,46 +579,24 @@
                   }
               }
 
-              function toggleTheme() {
-                  const html = document.documentElement;
-                  if (html.classList.contains('dark')) {
-                      html.classList.remove('dark');
-                      safeStorageSet('yanai_theme', 'light');
-                  } else {
-                      html.classList.add('dark');
-                      safeStorageSet('yanai_theme', 'dark');
-                  }
-              }
-
-              function checkApiKeyStatus() {
-                  const input = document.getElementById('user-input');
-                  const btn = document.getElementById('send-btn');
-                  const warning = document.getElementById('api-warning');
-                  const key = PROVIDER === 'openrouter' ? OR_API_KEY : GROQ_API_KEY;
-                  if (!key) {
-                      input.disabled = true; input.placeholder = "API Key required to chat...";
-                      btn.disabled = true; warning.classList.remove('hidden');
-                  } else {
-                      input.disabled = false; input.placeholder = "Message Yanai...";
-                      btn.disabled = false; warning.classList.add('hidden');
-                  }
-              }
-
-              function toggleSettingsModal() {
-                  const modal = document.getElementById('settings-modal');
-                  modal.classList.toggle('hidden');
-                  document.getElementById('settings-api-key-openrouter').value = OR_API_KEY;
-                  document.getElementById('settings-api-key-groq').value = GROQ_API_KEY;
-                  setProvider(PROVIDER);
-              }
-
-              function saveSettings() {
-                  const newOrKey = document.getElementById('settings-api-key-openrouter').value.trim();
-                  const newGroqKey = document.getElementById('settings-api-key-groq').value.trim();
-                  if (newOrKey) { OR_API_KEY = newOrKey; safeStorageSet('yanai_or_key', OR_API_KEY); }
-                  if (newGroqKey) { GROQ_API_KEY = newGroqKey; safeStorageSet('yanai_groq_key', GROQ_API_KEY); }
-                  checkApiKeyStatus();
-                  toggleSettingsModal();
+              function renderChatList() {
+                  const listContainer = document.getElementById('recent-chats-list');
+                  if (!listContainer) return;
+                  listContainer.innerHTML = '';
+                  const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
+                  sortedChats.forEach(chat => {
+                      const item = document.createElement('div');
+                      item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
+  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
+                      item.onclick = () => loadChat(chat.id);
+                      item.innerHTML = `
+                          <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
+                          <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
+  12"></path></svg>
+                          </button>`;
+                      listContainer.appendChild(item);
+                  });
               }
 
               function clearAllData() {
@@ -639,6 +630,7 @@
 
               function renderLibrary() {
                   const list = document.getElementById('library-list');
+                  if (!list) return;
                   list.innerHTML = '';
                   if (allUploadedDocs.length === 0) {
                       list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
@@ -988,7 +980,30 @@
                   }
               }
 
-              init();
+              // --- STARTUP ---
+              function init() {
+                  OR_API_KEY = safeStorageGet('yanai_or_key') || "";
+                  GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
+                  PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
+
+                  const savedTheme = safeStorageGet('yanai_theme');
+                  if (savedTheme === 'dark') {
+                      document.documentElement.classList.add('dark');
+                  }
+
+                  const savedChats = safeStorageGet('yanai_all_chats');
+                  if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
+                  const savedDocs = safeStorageGet('yanai_library');
+                  if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
+
+                  applySavedTheme();
+                  setProvider(PROVIDER);
+                  checkApiKeyStatus();
+                  renderChatList();
+                  window.addEventListener('paste', handlePaste);
+              }
+
+              window.addEventListener('DOMContentLoaded', init);
           </script>
   </body>
   </html>
