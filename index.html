@@ -108,7 +108,9 @@
               </div>
               <div class="mb-6 overflow-hidden">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
-                  <div class="space-y-2" id="model-selector"></div>
+                  <div class="space-y-2" id="model-selector">
+                      <!-- Dynamically populated -->
+                  </div>
               </div>
               <div class="flex-1 overflow-hidden flex flex-col">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
@@ -324,6 +326,8 @@
               function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
               function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
 
+              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
               function setBrandColor(themeKey) {
                   const theme = THEMES[themeKey];
                   const root = document.documentElement;
@@ -365,11 +369,37 @@
                   document.getElementById('key-container-openrouter').classList.toggle('hidden', prov !== 'openrouter');
                   document.getElementById('key-container-groq').classList.toggle('hidden', prov !== 'groq');
 
-                  if (prov === 'openrouter') MODEL = "nvidia/nemotron-3.5-super-vl";
-                  else MODEL = "gemma2-9b-it";
+                  if (prov === 'openrouter') { MODEL = "nvidia/nemotron-3.5-super-vl"; } else { MODEL = "gemma2-9b-it"; }
 
+                  renderModelSelector();
                   updateModelDisplay();
                   safeStorageSet('yanai_provider', prov);
+              }
+
+              function renderModelSelector() {
+                  const container = document.getElementById('model-selector');
+                  container.innerHTML = '';
+                  let models = [];
+                  if (PROVIDER === 'openrouter') {
+                      models = [
+                          { id: 'nvidia/nemotron-3.5-super-vl', name: 'Nvidia Nemotron 3.5 Super VL', desc: 'Vision & complex logic' },
+                          { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
+                      ];
+                  } else {
+                      models = [
+                          { id: 'gemma2-9b-it', name: 'Gwen 3.8 27B', desc: 'High reasoning efficiency' },
+                          { id: 'llama-3.1-70b-versatile', name: 'GPT OSS 120B', desc: 'Massive scale logic' }
+                      ];
+                  }
+                  models.forEach(m => {
+                      const btn = document.createElement('button');
+                      btn.className = `model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border ${MODEL === m.id ? 'bg-brand-500 text-white border-brand-500 shadow-sm' : 'border-slate-200
+  dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900'}`;
+                      btn.onclick = () => setModel(m.id, btn);
+                      btn.dataset.model = m.id;
+                      btn.innerHTML = `<div class="font-semibold whitespace-nowrap">${m.name}</div><div class="text-[10px] ${MODEL === m.id ? 'opacity-80' : 'opacity-70'} whitespace-nowrap">${m.desc}</div>`;
+                      container.appendChild(btn);
+                  });
               }
 
               function updateModelDisplay() {
@@ -706,21 +736,14 @@
               }
 
               function init() {
-                  try {
-                      if (typeof pdfjsLib !== 'undefined') {
-                          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                      }
-                      OR_API_KEY = safeStorageGet('yanai_or_key') || "";
-                      GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
-                      PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
-                      if (safeStorageGet('yanai_theme') === 'dark') document.documentElement.classList.add('dark');
-                      try { allChats = JSON.parse(safeStorageGet('yanai_all_chats') || "[]"); } catch(e) {}
-                      try { allUploadedDocs = JSON.parse(safeStorageGet('yanai_library') || "[]"); } catch(e) {}
-                      applySavedTheme(); setProvider(PROVIDER); checkApiKeyStatus(); renderChatList();
-                      window.addEventListener('paste', handlePaste);
-                  } catch(e) {
-                      console.error("Init error:", e);
-                  }
+                  OR_API_KEY = safeStorageGet('yanai_or_key') || "";
+                  GROQ_API_KEY = safeStorageGet('yanai_groq_key') || "";
+                  PROVIDER = safeStorageGet('yanai_provider') || "openrouter";
+                  if (safeStorageGet('yanai_theme') === 'dark') document.documentElement.classList.add('dark');
+                  try { allChats = JSON.parse(safeStorageGet('yanai_all_chats') || "[]"); } catch(e) {}
+                  try { allUploadedDocs = JSON.parse(safeStorageGet('yanai_library') || "[]"); } catch(e) {}
+                  applySavedTheme(); setProvider(PROVIDER); checkApiKeyStatus(); renderChatList();
+                  window.addEventListener('paste', handlePaste);
               }
               init();
           </script>
