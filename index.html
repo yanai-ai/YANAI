@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -368,8 +368,8 @@
                       { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses', detail: 'Optimized for speed and efficiency in general conversation.' }
                   ],
                   groq: [
-                      { id: 'qwen3.8-27b', name: 'Qwen 3.8 27B', desc: 'Logic & Coding', detail: 'Highly specialized in technical reasoning and precise code output.' },
-                      { id: 'gpt-oss120b', name: 'GPT-OSS 120B', desc: 'Knowledge Powerhouse', detail: 'Massive parameter count for deep nuance and comprehensive knowledge.' }
+                      { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B', desc: 'Logic & Coding', detail: 'Highly specialized in technical reasoning and precise code output.' },
+                      { id: 'openai/gpt-oss-120b', name: 'GPT OSS 120B', desc: 'Knowledge Powerhouse', detail: 'Massive parameter count for deep nuance and comprehensive knowledge.' }
                   ]
               };
 
@@ -654,7 +654,9 @@
                       appendMessage('ai', content);
                   } catch (e) {
                       console.error(e);
-                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">${e.name === 'AbortError' ? 'Response stopped.' : 'Error: ' + e.message}</div>`;
+                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
+                          ${e.name === 'AbortError' ? 'Response stopped.' : `Error with model [${config.model}]: ${e.message}`}
+                      </div>`;
                   } finally {
                       clearInterval(timerInterval);
                       isGenerating = false;
