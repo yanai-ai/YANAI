@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -372,8 +372,8 @@
                         { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses', detail: 'Optimized for speed and efficiency in general conversation.' }
                     ],
                     groq: [
-                        { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', desc: 'Logic & Reasoning', detail: 'Groq\'s most capable high-reasoning model.' },
-                        { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B', desc: 'Fast & Balanced', detail: 'Excellent for general chat and fast responses.' }
+                        { id: 'GPT OSS 120B', name: 'GPT OSS 120B', desc: 'Knowledge Powerhouse', detail: 'Massive parameter count for deep nuance and comprehensive knowledge.' },
+                        { id: 'Qwen 3.8 27B', name: 'Qwen 3.8 27B', desc: 'Logic & Coding', detail: 'Highly specialized in technical reasoning and precise code output.' }
                     ]
                 };
 
@@ -554,24 +554,25 @@
                     toggleSettingsModal();
                 }
 
+                // FINAL FIX: Purely flatten all messages to strings for Groq/Proxies
                 function sanitizeMessages(messages, provider) {
                     if (provider !== 'groq') return messages;
 
                     return messages.map(msg => {
-                        let finalContent = msg.content;
-                        if (typeof finalContent !== 'string') {
-                            let combinedText = "";
-                            if (Array.isArray(finalContent)) {
-                                finalContent.forEach(block => {
-                                    if (block.type === 'text') combinedText += block.text + " ";
-                                    if (block.type === 'image_url') combinedText += "[Attached Image] ";
+                        let content = msg.content;
+                        if (typeof content !== 'string') {
+                            let text = "";
+                            if (Array.isArray(content)) {
+                                content.forEach(block => {
+                                    if (block.type === 'text') text += block.text + " ";
+                                    if (block.type === 'image_url') text += "[Attached Image] ";
                                 });
                             } else {
-                                combinedText = JSON.stringify(finalContent);
+                                text = JSON.stringify(content);
                             }
-                            finalContent = combinedText.trim() || "Hello!";
+                            content = text.trim() || "Hello!";
                         }
-                        return { role: msg.role, content: finalContent };
+                        return { role: msg.role, content: content };
                     });
                 }
 
