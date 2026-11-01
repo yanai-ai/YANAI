@@ -383,7 +383,7 @@
     900: '#7c2d12' },
                     blue: { color: '#3b82f6', rgb: '59, 130, 246', 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af',
     900: '#1e3a8a' },
-                    mono: { color: '#475569', rgb: '71, 85, 105', 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b',
+                    mono: { color: '#475569', rgb: '71, 85, 105', 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b4', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b',
     900: '#0f172a' }
                 };
 
@@ -554,12 +554,15 @@
                     toggleSettingsModal();
                 }
 
+                // FULL REWRITE: Sanitize the entire message chain for Groq
                 function sanitizeMessages(messages, provider) {
                     if (provider !== 'groq') return messages;
 
                     return messages.map(msg => {
+                        // If content is already a string, it's safe
                         if (typeof msg.content === 'string') return msg;
 
+                        // If content is an array (Multimodal), flatten it to a string
                         let combinedText = "";
                         if (Array.isArray(msg.content)) {
                             msg.content.forEach(block => {
@@ -567,10 +570,14 @@
                                 if (block.type === 'image_url') combinedText += "[Attached Image] ";
                             });
                         } else {
+                            // Fallback for any other object types
                             combinedText = JSON.stringify(msg.content);
                         }
 
-                        return { ...msg, content: combinedText.trim() };
+                        return {
+                            role: msg.role,
+                            content: combinedText.trim() || "Hello!"
+                        };
                     });
                 }
 
@@ -579,6 +586,7 @@
                     const key = config.apiKeys[provider];
                     const model = config.model;
 
+                    // CRITICAL: Sanitize EVERY message in the history chain
                     const finalMessages = sanitizeMessages(messages, provider);
 
                     if (provider === 'openrouter') {
