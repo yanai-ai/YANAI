@@ -209,15 +209,23 @@
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Configuration</p>
                           <div class="space-y-3">
-                              <div>
+                              <div class="relative">
                                   <label class="text-sm font-medium text-slate-600 dark:text-slate-400 block mb-1">OpenRouter API Key</label>
-                                  <input type="password" id="settings-api-key-or" placeholder="sk-or-..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+                                  <div class="flex gap-2">
+                                      <input type="password" id="settings-api-key-or" placeholder="sk-or-..." class="flex-1 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
   rounded-xl outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
+                                      <button onclick="testConnection('openrouter')" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs font-bold hover:bg-brand-500 hover:text-white
+  transition-all">Test</button>
+                                  </div>
                               </div>
-                              <div>
+                              <div class="relative">
                                   <label class="text-sm font-medium text-slate-600 dark:text-slate-400 block mb-1">Groq API Key</label>
-                                  <input type="password" id="settings-api-key-groq" placeholder="gsk_..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+                                  <div class="flex gap-2">
+                                      <input type="password" id="settings-api-key-groq" placeholder="gsk_..." class="flex-1 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
   rounded-xl outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
+                                      <button onclick="testConnection('groq')" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs font-bold hover:bg-brand-500 hover:text-white
+  transition-all">Test</button>
+                                  </div>
                               </div>
                           </div>
                       </div>
@@ -360,8 +368,8 @@
                       { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses', detail: 'Optimized for speed and efficiency in general conversation.' }
                   ],
                   groq: [
-                      { id: 'qwen-2.5-32b', name: 'Qwen 2.5 32B', desc: 'Balanced Performance', detail: 'Exceptional at coding, mathematics, and structured data generation.' },
-                      { id: 'llama-3.1-70b-versatile', name: 'Llama 3.1 70B', desc: 'Generalist Powerhouse', detail: 'Highest general knowledge and nuanced conversational capabilities.' }
+                      { id: 'qwen3.8-27b', name: 'Qwen 3.8 27B', desc: 'Logic & Coding', detail: 'Highly specialized in technical reasoning and precise code output.' },
+                      { id: 'gpt-oss120b', name: 'GPT-OSS 120B', desc: 'Knowledge Powerhouse', detail: 'Massive parameter count for deep nuance and comprehensive knowledge.' }
                   ]
               };
 
@@ -419,10 +427,10 @@
                   document.getElementById('pill-openrouter').classList.toggle('active', prov === 'openrouter');
                   document.getElementById('pill-groq').classList.toggle('active', prov === 'groq');
 
-                  // Reset model to first available for that provider
                   config.model = MODEL_DATA[prov][0].id;
                   renderModelSelector();
                   updateModelDisplay();
+                  checkApiKeyStatus();
               }
 
               function renderModelSelector() {
@@ -457,6 +465,37 @@
               function updateModelDisplay() {
                   const modelObj = MODEL_DATA[config.provider].find(m => m.id === config.model);
                   document.getElementById('current-model-display').innerText = modelObj ? modelObj.name : config.model;
+              }
+
+              async function testConnection(provider) {
+                  const key = provider === 'openrouter' ? document.getElementById('settings-api-key-or').value : document.getElementById('settings-api-key-groq').value;
+                  if (!key) return alert("Please enter a key first");
+
+                  const btn = event.target;
+                  const originalText = btn.innerText;
+                  btn.innerText = "Testing...";
+                  btn.disabled = true;
+
+                  try {
+                      const response = await fetch(PROXIES[provider], {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json',
+                              'Authorization': `Bearer ${key}`
+                          },
+                          body: JSON.stringify({
+                              model: MODEL_DATA[provider][0].id,
+                              messages: [{ role: 'user', content: 'hi' }]
+                          })
+                      });
+                      if (response.ok) alert(`${provider} key is valid!`);
+                      else throw new Error();
+                  } catch (e) {
+                      alert(`${provider} key is invalid or rejected.`);
+                  } finally {
+                      btn.innerText = originalText;
+                      btn.disabled = false;
+                  }
               }
 
               function init() {
@@ -624,7 +663,7 @@
                   }
               }
 
-              // -- Utility Functions (preserved from original) --
+              // -- Utility Functions --
               function startNewChat() {
                   currentChatId = 'chat_' + Date.now();
                   allChats.push({ id: currentChatId, title: 'New Conversation', timestamp: Date.now(), messages: [] });
@@ -676,13 +715,6 @@
                       html.classList.add('dark');
                       safeStorageSet('yanai_theme', 'dark');
                   }
-              }
-
-              function toggleSettingsModal() {
-                  const modal = document.getElementById('settings-modal');
-                  modal.classList.toggle('hidden');
-                  document.getElementById('settings-api-key-or').value = config.apiKeys.openrouter;
-                  document.getElementById('settings-api-key-groq').value = config.apiKeys.groq;
               }
 
               function switchSettingTab(tabId) {
@@ -777,7 +809,9 @@
                       saveLibrary();
                       renderLibrary();
                       alert(`Successfully added ${file.name} to your library!`);
-                  } catch (err) { alert("File Error: " + err.message); }
+                  } catch (err) {
+                      alert("File Error: " + err.message);
+                  }
               }
 
               async function handleImageUpload(e) {
