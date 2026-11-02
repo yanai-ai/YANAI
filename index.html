@@ -127,9 +127,9 @@
   data-provider="openrouter">
                           OpenRouter
                       </button>
-                      <button onclick="setProvider('groq', this)" class="provider-btn py-2 px-3 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 text-slate-600
-  dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-provider="groq">
-                          Groq (Free)
+                      <button onclick="setProvider('huggingface', this)" class="provider-btn py-2 px-3 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 text-slate-600
+  dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-provider="huggingface">
+                          Hugging Face
                       </button>
                   </div>
               </div>
@@ -206,8 +206,8 @@
                           <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
                               <li class="flex gap-2"><span class="font-bold text-brand-500">OpenRouter:</span> <span>Get your key at <a href="https://openrouter.ai/" target="_blank" class="text-brand-600
   dark:text-brand-400 underline font-medium">openrouter.ai</a></span></li>
-                              <li class="flex gap-2"><span class="font-bold text-brand-500">Groq:</span> <span>Get your free key at <a href="https://console.groq.com/" target="_blank" class="text-brand-600
-  dark:text-brand-400 underline font-medium">console.groq.com</a></span></li>
+                              <li class="flex gap-2"><span class="font-bold text-brand-500">Hugging Face:</span> <span>Get your free token at <a href="https://huggingface.co/settings/tokens" target="_blank"
+  class="text-brand-600 dark:text-brand-400 underline font-medium">huggingface.co</a></span></li>
                           </ul>
                       </div>
                       <div class="space-y-4">
@@ -219,8 +219,8 @@
   outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
                               </div>
                               <div class="space-y-2">
-                                  <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Groq API Key</label>
-                                  <input type="password" id="settings-groq-key" placeholder="gsk_..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
+                                  <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Hugging Face Token</label>
+                                  <input type="password" id="settings-hf-key" placeholder="hf_..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
   outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
                               </div>
                           </div>
@@ -354,21 +354,21 @@
 
           <script>
               const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
-              const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+              const HF_API_URL = "https://api-inference.huggingface.co/v1/chat/completions";
 
               const MODELS_BY_PROVIDER = {
                   openrouter: [
                       { id: 'nvidia/nemotron-3.5-super-vl', name: 'Nvidia Nemotron 3.5 Super VL', desc: 'Vision & complex logic' },
                       { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
                   ],
-                  groq: [
-                      { id: 'openai/gpt-oss-120b', name: 'GPT-OSS 120B', desc: 'Extreme Reasoning & High Intelligence' },
-                      { id: 'openai/gpt-oss-20b', name: 'GPT-OSS 20B', desc: 'Fast & Efficient' },
-                      { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B', desc: 'Vision & Multilingual' }
+                  huggingface: [
+                      { id: 'meta-llama/Llama-3.1-70B-Instruct', name: 'Llama 3.1 70B', desc: 'Extremely Powerful & Smart' },
+                      { id: 'meta-llama/Llama-3.1-8B-Instruct', name: 'Llama 3.1 8B', desc: 'Fast & Efficient' },
+                      { id: 'mistralai/Mistral-7B-Instruct-v0.3', name: 'Mistral 7B', desc: 'Compact & Versatile' }
                   ]
               };
 
-              const VISION_MODELS = ['nvidia/nemotron-3.5-super-vl', 'qwen/qwen3.8-27b'];
+              const VISION_MODELS = ['nvidia/nemotron-3.5-super-vl'];
 
               const THEMES = {
                   orange: {
@@ -389,7 +389,7 @@
               };
 
               let OR_API_KEY = "";
-              let GROQ_API_KEY = "";
+              let HF_API_KEY = "";
               let CURRENT_PROVIDER = "openrouter";
               let MODEL = "nvidia/nemotron-3.5-super-vl";
               let attachedFile = { name: '', content: '' };
@@ -469,8 +469,8 @@
               function init() {
                   const savedOrKey = safeStorageGet('yanai_or_key');
                   if (savedOrKey) OR_API_KEY = savedOrKey;
-                  const savedGroqKey = safeStorageGet('yanai_groq_key');
-                  if (savedGroqKey) GROQ_API_KEY = savedGroqKey;
+                  const savedHfKey = safeStorageGet('yanai_hf_key');
+                  if (savedHfKey) HF_API_KEY = savedHfKey;
 
                   const savedTheme = safeStorageGet('yanai_theme');
                   if (savedTheme === 'dark') {
@@ -544,7 +544,7 @@
 
               function updateModelDisplay() {
                   const display = document.getElementById('current-model-display');
-                  const providerName = CURRENT_PROVIDER === 'groq' ? 'Groq' : 'OpenRouter';
+                  const providerName = CURRENT_PROVIDER === 'huggingface' ? 'Hugging Face' : 'OpenRouter';
                   const modelObj = MODELS_BY_PROVIDER[CURRENT_PROVIDER].find(m => m.id === MODEL) || { name: MODEL };
                   display.innerText = `${providerName} | ${modelObj.name}`;
               }
@@ -627,7 +627,7 @@
                   const btn = document.getElementById('send-btn');
                   const warning = document.getElementById('api-warning');
 
-                  const currentKey = CURRENT_PROVIDER === 'groq' ? GROQ_API_KEY : OR_API_KEY;
+                  const currentKey = CURRENT_PROVIDER === 'huggingface' ? HF_API_KEY : OR_API_KEY;
 
                   if (!currentKey) {
                       input.disabled = true; input.placeholder = `API Key required for ${CURRENT_PROVIDER}...`;
@@ -642,7 +642,7 @@
                   const modal = document.getElementById('settings-modal');
                   modal.classList.toggle('hidden');
                   document.getElementById('settings-api-key').value = OR_API_KEY;
-                  document.getElementById('settings-groq-key').value = GROQ_API_KEY;
+                  document.getElementById('settings-hf-key').value = HF_API_KEY;
               }
 
               function saveSettings() {
@@ -651,10 +651,10 @@
                       OR_API_KEY = newOrKey;
                       safeStorageSet('yanai_or_key', OR_API_KEY);
                   }
-                  const newGroqKey = document.getElementById('settings-groq-key').value.trim();
-                  if (newGroqKey) {
-                      GROQ_API_KEY = newGroqKey;
-                      safeStorageSet('yanai_groq_key', GROQ_API_KEY);
+                  const newHfKey = document.getElementById('settings-hf-key').value.trim();
+                  if (newHfKey) {
+                      HF_API_KEY = newHfKey;
+                      safeStorageSet('yanai_hf_key', HF_API_KEY);
                   }
                   checkApiKeyStatus();
                   toggleSettingsModal();
@@ -917,8 +917,8 @@
                   const input = document.getElementById('user-input');
                   const text = input.value.trim();
 
-                  const activeKey = CURRENT_PROVIDER === 'groq' ? GROQ_API_KEY : OR_API_KEY;
-                  if (!activeKey) return alert(`Set ${CURRENT_PROVIDER === 'groq' ? 'Groq' : 'OpenRouter'} Key first!`);
+                  const activeKey = CURRENT_PROVIDER === 'huggingface' ? HF_API_KEY : OR_API_KEY;
+                  if (!activeKey) return alert(`Set ${CURRENT_PROVIDER === 'huggingface' ? 'Hugging Face' : 'OpenRouter'} Key first!`);
                   if (!text && !attachedFile.content && attachedImages.length === 0) return;
                   if (isGenerating) return;
 
@@ -1000,31 +1000,35 @@
                               })
                           });
                       } else {
-                          // Groq direct integration - MUST USE STRINGS FOR CONTENT
-                          const groqMessages = [
-                              { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' },
-                              ...history.map(m => ({ role: m.role, content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content) })),
+                          // Hugging Face integration - Using strict simple string format
+                          const hfMessages = [
+                              { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' }
                           ];
 
-                          // Convert current userContent array to string for Groq
+                          // Clean and add history
+                          history.forEach(m => {
+                              hfMessages.push({ role: m.role, content: String(m.content) });
+                          });
+
+                          // Clean current input
                           let finalUserText = "";
                           userContent.forEach(item => {
                               if (item.type === "text") finalUserText += item.text + " ";
                               else if (item.type === "image_url") finalUserText += "[Image attached] ";
                           });
 
-                          groqMessages.push({ role: 'user', content: finalUserText.trim() });
+                          hfMessages.push({ role: 'user', content: finalUserText.trim() });
 
-                          response = await fetch(GROQ_API_URL, {
+                          response = await fetch(HF_API_URL, {
                               method: 'POST',
                               signal: currentAbortController.signal,
                               headers: {
                                   'Content-Type': 'application/json',
-                                  'Authorization': `Bearer ${GROQ_API_KEY}`
+                                  'Authorization': `Bearer ${HF_API_KEY}`
                               },
                               body: JSON.stringify({
                                   model: MODEL,
-                                  messages: groqMessages
+                                  messages: hfMessages
                               })
                           });
                       }
