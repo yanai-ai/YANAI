@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -340,12 +340,12 @@
                       { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
                   ],
                   huggingface: [
-                      { id: 'Qwen/Qwen2.5-72B-Instruct', name: 'Qwen 2.5 72B', desc: 'World-class open reasoning' },
-                      { id: 'Qwen/Qwen2.5-7B-Instruct', name: 'Qwen 2.5 7B', desc: 'Fast & Efficient' }
+                      { id: 'Qwen/Qwen3.8-27B', name: 'Qwen 3.8 27B', desc: 'Advanced Reasoning & Multimodal' },
+                      { id: 'Qwen/Qwen2.5-72B-Instruct', name: 'Qwen 2.5 72B', desc: 'World-class open reasoning' }
                   ]
               };
 
-              const VISION_MODELS = ['nvidia/nemotron-3.5-super-vl'];
+              const VISION_MODELS = ['nvidia/nemotron-3.5-super-vl', 'Qwen/Qwen3.8-27B'];
 
               const THEMES = {
                   orange: {
@@ -911,17 +911,24 @@
                               })
                           });
                       } else {
-                          // Hugging Face direct Inference API call
+                          // CORRECTED HF INFERENCE CALL for Qwen 3.8 27B
                           const hfMessages = [{ role: 'system', content: 'You are Yanai AI.' }];
                           history.forEach(m => hfMessages.push({ role: m.role, content: String(m.content) }));
+
                           let finalUserText = "";
-                          userContent.forEach(item => { if (item.type === "text") finalUserText += item.text + " "; else finalUserText += "[Image attached] "; });
+                          userContent.forEach(item => {
+                              if (item.type === "text") finalUserText += item.text + " ";
+                              else finalUserText += "[Image attached] ";
+                          });
                           hfMessages.push({ role: 'user', content: finalUserText.trim() });
 
                           response = await fetch(`${HF_BASE_URL}/${MODEL}`, {
                               method: 'POST',
                               signal: currentAbortController.signal,
-                              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${HF_API_KEY}` },
+                              headers: {
+                                  'Content-Type': 'application/json',
+                                  'Authorization': `Bearer ${HF_API_KEY}`
+                              },
                               body: JSON.stringify({
                                   inputs: hfMessages,
                                   parameters: { max_new_tokens: 1024, temperature: 0.7 }
@@ -932,7 +939,6 @@
                       clearTimeout(timeoutId);
                       const data = await response.json();
 
-                      // Handle different response formats (Chat vs Text)
                       let resultText = "";
                       if (data.choices && data.choices[0]?.message?.content) {
                           resultText = data.choices[0].message.content;
