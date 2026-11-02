@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -27,7 +27,6 @@
           }
       </script>
       <style>
-          /* Base Theme Variables - Orange Default */
           :root {
               --brand-color: #f97316;
               --brand-50: #fff7ed; --brand-100: #ffedd5; --brand-200: #fed7aa; --brand-300: #fdba74;
@@ -35,15 +34,12 @@
               --brand-800: #9a3412; --brand-900: #7c2d12;
               --brand-rgb: 249, 115, 22;
           }
-
           body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; }
           .chat-container::-webkit-scrollbar { width: 5px; }
           .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
           .dark .chat-container::-webkit-scrollbar-thumb { background: #334155; }
           .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
           @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-          /* AI Prose Styling */
           .prose-ai { line-height: 1.7; color: inherit; font-size: 1.05rem; }
           .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: var(--brand-color); letter-spacing: -0.02em; }
           .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(var(--brand-rgb), 0.2); padding-bottom: 0.25rem; }
@@ -58,14 +54,10 @@
           .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: var(--brand-color); font-weight: 800; }
           .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
           .dark .prose-ai code { background: rgba(255,255,255,0.1); }
-
-          /* Message Bubbles */
           .user-msg { background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-700) 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); font-size:
   1.05rem; }
           .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 1.05rem; }
           .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
-
-          /* AI Core Animation */
           .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
           .core-center { width: 8px; height: 8px; background: var(--brand-color); border-radius: 50%; z-index: 10; box-shadow: 0 0 12px var(--brand-color); animation: pulse-glow 1.5s infinite ease-in-out; }
           .core-ring { position: absolute; border: 2px solid var(--brand-color); border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -73,19 +65,16 @@
           .ring-2 { width: 20px; height: 20px; animation-delay: 0.6s; }
           @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px var(--brand-color); } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px var(--brand-color); } }
           @keyframes orbit { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
-
           .glass-input { backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(0, 0, 0, 0.05); }
           .dark .glass-input { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); }
           .chat-item.active { background: rgba(var(--brand-rgb), 0.1); border-color: var(--brand-color); color: var(--brand-color); }
           .dark .chat-item.active { background: rgba(var(--brand-rgb), 0.2); border-color: var(--brand-color); color: var(--brand-color); }
-
           #sidebar-resizer { width: 4px; cursor: col-resize; transition: background 0.2s; z-index: 20; }
           #sidebar-resizer:hover { background: var(--brand-color); }
       </style>
   </head>
   <body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-100">
 
-      <!-- Sidebar -->
       <aside id="sidebar" class="bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 relative overflow-x-hidden" style="width: 288px;">
           <div class="p-6 flex flex-col h-full overflow-hidden">
               <div class="flex items-center justify-between mb-10">
@@ -119,7 +108,6 @@
                   </button>
               </div>
 
-              <!-- Provider Selector -->
               <div class="mb-6 overflow-hidden">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">API Provider</p>
                   <div class="grid grid-cols-2 gap-2 px-2" id="provider-selector">
@@ -136,9 +124,7 @@
 
               <div class="mb-6 overflow-hidden">
                   <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
-                  <div class="space-y-2" id="model-selector">
-                      <!-- Models injected by JS -->
-                  </div>
+                  <div class="space-y-2" id="model-selector"></div>
               </div>
 
               <div class="flex-1 overflow-hidden flex flex-col">
@@ -161,7 +147,6 @@
           <div id="sidebar-resizer" class="absolute right-0 top-0 h-full hover:bg-brand-500"></div>
       </aside>
 
-      <!-- Library Overlay -->
       <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
           <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
   translate-x-full" id="library-panel">
@@ -184,7 +169,6 @@
           </div>
       </div>
 
-      <!-- Settings Modal -->
       <div id="settings-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
               <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
@@ -194,7 +178,6 @@
                   <button onclick="switchSettingTab('danger')" id="tab-danger" class="flex-1 py-4 text-sm font-bold transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700
   dark:hover:text-slate-300">Danger Zone</button>
               </div>
-
               <div class="p-8 overflow-y-auto flex-1 space-y-8">
                   <div id="panel-general" class="setting-panel space-y-8">
                       <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
@@ -226,7 +209,6 @@
                           </div>
                       </div>
                   </div>
-
                   <div id="panel-appearance" class="setting-panel hidden space-y-8">
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Theme Mode</p>
@@ -237,7 +219,6 @@
                               </button>
                           </div>
                       </div>
-
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Brand Accent Color</p>
                           <div class="grid grid-cols-3 gap-3">
@@ -256,7 +237,6 @@
                           </div>
                       </div>
                   </div>
-
                   <div id="panel-danger" class="setting-panel hidden space-y-8">
                       <div class="space-y-4">
                           <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Data Management</p>
@@ -272,14 +252,12 @@
                       </div>
                   </div>
               </div>
-
               <div class="p-6 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 flex justify-end">
                   <button onclick="saveSettings()" class="px-6 py-2 bg-brand-500 text-white font-semibold rounded-xl shadow-lg hover:bg-brand-600 transition-all text-sm">Save Changes</button>
               </div>
           </div>
       </div>
 
-      <!-- Main Chat Area -->
       <main class="flex-1 flex flex-col relative bg-slate-50 dark:bg-black overflow-hidden">
           <header class="h-16 flex items-center justify-between px-8 border-b border-slate-200 dark:border-slate-900 bg-white/80 dark:bg-black/50 backdrop-blur-md z-10">
               <div class="flex items-center gap-4">
@@ -354,7 +332,7 @@
 
           <script>
               const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
-              const HF_API_URL = "https://api-inference.huggingface.co/v1/chat/completions";
+              const HF_BASE_URL = "https://api-inference.huggingface.co/models";
 
               const MODELS_BY_PROVIDER = {
                   openrouter: [
@@ -362,9 +340,8 @@
                       { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
                   ],
                   huggingface: [
-                      { id: 'meta-llama/Llama-3.1-70B-Instruct', name: 'Llama 3.1 70B', desc: 'Extremely Powerful & Smart' },
-                      { id: 'meta-llama/Llama-3.1-8B-Instruct', name: 'Llama 3.1 8B', desc: 'Fast & Efficient' },
-                      { id: 'mistralai/Mistral-7B-Instruct-v0.3', name: 'Mistral 7B', desc: 'Compact & Versatile' }
+                      { id: 'Qwen/Qwen2.5-72B-Instruct', name: 'Qwen 2.5 72B', desc: 'World-class open reasoning' },
+                      { id: 'Qwen/Qwen2.5-7B-Instruct', name: 'Qwen 2.5 7B', desc: 'Fast & Efficient' }
                   ]
               };
 
@@ -412,13 +389,11 @@
                   const root = document.documentElement;
                   root.style.setProperty('--brand-color', theme.color);
                   root.style.setProperty('--brand-rgb', theme.rgb);
-
                   Object.keys(theme).forEach(key => {
                       if (key !== 'color' && key !== 'rgb') {
                           root.style.setProperty(`--brand-${key}`, theme[key]);
                       }
                   });
-
                   document.querySelectorAll('.theme-option-btn').forEach(btn => {
                       btn.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
                       btn.classList.add('border-slate-200', 'dark:border-slate-800');
@@ -471,20 +446,14 @@
                   if (savedOrKey) OR_API_KEY = savedOrKey;
                   const savedHfKey = safeStorageGet('yanai_hf_key');
                   if (savedHfKey) HF_API_KEY = savedHfKey;
-
                   const savedTheme = safeStorageGet('yanai_theme');
-                  if (savedTheme === 'dark') {
-                      document.documentElement.classList.add('dark');
-                  }
-
+                  if (savedTheme === 'dark') document.documentElement.classList.add('dark');
                   const savedChats = safeStorageGet('yanai_all_chats');
                   if (savedChats) { try { allChats = JSON.parse(savedChats); } catch(e) { allChats = []; } }
                   const savedDocs = safeStorageGet('yanai_library');
                   if (savedDocs) { try { allUploadedDocs = JSON.parse(savedDocs); } catch(e) { allUploadedDocs = []; } }
-
                   const savedProvider = safeStorageGet('yanai_provider') || 'openrouter';
                   setProvider(savedProvider, document.querySelector(`[data-provider="${savedProvider}"]`));
-
                   applySavedTheme();
                   checkApiKeyStatus();
                   renderChatList();
@@ -494,19 +463,14 @@
               function setProvider(providerId, btn) {
                   CURRENT_PROVIDER = providerId;
                   safeStorageSet('yanai_provider', providerId);
-
-                  // Update Provider UI
                   document.querySelectorAll('.provider-btn').forEach(b => {
                       b.classList.remove('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-sm');
                       b.classList.add('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
                   });
                   btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-white', 'dark:hover:bg-slate-900');
                   btn.classList.add('bg-brand-500', 'text-white', 'border-brand-500', 'shadow-sm');
-
-                  // Set default model for provider
                   const defaultModel = MODELS_BY_PROVIDER[providerId][0];
                   MODEL = defaultModel.id;
-
                   renderModelSelector();
                   updateModelDisplay();
                   checkApiKeyStatus();
@@ -516,17 +480,13 @@
                   const container = document.getElementById('model-selector');
                   container.innerHTML = '';
                   const models = MODELS_BY_PROVIDER[CURRENT_PROVIDER];
-
                   models.forEach(m => {
                       const btn = document.createElement('button');
                       btn.className = `model-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border overflow-hidden ${m.id === MODEL ? 'bg-brand-500 text-white border-brand-500 shadow-sm' :
   'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900'}`;
                       btn.dataset.model = m.id;
                       btn.onclick = () => setModel(m.id, btn);
-                      btn.innerHTML = `
-                          <div class="font-semibold whitespace-nowrap">${m.name}</div>
-                          <div class="text-[10px] opacity-80 whitespace-nowrap">${m.desc}</div>
-                      `;
+                      btn.innerHTML = `<div class="font-semibold whitespace-nowrap">${m.name}</div><div class="text-[10px] opacity-80 whitespace-nowrap">${m.desc}</div>`;
                       container.appendChild(btn);
                   });
               }
@@ -558,12 +518,9 @@
                       item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
   dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
                       item.onclick = () => loadChat(chat.id);
-                      item.innerHTML = `
-                          <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
-                          <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
-                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
-  12"></path></svg>
-                          </button>`;
+                      item.innerHTML = `<div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div><button onclick="event.stopPropagation();
+  deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path
+  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>`;
                       listContainer.appendChild(item);
                   });
               }
@@ -626,9 +583,7 @@
                   const input = document.getElementById('user-input');
                   const btn = document.getElementById('send-btn');
                   const warning = document.getElementById('api-warning');
-
                   const currentKey = CURRENT_PROVIDER === 'huggingface' ? HF_API_KEY : OR_API_KEY;
-
                   if (!currentKey) {
                       input.disabled = true; input.placeholder = `API Key required for ${CURRENT_PROVIDER}...`;
                       btn.disabled = true; warning.classList.remove('hidden');
@@ -647,31 +602,21 @@
 
               function saveSettings() {
                   const newOrKey = document.getElementById('settings-api-key').value.trim();
-                  if (newOrKey) {
-                      OR_API_KEY = newOrKey;
-                      safeStorageSet('yanai_or_key', OR_API_KEY);
-                  }
+                  if (newOrKey) { OR_API_KEY = newOrKey; safeStorageSet('yanai_or_key', OR_API_KEY); }
                   const newHfKey = document.getElementById('settings-hf-key').value.trim();
-                  if (newHfKey) {
-                      HF_API_KEY = newHfKey;
-                      safeStorageSet('yanai_hf_key', HF_API_KEY);
-                  }
+                  if (newHfKey) { HF_API_KEY = newHfKey; safeStorageSet('yanai_hf_key', HF_API_KEY); }
                   checkApiKeyStatus();
                   toggleSettingsModal();
               }
 
               function clearAllData() {
                   if (confirm("Are you absolutely sure? This will delete all your conversations and your document library. This cannot be undone.")) {
-                      allChats = [];
-                      allUploadedDocs = [];
-                      saveAllChats();
-                      saveLibrary();
-                      localStorage.removeItem('yanai_all_chats');
-                      localStorage.removeItem('yanai_library');
+                      allChats = []; allUploadedDocs = [];
+                      saveAllChats(); saveLibrary();
+                      localStorage.removeItem('yanai_all_chats'); localStorage.removeItem('yanai_library');
                       document.getElementById('messages').innerHTML = '';
                       document.getElementById('welcome-screen').classList.remove('hidden');
-                      renderChatList();
-                      renderLibrary();
+                      renderChatList(); renderLibrary();
                       alert("All data has been cleared.");
                   }
               }
@@ -699,11 +644,9 @@
                   allUploadedDocs.forEach((doc, index) => {
                       const div = document.createElement('div');
                       div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group";
-                      div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
-                                      <div class="flex items-center gap-3">
-                                        <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>
-                                        <button onclick="deleteDoc(${index})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-all">✕</button>
-                                      </div>`;
+                      div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div><div class="flex
+  items-center gap-3"><span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span><button onclick="deleteDoc(${index})" class="opacity-0 group-hover:opacity-100 text-slate-400
+  hover:text-red-500 transition-all">✕</button></div>`;
                       list.appendChild(div);
                   });
               }
@@ -757,9 +700,7 @@
                       saveLibrary();
                       renderLibrary();
                       alert(`Successfully added ${file.name} to your library!`);
-                  } catch (err) {
-                      alert("File Error: " + err.message);
-                  }
+                  } catch (err) { alert("File Error: " + err.message); }
               }
 
               async function handleImageUpload(e) {
@@ -774,8 +715,7 @@
                       reader.onload = (e) => {
                           const base64 = e.target.result;
                           attachedImages.push({ name: file.name, base64: base64 });
-                          document.getElementById('preview-name').innerText =
-                              attachedImages.length === 1 ? file.name : `${attachedImages.length} images`;
+                          document.getElementById('preview-name').innerText = attachedImages.length === 1 ? file.name : `${attachedImages.length} images`;
                           document.getElementById('file-preview').classList.remove('hidden');
                           resolve();
                       };
@@ -834,9 +774,7 @@
                           relevantSnippets.push(`[Source: ${doc.name}]\n${doc.content.substring(start, end)}`);
                       }
                   });
-                  return relevantSnippets.length > 0
-                      ? "\n\n### REFERENCE KNOWLEDGE ###\n" + relevantSnippets.join("\n\n") + "\n### END REFERENCE ###"
-                      : "";
+                  return relevantSnippets.length > 0 ? "\n\n### REFERENCE KNOWLEDGE ###\n" + relevantSnippets.join("\n\n") + "\n### END REFERENCE ###" : "";
               }
 
               async function typeWriter(element, text) {
@@ -862,21 +800,15 @@
                   const container = document.getElementById('messages');
                   const msgDiv = document.createElement('div');
                   msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
-
                   if (role === 'user') {
                       msgDiv.innerHTML = `<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
                   } else {
                       msgDiv.innerHTML = `<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
                       const target = msgDiv.querySelector('.typing-target');
-                      if (!save) {
-                          target.innerHTML = marked.parse(text);
-                      } else {
-                          typeWriter(target, text);
-                      }
+                      if (!save) { target.innerHTML = marked.parse(text); } else { typeWriter(target, text); }
                   }
                   container.appendChild(msgDiv);
                   scrollToBottom();
-
                   if (save) {
                       const chat = allChats.find(c => c.id === currentChatId);
                       if (chat) {
@@ -893,45 +825,33 @@
               }
 
               function stopResponse() {
-                  if (currentAbortController) {
-                      currentAbortController.abort();
-                  }
-                  isGenerating = false;
-                  isTyping = false;
+                  if (currentAbortController) currentAbortController.abort();
+                  isGenerating = false; isTyping = false;
                   updateInputButtons();
               }
 
               function updateInputButtons() {
                   const sendBtn = document.getElementById('send-btn');
                   const stopBtn = document.getElementById('stop-btn');
-                  if (isGenerating || isTyping) {
-                      sendBtn.classList.add('hidden');
-                      stopBtn.classList.remove('hidden');
-                  } else {
-                      sendBtn.classList.remove('hidden');
-                      stopBtn.classList.add('hidden');
-                  }
+                  if (isGenerating || isTyping) { sendBtn.classList.add('hidden'); stopBtn.classList.remove('hidden'); } else { sendBtn.classList.remove('hidden'); stopBtn.classList.add('hidden'); }
               }
 
               async function handleSend() {
                   const input = document.getElementById('user-input');
                   const text = input.value.trim();
-
                   const activeKey = CURRENT_PROVIDER === 'huggingface' ? HF_API_KEY : OR_API_KEY;
                   if (!activeKey) return alert(`Set ${CURRENT_PROVIDER === 'huggingface' ? 'Hugging Face' : 'OpenRouter'} Key first!`);
                   if (!text && !attachedFile.content && attachedImages.length === 0) return;
                   if (isGenerating) return;
 
                   if (attachedImages.length > 0 && !VISION_MODELS.includes(MODEL)) {
-                      const confirmSwitch = confirm(`The current model (${MODEL.split('/').pop()}) does not support images. \n\nSwitch to a Vision model?`);
+                      const confirmSwitch = confirm(`The current model does not support images. Switch to a Vision model?`);
                       if (confirmSwitch) {
                           const vlModel = MODELS_BY_PROVIDER[CURRENT_PROVIDER].find(m => VISION_MODELS.includes(m.id));
                           if (vlModel) {
                               const btn = document.querySelector(`[data-model="${vlModel.id}"]`);
                               setModel(vlModel.id, btn);
-                          } else {
-                              return alert("No vision model available for this provider.");
-                          }
+                          } else return alert("No vision model available.");
                       } else return;
                   }
 
@@ -956,13 +876,8 @@
 
                   const displayUserText = text || (attachedImages.length > 0 ? `${attachedImages.length} images` : (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!"));
                   appendMessage('user', displayUserText);
-
-                  input.value = '';
-                  input.style.height = '';
-                  clearFile();
-
-                  isGenerating = true;
-                  updateInputButtons();
+                  input.value = ''; input.style.height = ''; clearFile();
+                  isGenerating = true; updateInputButtons();
 
                   const startTime = Date.now();
                   const loadingDiv = document.createElement('div');
@@ -992,68 +907,54 @@
                               body: JSON.stringify({
                                   headers: { Authorization: `Bearer ${OR_API_KEY}` },
                                   model: MODEL,
-                                  messages: [
-                                      { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' },
-                                      ...history,
-                                      { role: 'user', content: userContent }
-                                  ]
+                                  messages: [{ role: 'system', content: 'You are Yanai AI.' }, ...history, { role: 'user', content: userContent }]
                               })
                           });
                       } else {
-                          // Hugging Face integration - Using strict simple string format
-                          const hfMessages = [
-                              { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' }
-                          ];
-
-                          // Clean and add history
-                          history.forEach(m => {
-                              hfMessages.push({ role: m.role, content: String(m.content) });
-                          });
-
-                          // Clean current input
+                          // Hugging Face direct Inference API call
+                          const hfMessages = [{ role: 'system', content: 'You are Yanai AI.' }];
+                          history.forEach(m => hfMessages.push({ role: m.role, content: String(m.content) }));
                           let finalUserText = "";
-                          userContent.forEach(item => {
-                              if (item.type === "text") finalUserText += item.text + " ";
-                              else if (item.type === "image_url") finalUserText += "[Image attached] ";
-                          });
-
+                          userContent.forEach(item => { if (item.type === "text") finalUserText += item.text + " "; else finalUserText += "[Image attached] "; });
                           hfMessages.push({ role: 'user', content: finalUserText.trim() });
 
-                          response = await fetch(HF_API_URL, {
+                          response = await fetch(`${HF_BASE_URL}/${MODEL}`, {
                               method: 'POST',
                               signal: currentAbortController.signal,
-                              headers: {
-                                  'Content-Type': 'application/json',
-                                  'Authorization': `Bearer ${HF_API_KEY}`
-                              },
+                              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${HF_API_KEY}` },
                               body: JSON.stringify({
-                                  model: MODEL,
-                                  messages: hfMessages
+                                  inputs: hfMessages,
+                                  parameters: { max_new_tokens: 1024, temperature: 0.7 }
                               })
                           });
                       }
 
                       clearTimeout(timeoutId);
                       const data = await response.json();
-                      if (data.error) throw new Error(data.error.message || "API Error occurred");
-                      if (!data.choices || data.choices.length === 0) throw new Error("The AI returned an empty response.");
+
+                      // Handle different response formats (Chat vs Text)
+                      let resultText = "";
+                      if (data.choices && data.choices[0]?.message?.content) {
+                          resultText = data.choices[0].message.content;
+                      } else if (Array.isArray(data) && data[0]?.generated_text) {
+                          resultText = data[0].generated_text;
+                      } else if (data.generated_text) {
+                          resultText = data.generated_text;
+                      } else if (data.error) {
+                          throw new Error(data.error);
+                      } else {
+                          throw new Error("Unexpected API response format.");
+                      }
 
                       loadingDiv.remove();
                       isTyping = true;
-                      appendMessage('ai', data.choices[0].message.content);
+                      appendMessage('ai', resultText);
                   } catch (e) {
                       console.error(e);
-                      if (e.name === 'AbortError') {
-                          loadingDiv.innerHTML = `<div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl text-slate-500 dark:text-slate-400 text-sm">Response stopped by user.</div>`;
-                      } else {
-                          loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">
-                              ${e.name === 'AbortError' ? 'Request timed out.' : 'Error: ' + e.message}
-                          </div>`;
-                      }
+                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">Error: ${e.message}</div>`;
                   } finally {
                       clearInterval(timerInterval);
-                      isGenerating = false;
-                      currentAbortController = null;
+                      isGenerating = false; currentAbortController = null;
                       updateInputButtons();
                   }
               }
