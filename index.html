@@ -911,7 +911,7 @@
                               })
                           });
                       } else {
-                          // HF Inference API Call for Qwen 3.8 27B
+                          // HF PROXY CALL to avoid CORS "Failed to fetch"
                           const hfMessages = [{ role: 'system', content: 'You are Yanai AI.' }];
                           history.forEach(m => hfMessages.push({ role: m.role, content: String(m.content) }));
                           let finalUserText = "";
@@ -921,16 +921,17 @@
                           });
                           hfMessages.push({ role: 'user', content: finalUserText.trim() });
 
-                          response = await fetch(`${HF_BASE_URL}/${MODEL}`, {
+                          response = await fetch(API_PROXY_URL, {
                               method: 'POST',
                               signal: currentAbortController.signal,
-                              headers: {
-                                  'Content-Type': 'application/json',
-                                  'Authorization': `Bearer ${HF_API_KEY}`
-                              },
+                              headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({
-                                  inputs: hfMessages,
-                                  parameters: { max_new_tokens: 1024, temperature: 0.7 }
+                                  target: `${HF_BASE_URL}/${MODEL}`,
+                                  headers: { 'Authorization': `Bearer ${HF_API_KEY}` },
+                                  body: {
+                                      inputs: hfMessages,
+                                      parameters: { max_new_tokens: 1024, temperature: 0.7 }
+                                  }
                               })
                           });
                       }
@@ -938,7 +939,7 @@
                       clearTimeout(timeoutId);
 
                       if (!response.ok) {
-                          const errData = await response.json().catch(() => ({ error: "Unknown Error" }));
+                          const errData = await response.json().catch(() => ({ error: response.statusText }));
                           throw new Error(`HTTP ${response.status}: ${errData.error || response.statusText}`);
                       }
 
@@ -954,8 +955,7 @@
                       } else if (data.error) {
                           throw new Error(data.error);
                       } else {
-                          console.log("Raw Response:", data);
-                          throw new Error(`Unexpected response format. Check console for raw data.`);
+                          throw new Error(`Unexpected response format. Raw: ${JSON.stringify(data).substring(0, 100)}...`);
                       }
 
                       loadingDiv.remove();
@@ -963,7 +963,7 @@
                       appendMessage('ai', resultText);
                   } catch (e) {
                       console.error(e);
-                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm"><strong>API Error:</strong> ${e.message}</div>`;
+                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm"><strong class="font-bold">API Error:</strong> ${e.message}</div>`;
                   } finally {
                       clearInterval(timerInterval);
                       isGenerating = false; currentAbortController = null;
