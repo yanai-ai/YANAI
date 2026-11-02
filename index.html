@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -340,7 +340,7 @@
                       { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
                   ],
                   huggingface: [
-                      { id: 'Qwen/Qwen3.8-27B', name: 'Qwen 3.8 27B', desc: 'Advanced Reasoning & Multimodal' },
+                      { id: 'Qwen/Qwen3.8-27B', name: 'Qwen 3.8 27B', desc: 'Advanced Reasoning' },
                       { id: 'Qwen/Qwen2.5-72B-Instruct', name: 'Qwen 2.5 72B', desc: 'World-class open reasoning' }
                   ]
               };
@@ -911,10 +911,9 @@
                               })
                           });
                       } else {
-                          // CORRECTED HF INFERENCE CALL for Qwen 3.8 27B
+                          // HF Inference API Call for Qwen 3.8 27B
                           const hfMessages = [{ role: 'system', content: 'You are Yanai AI.' }];
                           history.forEach(m => hfMessages.push({ role: m.role, content: String(m.content) }));
-
                           let finalUserText = "";
                           userContent.forEach(item => {
                               if (item.type === "text") finalUserText += item.text + " ";
@@ -937,6 +936,12 @@
                       }
 
                       clearTimeout(timeoutId);
+
+                      if (!response.ok) {
+                          const errData = await response.json().catch(() => ({ error: "Unknown Error" }));
+                          throw new Error(`HTTP ${response.status}: ${errData.error || response.statusText}`);
+                      }
+
                       const data = await response.json();
 
                       let resultText = "";
@@ -949,7 +954,8 @@
                       } else if (data.error) {
                           throw new Error(data.error);
                       } else {
-                          throw new Error("Unexpected API response format.");
+                          console.log("Raw Response:", data);
+                          throw new Error(`Unexpected response format. Check console for raw data.`);
                       }
 
                       loadingDiv.remove();
@@ -957,7 +963,7 @@
                       appendMessage('ai', resultText);
                   } catch (e) {
                       console.error(e);
-                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm">Error: ${e.message}</div>`;
+                      loadingDiv.innerHTML = `<div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm"><strong>API Error:</strong> ${e.message}</div>`;
                   } finally {
                       clearInterval(timerInterval);
                       isGenerating = false; currentAbortController = null;
