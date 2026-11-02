@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+  <!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -1000,7 +1000,21 @@
                               })
                           });
                       } else {
-                          // Groq direct integration
+                          // Groq direct integration - MUST USE STRINGS FOR CONTENT
+                          const groqMessages = [
+                              { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' },
+                              ...history.map(m => ({ role: m.role, content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content) })),
+                          ];
+
+                          // Convert current userContent array to string for Groq
+                          let finalUserText = "";
+                          userContent.forEach(item => {
+                              if (item.type === "text") finalUserText += item.text + " ";
+                              else if (item.type === "image_url") finalUserText += "[Image attached] ";
+                          });
+
+                          groqMessages.push({ role: 'user', content: finalUserText.trim() });
+
                           response = await fetch(GROQ_API_URL, {
                               method: 'POST',
                               signal: currentAbortController.signal,
@@ -1010,11 +1024,7 @@
                               },
                               body: JSON.stringify({
                                   model: MODEL,
-                                  messages: [
-                                      { role: 'system', content: 'You are Yanai AI. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.' },
-                                      ...history,
-                                      { role: 'user', content: userContent }
-                                  ]
+                                  messages: groqMessages
                               })
                           });
                       }
