@@ -127,9 +127,9 @@
   data-provider="openrouter">
                           OpenRouter
                       </button>
-                      <button onclick="setProvider('openai', this)" class="provider-btn py-2 px-3 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 text-slate-600
-  dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-provider="openai">
-                          OpenAI
+                      <button onclick="setProvider('groq', this)" class="provider-btn py-2 px-3 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 text-slate-600
+  dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900" data-provider="groq">
+                          Groq (Free)
                       </button>
                   </div>
               </div>
@@ -206,8 +206,8 @@
                           <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
                               <li class="flex gap-2"><span class="font-bold text-brand-500">OpenRouter:</span> <span>Get your key at <a href="https://openrouter.ai/" target="_blank" class="text-brand-600
   dark:text-brand-400 underline font-medium">openrouter.ai</a></span></li>
-                              <li class="flex gap-2"><span class="font-bold text-brand-500">OpenAI:</span> <span>Get your key at <a href="https://platform.openai.com/" target="_blank" class="text-brand-600
-  dark:text-brand-400 underline font-medium">platform.openai.com</a></span></li>
+                              <li class="flex gap-2"><span class="font-bold text-brand-500">Groq:</span> <span>Get your free key at <a href="https://console.groq.com/" target="_blank" class="text-brand-600
+  dark:text-brand-400 underline font-medium">console.groq.com</a></span></li>
                           </ul>
                       </div>
                       <div class="space-y-4">
@@ -219,8 +219,8 @@
   outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
                               </div>
                               <div class="space-y-2">
-                                  <label class="text-sm font-medium text-slate-600 dark:text-slate-400">OpenAI API Key</label>
-                                  <input type="password" id="settings-openai-key" placeholder="sk-..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
+                                  <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Groq API Key</label>
+                                  <input type="password" id="settings-groq-key" placeholder="gsk_..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
   outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
                               </div>
                           </div>
@@ -354,20 +354,21 @@
 
           <script>
               const API_PROXY_URL = "https://yanai-api.wandering-butterfly-327a.workers.dev/";
-              const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+              const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
               const MODELS_BY_PROVIDER = {
                   openrouter: [
                       { id: 'nvidia/nemotron-3.5-super-vl', name: 'Nvidia Nemotron 3.5 Super VL', desc: 'Vision & complex logic' },
                       { id: 'nvidia/nemotron-3.5-lightning', name: 'Nvidia Nemotron 3.5 Lightning', desc: 'Ultra-fast responses' }
                   ],
-                  openai: [
-                      { id: 'gpt-4o', name: 'GPT-4o', desc: 'State-of-the-art intelligence' },
-                      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', desc: 'Efficient & fast' }
+                  groq: [
+                      { id: 'gpt-oss-120b', name: 'GPT-OSS 120B', desc: 'Extreme Reasoning & High Intelligence' },
+                      { id: 'gpt-oss-20b', name: 'GPT-OSS 20B', desc: 'Fast & Efficient' },
+                      { id: 'qwen-3.8-27b', name: 'Qwen 3.8 27B', desc: 'Vision & Multilingual' }
                   ]
               };
 
-              const VISION_MODELS = ['nvidia/nemotron-3.5-super-vl', 'gpt-4o'];
+              const VISION_MODELS = ['nvidia/nemotron-3.5-super-vl', 'qwen-3.8-27b'];
 
               const THEMES = {
                   orange: {
@@ -388,7 +389,7 @@
               };
 
               let OR_API_KEY = "";
-              let OPENAI_API_KEY = "";
+              let GROQ_API_KEY = "";
               let CURRENT_PROVIDER = "openrouter";
               let MODEL = "nvidia/nemotron-3.5-super-vl";
               let attachedFile = { name: '', content: '' };
@@ -468,8 +469,8 @@
               function init() {
                   const savedOrKey = safeStorageGet('yanai_or_key');
                   if (savedOrKey) OR_API_KEY = savedOrKey;
-                  const savedOpenAIKey = safeStorageGet('yanai_openai_key');
-                  if (savedOpenAIKey) OPENAI_API_KEY = savedOpenAIKey;
+                  const savedGroqKey = safeStorageGet('yanai_groq_key');
+                  if (savedGroqKey) GROQ_API_KEY = savedGroqKey;
 
                   const savedTheme = safeStorageGet('yanai_theme');
                   if (savedTheme === 'dark') {
@@ -543,7 +544,7 @@
 
               function updateModelDisplay() {
                   const display = document.getElementById('current-model-display');
-                  const providerName = CURRENT_PROVIDER === 'openai' ? 'OpenAI' : 'OpenRouter';
+                  const providerName = CURRENT_PROVIDER === 'groq' ? 'Groq' : 'OpenRouter';
                   const modelObj = MODELS_BY_PROVIDER[CURRENT_PROVIDER].find(m => m.id === MODEL) || { name: MODEL };
                   display.innerText = `${providerName} | ${modelObj.name}`;
               }
@@ -626,7 +627,7 @@
                   const btn = document.getElementById('send-btn');
                   const warning = document.getElementById('api-warning');
 
-                  const currentKey = CURRENT_PROVIDER === 'openai' ? OPENAI_API_KEY : OR_API_KEY;
+                  const currentKey = CURRENT_PROVIDER === 'groq' ? GROQ_API_KEY : OR_API_KEY;
 
                   if (!currentKey) {
                       input.disabled = true; input.placeholder = `API Key required for ${CURRENT_PROVIDER}...`;
@@ -641,7 +642,7 @@
                   const modal = document.getElementById('settings-modal');
                   modal.classList.toggle('hidden');
                   document.getElementById('settings-api-key').value = OR_API_KEY;
-                  document.getElementById('settings-openai-key').value = OPENAI_API_KEY;
+                  document.getElementById('settings-groq-key').value = GROQ_API_KEY;
               }
 
               function saveSettings() {
@@ -650,10 +651,10 @@
                       OR_API_KEY = newOrKey;
                       safeStorageSet('yanai_or_key', OR_API_KEY);
                   }
-                  const newOpenAIKey = document.getElementById('settings-openai-key').value.trim();
-                  if (newOpenAIKey) {
-                      OPENAI_API_KEY = newOpenAIKey;
-                      safeStorageSet('yanai_openai_key', OPENAI_API_KEY);
+                  const newGroqKey = document.getElementById('settings-groq-key').value.trim();
+                  if (newGroqKey) {
+                      GROQ_API_KEY = newGroqKey;
+                      safeStorageSet('yanai_groq_key', GROQ_API_KEY);
                   }
                   checkApiKeyStatus();
                   toggleSettingsModal();
@@ -916,8 +917,8 @@
                   const input = document.getElementById('user-input');
                   const text = input.value.trim();
 
-                  const activeKey = CURRENT_PROVIDER === 'openai' ? OPENAI_API_KEY : OR_API_KEY;
-                  if (!activeKey) return alert(`Set ${CURRENT_PROVIDER === 'openai' ? 'OpenAI' : 'OpenRouter'} Key first!`);
+                  const activeKey = CURRENT_PROVIDER === 'groq' ? GROQ_API_KEY : OR_API_KEY;
+                  if (!activeKey) return alert(`Set ${CURRENT_PROVIDER === 'groq' ? 'Groq' : 'OpenRouter'} Key first!`);
                   if (!text && !attachedFile.content && attachedImages.length === 0) return;
                   if (isGenerating) return;
 
@@ -999,13 +1000,13 @@
                               })
                           });
                       } else {
-                          // OpenAI direct integration
-                          response = await fetch(OPENAI_API_URL, {
+                          // Groq direct integration
+                          response = await fetch(GROQ_API_URL, {
                               method: 'POST',
                               signal: currentAbortController.signal,
                               headers: {
                                   'Content-Type': 'application/json',
-                                  'Authorization': `Bearer ${OPENAI_API_KEY}`
+                                  'Authorization': `Bearer ${GROQ_API_KEY}`
                               },
                               body: JSON.stringify({
                                   model: MODEL,
