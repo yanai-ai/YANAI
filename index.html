@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Yanai AI | Intelligence</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <script>
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            brand: {
+                                DEFAULT: 'var(--brand-color)',
+                                50: 'var(--brand-50)', 100: 'var(--brand-100)', 200: 'var(--brand-200)',
+                                300: 'var(--brand-300)', 400: 'var(--brand-400)', 500: 'var(--brand-500)',
+                                600: 'var(--brand-600)', 700: 'var(--brand-700)', 800: 'var(--brand-800)', 900: 'var(--brand-900)',
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+        <style>
+            /* Base Theme Variables - Orange Default */
+            :root {
+                --brand-color: #f97316;
+                --brand-50: #fff7ed; --brand-100: #ffedd5; --brand-200: #fed7aa; --brand-300: #fdba74;
+                --brand-400: #fb923c; --brand-500: #f97316; --brand-600: #ea580c; --brand-700: #c2410c;
+                --brand-800: #9a3412; --brand-900: #7c2d12;
+                --brand-rgb: 249, 115, 22;
+            }
+
+            body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; }
+            .chat-container::-webkit-scrollbar { width: 5px; }
+            .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+            .dark .chat-container::-webkit-scrollbar-thumb { background: #334155; }
+            .message-appear { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+            @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+            /* AI Prose Styling */
+            .prose-ai { line-height: 1.7; color: inherit; font-size: 1.05rem; }
+            .prose-ai h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: var(--brand-color); letter-spacing: -0.02em; }
+            .prose-ai h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 1.25rem; border-bottom: 1px solid rgba(var(--brand-rgb), 0.2); padding-bottom: 0.25rem; }
+            .prose-ai p { margin-bottom: 1.25rem; }
+            .prose-ai strong { font-weight: 700; color: #1e293b; }
+            .dark .prose-ai strong { color: #f1f5f9; }
+            .prose-ai ul { list-style-type: none; margin-left: 0.5rem; margin-bottom: 1.25rem; }
+            .prose-ai ul li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+            .prose-ai ul li::before { content: "•"; position: absolute; left: 0; color: var(--brand-color); font-weight: bold; }
+            .prose-ai ol { list-style-type: none; margin-left: 0.5rem; margin-bottom: 1.25rem; counter-reset: item; }
+            .prose-ai ol li { position: relative; padding-left: 2rem; margin-bottom: 0.5rem; counter-increment: item; }
+            .prose-ai ol li::before { content: counter(item) "."; position: absolute; left: 0; color: var(--brand-color); font-weight: 800; }
+            .prose-ai code { background: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
+            .dark .prose-ai code { background: rgba(255,255,255,0.1); }
+            .prose-ai pre { background: rgba(0,0,0,0.05); padding: 0.9rem; border-radius: 0.75rem; overflow-x: auto; margin-bottom: 1.25rem; }
+            .dark .prose-ai pre { background: rgba(255,255,255,0.08); }
+            .prose-ai pre code { background: transparent; padding: 0; }
+
+            /* Message Bubbles */
+            .user-msg { background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-700) 100%); color: white; border-radius: 22px 22px 4px 22px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); font-size:
+  1.05rem; }
+            .ai-msg { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; border-radius: 22px 22px 22px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 1.05rem; }
+            .dark .ai-msg { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; }
+
+            /* Streaming cursor */
+            .stream-cursor { display: inline-block; width: 7px; height: 1.05em; background: var(--brand-color); border-radius: 2px; margin-left: 3px; vertical-align: -2px; animation: blink-cursor 1s steps(2, start) infinite; }
+            @keyframes blink-cursor { to { visibility: hidden; } }
+
+            /* AI Core Animation */
+            .ai-core { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+            .core-center { width: 8px; height: 8px; background: var(--brand-color); border-radius: 50%; z-index: 10; box-shadow: 0 0 12px var(--brand-color); animation: pulse-glow 1.5s infinite ease-in-out; }
+            .core-ring { position: absolute; border: 2px solid var(--brand-color); border-radius: 50%; opacity: 0; animation: orbit 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+            .ring-1 { width: 12px; height: 12px; animation-delay: 0s; }
+            .ring-2 { width: 20px; height: 20px; animation-delay: 0.6s; }
+            @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px var(--brand-color); } 50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 20px var(--brand-color); } }
+            @keyframes orbit { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
+
+            .glass-input { backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(0, 0, 0, 0.05); }
+            .dark .glass-input { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); }
+            .chat-item.active { background: rgba(var(--brand-rgb), 0.1); border-color: var(--brand-color); color: var(--brand-color); }
+            .dark .chat-item.active { background: rgba(var(--brand-rgb), 0.2); border-color: var(--brand-color); color: var(--brand-color); }
+
+            #sidebar-resizer { width: 4px; cursor: col-resize; transition: background 0.2s; z-index: 20; }
+            #sidebar-resizer:hover { background: var(--brand-color); }
+
+            /* Brand color picker (Settings > Appearance) */
+            #panel-appearance .theme-option-btn {
+                position: relative;
+                border: 2px solid #e2e8f0;
+                background: #ffffff;
+                color: #475569;
+                cursor: pointer;
+            }
+            #panel-appearance .theme-option-btn:hover {
+                border-color: #cbd5e1;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            }
+            .dark #panel-appearance .theme-option-btn {
+                border-color: #1e293b;
+                background: #0f172a;
+                color: #94a3b8;
+            }
+            .dark #panel-appearance .theme-option-btn:hover {
+                border-color: #334155;
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+            }
+            #panel-appearance .theme-option-btn.selected {
+                border-color: var(--brand-color);
+                background: rgba(var(--brand-rgb), 0.10);
+                box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.14);
+                color: var(--brand-600);
+            }
+            .dark #panel-appearance .theme-option-btn.selected {
+                background: rgba(var(--brand-rgb), 0.20);
+                color: var(--brand-300);
+            }
+            #panel-appearance .theme-option-btn .theme-label { color: inherit; }
+            #panel-appearance .theme-swatch {
+                width: 26px;
+                height: 26px;
+                border-radius: 9999px;
+                border: 2px solid rgba(255, 255, 255, 0.9);
+                box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.15);
+            }
+            .dark #panel-appearance .theme-swatch { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2); }
+            #panel-appearance .theme-check {
+                position: absolute;
+                top: 6px;
+                right: 6px;
+                width: 16px;
+                height: 16px;
+                border-radius: 9999px;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                background: var(--brand-color);
+                color: #ffffff;
+            }
+            #panel-appearance .theme-option-btn.selected .theme-check { display: flex; }
+
+            /* Request quota bars */
+            .quota-bar {
+                height: 6px;
+                width: 100%;
+                border-radius: 9999px;
+                background: #e2e8f0;
+                box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06);
+                overflow: hidden;
+            }
+            .dark .quota-bar {
+                background: rgba(255, 255, 255, 0.14);
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            }
+            .quota-bar-sm { height: 4px; }
+            .quota-bar-fill {
+                height: 100%;
+                width: 0;
+                border-radius: 9999px;
+                background: var(--brand-color);
+                transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+            }
+            .quota-bar-fill.warn { background: #f59e0b; }
+            .quota-bar-fill.low { background: #ef4444; }
+            .quota-label { font-variant-numeric: tabular-nums; }
+            .quota-sub { color: rgba(255, 255, 255, 0.82); }
+
+            /* Selected model: dark track + white fill so the bar is always readable */
+            .model-btn.is-active .quota-bar {
+                background: rgba(0, 0, 0, 0.24);
+                box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+            }
+            .model-btn.is-active .quota-bar-fill { background: #ffffff; }
+            .model-btn.is-active .quota-label { color: rgba(255, 255, 255, 0.96); }
+
+            .live-dot {
+                flex: none;
+                width: 6px;
+                height: 6px;
+                margin-top: 5px;
+                border-radius: 9999px;
+                background: #10b981;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16);
+            }
+            .model-btn.is-active .live-dot {
+                background: #ffffff;
+                box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.22);
+            }
+        </style>
+    </head>
+    <body class="flex h-screen overflow-hidden bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-100">
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="bg-slate-100 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 relative overflow-x-hidden" style="width: 288px;">
+            <div class="p-6 flex flex-col h-full overflow-hidden">
+                <div class="flex items-center justify-between mb-10">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-9 h-9 bg-white dark:bg-slate-900 rounded-xl flex-shrink-0 flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-800">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 10C18 10 19 8 20 8C21 8 22 9 22 11C22 13 20 13 20 13C20 13 20 15 18 16C16 17 14 16 14 16" stroke="var(--brand-color)" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 7C12 7 11 4 8 4C5 4 4 6 4 9C4 12 6 13 8 13C10 13 11 11 11 11L12 13C12 15 11 17 9 18C7 19 5 18 5 18" stroke="var(--brand-color)" stroke-width="2"
+  stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 7L14 7C16 7 17 8 17 10C17 12 15 13 13 13" stroke="var(--brand-color)" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="16" cy="9" r="1" fill="var(--brand-color)"/>
+                            </svg>
+                        </div>
+                        <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">Yanai AI</h1>
+                    </div>
+                </div>
+
+                <div class="space-y-3 mb-6">
+                    <button onclick="startNewChat()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
+  rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
+                        <svg class="w-4 h-4 text-brand-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
+  stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span class="whitespace-nowrap">New Chat</span>
+                    </button>
+                    <button onclick="toggleLibrary()" class="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300
+  rounded-2xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm shadow-sm group overflow-hidden">
+                        <svg class="w-4 h-4 text-brand-500 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round"
+  stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477
+  4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        <span class="whitespace-nowrap">Library</span>
+                    </button>
+                </div>
+
+                <div class="mb-6 overflow-hidden">
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Provider</p>
+                    <div class="grid grid-cols-2 gap-2 mb-5" id="provider-selector">
+                        <button type="button" onclick="setProvider('openrouter')" class="provider-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-transparent bg-brand-500 text-white shadow-sm overflow-hidden" data-provider="openrouter">
+                            <div class="font-semibold whitespace-nowrap">OpenRouter</div>
+                            <div class="text-[10px] opacity-70 whitespace-nowrap">Nemotron models</div>
+                        </button>
+                        <button type="button" onclick="setProvider('groq')" class="provider-btn w-full text-left px-3 py-2 rounded-xl text-sm transition-all border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 overflow-hidden" data-provider="groq">
+                            <div class="font-semibold whitespace-nowrap">Groq</div>
+                            <div class="text-[10px] opacity-70 whitespace-nowrap">GPT-OSS &amp; Qwen</div>
+                        </button>
+                    </div>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Select Intelligence</p>
+                    <div class="space-y-2" id="model-selector"></div>
+                </div>
+
+                <div class="flex-1 overflow-hidden flex flex-col">
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3">Recent Chats</p>
+                    <div id="recent-chats-list" class="space-y-1 overflow-y-auto chat-container px-2 pb-4"></div>
+                </div>
+
+                <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1">
+                    <button onclick="toggleSettingsModal()" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 rounded-xl
+  transition-all group overflow-hidden">
+                        <!-- FIXED GEAR ICON -->
+                        <svg class="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.457 3.043.72 3.043 2.466v10.5c0
+  1.746-1.5 2.924-3.043 2.466a1.724 1.724 0 00-2.573-1.066c-1.543.457-3.043-.72-3.043-2.466v-10.5c0-1.746 1.5-2.924 3.043-2.466z"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01"></path>
+                        </svg>
+                        <span class="whitespace-nowrap">Settings</span>
+                    </button>
+                </div>
+            </div>
+            <div id="sidebar-resizer" class="absolute right-0 top-0 h-full hover:bg-brand-500"></div>
+        </aside>
+
+        <!-- Library Overlay -->
+        <div id="library-overlay" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-all">
+            <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 p-8 overflow-y-auto transition-transform transform
+  translate-x-full" id="library-panel">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Document Library</h3>
+                    <button onclick="toggleLibrary()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="mb-6">
+                    <button onclick="document.getElementById('library-file-input').click()" class="w-full py-3 px-4 bg-brand-500 text-white rounded-2xl font-semibold hover:bg-brand-600 transition-all text-sm
+  shadow-md flex items-center justify-center gap-2 group">
+                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
+  stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Add Document to Library
+                    </button>
+                    <input type="file" id="library-file-input" class="hidden" onchange="handleLibraryFileUpload(event)">
+                </div>
+                <div id="library-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
+                <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                    <button onclick="switchSettingTab('general')" id="tab-general" class="flex-1 py-4 text-sm font-bold transition-all border-b-2 border-brand-500 text-brand-500">General</button>
+                    <button onclick="switchSettingTab('appearance')" id="tab-appearance" class="flex-1 py-4 text-sm font-bold transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700
+  dark:hover:text-slate-300">Appearance</button>
+                    <button onclick="switchSettingTab('danger')" id="tab-danger" class="flex-1 py-4 text-sm font-bold transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700
+  dark:hover:text-slate-300">Danger Zone</button>
+                </div>
+
+                <div class="p-8 overflow-y-auto flex-1 space-y-8">
+                    <div id="panel-general" class="setting-panel space-y-8">
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+                            <p class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21
+  12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Quick Start: Getting your API Keys
+                            </p>
+                            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
+                                <li class="flex gap-2"><span class="font-bold text-brand-500">OpenRouter</span> <span>Create a key at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener" class="text-brand-600 dark:text-brand-400 underline font-medium">openrouter.ai/keys</a>.</span></li>
+                                <li class="flex gap-2"><span class="font-bold text-brand-500">Groq</span> <span>Create a key at <a href="https://console.groq.com/keys" target="_blank" rel="noopener" class="text-brand-600 dark:text-brand-400 underline font-medium">console.groq.com/keys</a>.</span></li>
+                                <li class="flex gap-2"><span class="font-bold text-brand-500">Save</span> <span>Paste each key below, save, then choose a provider in the sidebar.</span></li>
+                            </ul>
+                        </div>
+                        <div class="space-y-5">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">API Configuration</p>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-sm font-medium text-slate-600 dark:text-slate-400">OpenRouter API Key</label>
+                                    <button type="button" onclick="clearProviderKey('openrouter')" class="text-[10px] font-semibold text-slate-400 hover:text-red-500 transition-colors">Remove</button>
+                                </div>
+                                <input type="password" id="settings-api-key" placeholder="sk-or-..." autocomplete="off" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
+  outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
+                                <p class="text-[10px] text-slate-400">Used when the OpenRouter provider is active.</p>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Groq API Key</label>
+                                    <button type="button" onclick="clearProviderKey('groq')" class="text-[10px] font-semibold text-slate-400 hover:text-red-500 transition-colors">Remove</button>
+                                </div>
+                                <input type="password" id="settings-groq-key" placeholder="gsk_..." autocomplete="off" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl
+  outline-none focus:ring-2 focus:ring-brand-500 transition-all dark:text-white text-sm">
+                                <p class="text-[10px] text-slate-400">Used when the Groq provider is active.</p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 text-[11px] leading-relaxed text-amber-700 dark:text-amber-400">
+                                This is a static GitHub Pages site. Keys are stored in this browser's localStorage and sent directly to the selected provider. They are not protected by a server, so anyone with access to this device or browser profile could read them. Use keys you can rotate or revoke.
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Request Limits</p>
+                                <button type="button" id="rate-refresh-btn" onclick="refreshRateLimits()" class="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400 hover:text-brand-500 transition-colors disabled:opacity-50 disabled:cursor-wait">
+                                    <svg id="rate-refresh-icon" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                    <span>Refresh</span>
+                                </button>
+                            </div>
+                            <div id="rate-limit-list" class="space-y-3"></div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">
+                                Bars refill automatically: the minute bar 60 seconds after your last request and the day bar at the provider's reset time. OpenRouter counts are shared by both free NVIDIA models and read live from your key. Groq shows published free-tier limits (30/min, 1,000/day per model) until response headers are available.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="panel-appearance" class="setting-panel hidden space-y-8">
+                        <div class="space-y-4">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Theme Mode</p>
+                            <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <span class="text-sm font-medium">Dark Mode</span>
+                                <button onclick="toggleTheme()" id="theme-toggle-btn" class="w-12 h-6 rounded-full bg-slate-300 dark:bg-brand-500 relative transition-colors duration-300">
+                                    <div id="theme-toggle-dot" class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 transform translate-x-0 dark:translate-x-6"></div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Brand Accent Color</p>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button onclick="setBrandColor('orange')" class="theme-option-btn p-3 rounded-xl flex flex-col items-center gap-2 transition-all" data-theme="orange" aria-pressed="false">
+                                    <div class="theme-swatch" style="background:#f97316"></div>
+                                    <span class="theme-label text-xs font-semibold">Orange</span>
+                                    <span class="theme-check" aria-hidden="true">
+                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </span>
+                                </button>
+                                <button onclick="setBrandColor('blue')" class="theme-option-btn p-3 rounded-xl flex flex-col items-center gap-2 transition-all" data-theme="blue" aria-pressed="false">
+                                    <div class="theme-swatch" style="background:#3b82f6"></div>
+                                    <span class="theme-label text-xs font-semibold">Blue</span>
+                                    <span class="theme-check" aria-hidden="true">
+                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </span>
+                                </button>
+                                <button onclick="setBrandColor('mono')" class="theme-option-btn p-3 rounded-xl flex flex-col items-center gap-2 transition-all" data-theme="mono" aria-pressed="false">
+                                    <div class="theme-swatch" style="background:#475569"></div>
+                                    <span class="theme-label text-xs font-semibold">Mono</span>
+                                    <span class="theme-check" aria-hidden="true">
+                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="panel-danger" class="setting-panel hidden space-y-8">
+                        <div class="space-y-4">
+                            <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Data Management</p>
+                            <div class="space-y-3">
+                                <button onclick="clearAllData()" class="w-full py-3 px-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl font-semibold hover:bg-red-100
+  dark:hover:bg-red-900/40 transition-all text-sm border border-red-200 dark:border-red-800/50 flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0
+  0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Clear Entire History & Library
+                                </button>
+                                <p class="text-center text-[10px] text-slate-400">This action is permanent and cannot be undone.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+                    <button onclick="saveSettings()" class="px-6 py-2 bg-brand-500 text-white font-semibold rounded-xl shadow-lg hover:bg-brand-600 transition-all text-sm">Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <main class="flex-1 flex flex-col relative bg-slate-50 dark:bg-black overflow-hidden">
+            <header class="h-16 flex items-center justify-between px-8 border-b border-slate-200 dark:border-slate-900 bg-white/80 dark:bg-black/50 backdrop-blur-md z-10">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span id="current-provider-display" class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 flex-shrink-0">OpenRouter</span>
+                    <span id="current-model-display" class="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider truncate">Nvidia Nemotron 3.5 Super VL</span>
+                </div>
+                <!-- Top right theme button removed as requested -->
+            </header>
+
+            <div id="chat-window" class="flex-1 overflow-y-auto chat-container px-4 py-8 md:px-8">
+                <div id="welcome-screen" class="max-w-3xl mx-auto mt-32 text-center space-y-8 animate-fade-in">
+                    <h2 class="text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">How can I help you today?</h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">Upload a document, ask a complex question, or simply start a conversation.</p>
+                </div>
+                <div id="messages" class="max-w-4xl mx-auto space-y-10 pb-32"></div>
+            </div>
+
+            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50 dark:from-black via-slate-50 dark:via-black to-transparent">
+                <div class="max-w-4xl mx-auto relative">
+                    <div id="api-warning" class="hidden absolute -top-16 left-0 right-0 text-center">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-full
+  text-xs font-semibold shadow-sm animate-pulse">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0
+  01-7.743 5.743L11 17H9v-5.257a6 6 0 01-7.743-5.743L3 6a1 1 0 011-1h16a1 1 0 011 1z"></path></svg>
+                            <span id="api-warning-text">API Key required to chat</span>
+                        </div>
+                    </div>
+
+                    <div id="file-preview" class="hidden absolute -top-14 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 flex items-center gap-3 shadow-lg
+  text-xs animate-bounce">
+                        <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2
+  2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span id="preview-name" class="font-semibold dark:text-white">doc.pdf</span>
+                        <button onclick="clearFile()" class="text-slate-400 hover:text-red-500 transition-colors">✕</button>
+                    </div>
+                    <div class="glass-input flex items-center gap-3 p-4 rounded-[32px] bg-white/50 dark:bg-slate-900/50">
+                        <div class="relative">
+                            <button id="attach-btn" onclick="toggleAttachMenu()" class="p-3 text-slate-400 dark:text-slate-500 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            </button>
+                            <div id="attach-menu" class="hidden absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-2 z-20">
+                                <button onclick="triggerFileInput('doc')" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2
+  0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    Document
+                                </button>
+                                <button onclick="triggerFileInput('img')" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0
+  012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    Image
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="user-input" rows="1" placeholder="Message Yanai..." class="flex-1 bg-transparent border-none outline-none resize-none py-2 px-2 text-slate-700 dark:text-slate-200 text-sm
+  leading-relaxed max-h-40" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+                        <div class="flex items-center gap-2">
+                            <button id="send-btn" onclick="handleSend()" class="p-3 bg-brand-500 text-white rounded-2xl shadow-lg shadow-brand-900/20 hover:bg-brand-600 disabled:opacity-50 transition-all
+  active:scale-95">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7
+  7m-7-7v18"></path></svg>
+                            </button>
+                            <button id="stop-btn" onclick="stopResponse()" class="hidden p-3 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl shadow-sm hover:bg-slate-300
+  dark:hover:bg-slate-700 transition-all active:scale-95">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
+  12"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <input type="file" id="file-input" class="hidden" onchange="handleFileUpload(event)">
+        <input type="file" id="image-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
+
+        <script>
+            const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
+            const OPENROUTER_MAX_TOKENS = 8192;
+            const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+
+            // Published request limits used for the quota bars. OpenRouter's daily
+            // limit is refreshed live from /api/v1/key; Groq's free-tier limits are
+            // used as defaults and replaced by response headers when available.
+            const RATE_LIMITS = {
+                openrouter: { rpm: 20, dailyFallback: 50 },
+                groq: {
+                    default: { rpm: 30, rpd: 1000 },
+                    models: {
+                        'openai/gpt-oss-120b': { rpm: 30, rpd: 1000 },
+                        'openai/gpt-oss-20b': { rpm: 30, rpd: 1000 },
+                        'qwen/qwen3.8-27b': { rpm: 30, rpd: 1000 }
+                    }
+                }
+            };
+
+            const PROVIDERS = {
+                openrouter: {
+                    id: 'openrouter',
+                    label: 'OpenRouter',
+                    keyStorage: 'yanai_or_key',
+                    models: [
+                        {
+                            id: 'nvidia/nemotron-3.5-super-vl:free',
+                            name: 'Nvidia Nemotron 3.5 Super VL',
+                            desc: 'Vision & complex logic',
+                            vision: true,
+                            config: {}
+                        },
+                        {
+                            id: 'nvidia/nemotron-3.5-lightning:free',
+                            name: 'Nvidia Nemotron 3.5 Lightning',
+                            desc: 'Ultra-fast responses',
+                            vision: false,
+                            config: {}
+                        }
+                    ]
+                },
+                groq: {
+                    id: 'groq',
+                    label: 'Groq',
+                    keyStorage: 'yanai_groq_key',
+                    models: [
+                        {
+                            id: 'openai/gpt-oss-120b',
+                            name: 'GPT-OSS 120B',
+                            desc: 'Deep reasoning · 120B',
+                            vision: false,
+                            config: {
+                                temperature: 1,
+                                max_completion_tokens: 2048,
+                                top_p: 1,
+                                reasoning_effort: 'medium',
+                                stream: true
+                            }
+                        },
+                        {
+                            id: 'openai/gpt-oss-20b',
+                            name: 'GPT-OSS 20B',
+                            desc: 'Fast reasoning · 20B',
+                            vision: false,
+                            config: {
+                                temperature: 1,
+                                max_completion_tokens: 2048,
+                                top_p: 1,
+                                reasoning_effort: 'medium',
+                                stream: true
+                            }
+                        },
+                        {
+                            id: 'qwen/qwen3.8-27b',
+                            name: 'Qwen 3.8 27B',
+                            desc: 'Balanced · 27B',
+                            vision: false,
+                            config: {
+                                temperature: 0.6,
+                                max_completion_tokens: 2048,
+                                top_p: 0.95,
+                                reasoning_effort: 'default',
+                                stream: true
+                            }
+                        }
+                    ]
+                }
+            };
+
+            const THEMES = {
+                orange: {
+                    color: '#f97316', rgb: '249, 115, 22',
+                    50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
+                    400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12'
+                },
+                blue: {
+                    color: '#3b82f6', rgb: '59, 130, 246',
+                    50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+                    400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
+                },
+                mono: {
+                    color: '#475569', rgb: '71, 85, 105',
+                    50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
+                    400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a'
+                }
+            };
+
+            const KEYS = { openrouter: '', groq: '' };
+            let provider = 'openrouter';
+            const selectedModels = {
+                openrouter: 'nvidia/nemotron-3.5-super-vl:free',
+                groq: 'openai/gpt-oss-120b'
+            };
+
+            let attachedFile = { name: '', content: '' };
+            let attachedImages = [];
+            let isGenerating = false;
+            let isTyping = false;
+            let timerInterval = null;
+            let currentAbortController = null;
+            let allChats = [];
+            let currentChatId = null;
+            let allUploadedDocs = [];
+            let rateState = {
+                openrouter: { dayKey: '', dailyUsed: 0, minute: [], live: null, lastFetch: 0, blockedUntil: 0 },
+                groq: {}
+            };
+            let openRouterRefreshPromise = null;
+            let rateTicker = null;
+
+            class ApiError extends Error {
+                constructor(message, status, param, streamStarted) {
+                    super(message);
+                    this.name = 'ApiError';
+                    this.status = status || 0;
+                    this.param = param || null;
+                    this.streamStarted = !!streamStarted;
+                }
+            }
+
+            function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+            function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.error("Storage blocked"); } }
+            function safeStorageRemove(key) { try { localStorage.removeItem(key); } catch (e) { /* ignore */ } }
+
+            function escapeHtml(value) {
+                return String(value == null ? '' : value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function getActiveProvider() {
+                return PROVIDERS[provider] || PROVIDERS.openrouter;
+            }
+
+            function getActiveModel() {
+                const p = getActiveProvider();
+                return p.models.find(m => m.id === selectedModels[p.id]) || p.models[0];
+            }
+
+            function getActiveConfig() {
+                const p = getActiveProvider();
+                return {
+                    providerId: p.id,
+                    providerLabel: p.label,
+                    model: getActiveModel(),
+                    key: KEYS[p.id] || ''
+                };
+            }
+
+            // Tell each model exactly which provider/model it is so it does not
+            // fall back to a generic or incorrect self-identification.
+            function buildSystemPrompt(providerId, model) {
+                const p = PROVIDERS[providerId];
+                return `You are Yanai AI, the assistant inside the Yanai AI chat app. ` +
+                    `You are currently running on the ${p.label} provider, using the "${model.name}" model ` +
+                    `(exact model ID: ${model.id}). If the user asks which model, AI, or company you are, ` +
+                    `answer precisely that you are ${model.name} (${model.id}) served through ${p.label}, ` +
+                    `inside the Yanai AI app. Never claim to be a different model or provider, and never ` +
+                    `guess a model name. Prioritize the REFERENCE KNOWLEDGE provided in the prompt if it exists.`;
+            }
+
+            function persistSelectedModels() {
+                safeStorageSet('yanai_models', JSON.stringify(selectedModels));
+            }
+
+            /* ------------------- Request quota bars ------------------- */
+            const QUOTA_MINUTE_MS = 60000;
+            const QUOTA_PERSIST_EVERY_MS = 15000;
+
+            function utcDayKey() {
+                return new Date().toISOString().slice(0, 10);
+            }
+
+            function nextUtcMidnight() {
+                const now = new Date();
+                return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+            }
+
+            // Groq reports resets as Go-style durations such as "2m59.56s".
+            function parseDurationMs(value) {
+                if (!value) return 0;
+                const parts = String(value).trim().match(/(\d+(?:\.\d+)?)(h|m|s)/g);
+                if (!parts) return 0;
+                return Math.round(parts.reduce((total, part) => {
+                    const amount = parseFloat(part);
+                    if (part.endsWith('h')) return total + amount * 3600000;
+                    if (part.endsWith('m')) return total + amount * 60000;
+                    return total + amount * 1000;
+                }, 0));
+            }
+
+            function formatCountdown(ms) {
+                if (!Number.isFinite(ms) || ms <= 0) return 'now';
+                const total = Math.ceil(ms / 1000);
+                if (total < 60) return `${total}s`;
+                const minutes = Math.floor(total / 60);
+                const seconds = total % 60;
+                if (minutes < 60) return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`;
+                const hours = Math.floor(minutes / 60);
+                const rest = minutes % 60;
+                return rest ? `${hours}h ${rest}m` : `${hours}h`;
+            }
+
+            function pruneMinute(list) {
+                const cutoff = Date.now() - QUOTA_MINUTE_MS;
+                return (Array.isArray(list) ? list : []).filter(t => typeof t === 'number' && t > cutoff);
+            }
+
+            // Resets a bucket when the UTC day rolls over, or when a provider-supplied
+            // reset timestamp passes. Returns true when anything changed.
+            function rollRateDay(s) {
+                let changed = false;
+                const dayKey = utcDayKey();
+                if (s.dayKey !== dayKey) {
+                    s.dayKey = dayKey;
+                    s.dailyUsed = 0;
+                    s.blockedUntil = 0;
+                    s.live = null;
+                    changed = true;
+                }
+                if (s.live && s.live.resetAt && Date.now() >= s.live.resetAt) {
+                    s.live = null;
+                    s.dailyUsed = 0;
+                    changed = true;
+                }
+                const before = Array.isArray(s.minute) ? s.minute.length : 0;
+                s.minute = pruneMinute(s.minute);
+                return changed || s.minute.length !== before;
+            }
+
+            function getOpenRouterRateState() {
+                if (!rateState.openrouter || typeof rateState.openrouter !== 'object') {
+                    rateState.openrouter = { dayKey: '', dailyUsed: 0, minute: [], live: null, lastFetch: 0, blockedUntil: 0 };
+                }
+                const s = rateState.openrouter;
+                rollRateDay(s);
+                return s;
+            }
+
+            function getGroqRateState(modelId) {
+                const key = modelId || 'default';
+                if (!rateState.groq || typeof rateState.groq !== 'object') rateState.groq = {};
+                if (!rateState.groq[key]) {
+                    rateState.groq[key] = { dayKey: utcDayKey(), dailyUsed: 0, minute: [], live: null, blockedUntil: 0 };
+                }
+                const s = rateState.groq[key];
+                rollRateDay(s);
+                return s;
+            }
+
+            function persistRateState() {
+                safeStorageSet('yanai_rate_limits', JSON.stringify(rateState));
+            }
+
+            function formatQuota(value) {
+                return Math.max(0, Math.round(Number(value) || 0)).toLocaleString();
+            }
+
+            function quotaPercent(remaining, limit) {
+                if (!limit || limit <= 0) return 0;
+                return Math.max(0, Math.min(100, Math.round((remaining / limit) * 100)));
+            }
+
+            function quotaClass(percent) {
+                if (percent <= 15) return 'low';
+                if (percent <= 40) return 'warn';
+                return '';
+            }
+
+            function getModelRateInfo(providerId, modelId) {
+                const now = Date.now();
+                const isOpenRouter = providerId === 'openrouter';
+                const cfg = isOpenRouter
+                    ? RATE_LIMITS.openrouter
+                    : (RATE_LIMITS.groq.models[modelId] || RATE_LIMITS.groq.default);
+                const s = isOpenRouter ? getOpenRouterRateState() : getGroqRateState(modelId);
+                const dayLimit = s.live ? s.live.limit : (isOpenRouter ? cfg.dailyFallback : cfg.rpd);
+                const dayRemaining = s.live ? s.live.remaining : Math.max(0, dayLimit - s.dailyUsed);
+
+                // A 429 pauses the minute bar until the retry window ends; otherwise the
+                // rolling 60-second log of local attempts is authoritative.
+                const minuteUsed = Math.max(
+                    s.minute.length,
+                    s.blockedUntil > now ? cfg.rpm : 0
+                );
+                const minuteRemaining = Math.max(0, cfg.rpm - Math.min(cfg.rpm, minuteUsed));
+                const minuteResetAt = Math.max(
+                    s.minute.length ? s.minute[s.minute.length - 1] + QUOTA_MINUTE_MS : 0,
+                    s.blockedUntil > now ? s.blockedUntil : 0
+                );
+
+                return {
+                    dailyLimit: dayLimit,
+                    dailyRemaining: Math.max(0, Math.min(dayLimit, dayRemaining)),
+                    minuteLimit: cfg.rpm,
+                    minuteRemaining,
+                    live: !!s.live,
+                    shared: isOpenRouter,
+                    dayResetAt: s.live && s.live.resetAt ? s.live.resetAt : nextUtcMidnight(),
+                    minuteResetAt
+                };
+            }
+
+            function recordRequestAttempt(providerId, modelId) {
+                if (providerId === 'openrouter') {
+                    getOpenRouterRateState().minute.push(Date.now());
+                } else {
+                    getGroqRateState(modelId).minute.push(Date.now());
+                }
+                persistRateState();
+                updateQuotaUI();
+            }
+
+            function recordRequestSuccess(providerId, modelId) {
+                if (providerId === 'openrouter') {
+                    const s = getOpenRouterRateState();
+                    s.dailyUsed += 1;
+                    if (s.live) {
+                        s.live.remaining = Math.max(0, s.live.remaining - 1);
+                        s.live.used = (Number(s.live.used) || 0) + 1;
+                    }
+                } else {
+                    // Groq response headers (when exposed) already carry the updated
+                    // remaining count, so only the local fallback is incremented here.
+                    getGroqRateState(modelId).dailyUsed += 1;
+                }
+                persistRateState();
+                updateQuotaUI();
+            }
+
+            function applyGroqQuotaHeaders(modelId, response) {
+                try {
+                    const s = getGroqRateState(modelId);
+                    const limit = Number(response.headers.get('x-ratelimit-limit-requests'));
+                    const remaining = Number(response.headers.get('x-ratelimit-remaining-requests'));
+
+                    if (Number.isFinite(limit) && limit > 0 && Number.isFinite(remaining)) {
+                        const fetchedAt = Date.now();
+                        const resetMs = parseDurationMs(response.headers.get('x-ratelimit-reset-requests'));
+                        s.live = {
+                            limit,
+                            remaining: Math.max(0, Math.min(limit, remaining)),
+                            reset: response.headers.get('x-ratelimit-reset-requests') || '',
+                            fetchedAt,
+                            resetAt: resetMs > 0 ? fetchedAt + resetMs : 0
+                        };
+                    }
+                    if (response.status === 429) {
+                        const retry = Number(response.headers.get('retry-after'));
+                        s.blockedUntil = Date.now() + (Number.isFinite(retry) && retry > 0 ? retry * 1000 : 60000);
+                    }
+                    persistRateState();
+                    updateQuotaUI();
+                } catch (e) { /* custom headers may be hidden by CORS */ }
+            }
+
+            function markOpenRouterRateLimited(scope) {
+                const s = getOpenRouterRateState();
+                s.blockedUntil = Date.now() + 60000;
+                if (scope === 'daily') {
+                    const cfg = RATE_LIMITS.openrouter;
+                    if (s.live) {
+                        s.live.remaining = 0;
+                        s.live.used = s.live.limit;
+                    } else {
+                        s.dailyUsed = Math.max(s.dailyUsed, cfg.dailyFallback);
+                    }
+                }
+                persistRateState();
+                updateQuotaUI();
+                // When the 429 does not clearly name the daily cap, the key endpoint
+                // reports the authoritative daily counter and corrects the estimate.
+                if (scope !== 'daily') refreshOpenRouterLimits(true);
+            }
+
+            async function refreshOpenRouterLimits(force) {
+                if (!KEYS.openrouter) {
+                    rateState.openrouter.live = null;
+                    persistRateState();
+                    updateQuotaUI();
+                    return;
+                }
+                if (openRouterRefreshPromise) return openRouterRefreshPromise;
+
+                const s = getOpenRouterRateState();
+                if (!force && Date.now() - (s.lastFetch || 0) < 60000) return;
+                // Record the attempt time too, so a network failure cannot make the
+                // one-second ticker retry the key endpoint on every tick.
+                s.lastFetch = Date.now();
+
+                openRouterRefreshPromise = (async () => {
+                    try {
+                        const response = await fetch('https://openrouter.ai/api/v1/key', {
+                            headers: { 'Authorization': `Bearer ${KEYS.openrouter}` }
+                        });
+                        if (!response.ok) {
+                            if (response.status === 401 || response.status === 403) {
+                                s.live = null;
+                                persistRateState();
+                                updateQuotaUI();
+                            }
+                            return;
+                        }
+                        const data = await response.json();
+                        const daily = data && data.data ? data.data.free_model_daily_requests : null;
+                        const limit = daily ? Number(daily.limit) : NaN;
+                        const remaining = daily ? Number(daily.remaining) : NaN;
+
+                        if (Number.isFinite(limit) && limit > 0 && Number.isFinite(remaining)) {
+                            s.live = {
+                                limit,
+                                remaining: Math.max(0, Math.min(limit, remaining)),
+                                used: Number(daily.used) || 0,
+                                fetchedAt: Date.now(),
+                                resetAt: nextUtcMidnight()
+                            };
+                        } else {
+                            s.live = null;
+                        }
+                        persistRateState();
+                        updateQuotaUI();
+                    } catch (e) { /* offline or blocked */ }
+                    finally {
+                        openRouterRefreshPromise = null;
+                    }
+                })();
+                return openRouterRefreshPromise;
+            }
+
+            async function refreshRateLimits() {
+                const btn = document.getElementById('rate-refresh-btn');
+                const icon = document.getElementById('rate-refresh-icon');
+                if (btn) btn.disabled = true;
+                if (icon) icon.classList.add('animate-spin');
+                try {
+                    if (KEYS.openrouter) {
+                        await refreshOpenRouterLimits(true);
+                    } else if (rateState.openrouter.live) {
+                        // No key means no live source: fall back to local estimates.
+                        rateState.openrouter.live = null;
+                        persistRateState();
+                    }
+                    updateQuotaUI();
+                } finally {
+                    if (btn) btn.disabled = false;
+                    if (icon) icon.classList.remove('animate-spin');
+                }
+            }
+
+            function getQuotaEntries() {
+                const entries = [];
+                ['openrouter', 'groq'].forEach(pid => {
+                    PROVIDERS[pid].models.forEach(model => {
+                        entries.push({
+                            providerId: pid,
+                            providerLabel: PROVIDERS[pid].label,
+                            model,
+                            info: getModelRateInfo(pid, model.id)
+                        });
+                    });
+                });
+                return entries;
+            }
+
+            function setBar(fill, pct) {
+                if (!fill) return;
+                const value = Math.max(0, Math.min(100, Math.round(pct)));
+                const width = value + '%';
+                if (fill.style.width !== width) fill.style.width = width;
+                const classes = 'quota-bar-fill ' + quotaClass(value);
+                if (fill.className !== classes) fill.className = classes;
+                const bar = fill.parentElement;
+                if (bar) {
+                    bar.setAttribute('aria-valuenow', String(value));
+                    bar.setAttribute('aria-valuetext', `${value}% remaining`);
+                }
+            }
+
+            function setQuotaText(el, text) {
+                if (el && el.textContent !== text) el.textContent = text;
+            }
+
+            function dayResetLabel(info) {
+                return `resets in ${formatCountdown(info.dayResetAt - Date.now())}`;
+            }
+
+            function minuteResetLabel(info) {
+                if (info.minuteRemaining >= info.minuteLimit) return 'ready';
+                return `full in ${formatCountdown(info.minuteResetAt - Date.now())}`;
+            }
+
+            function buildRateLimitCards() {
+                const list = document.getElementById('rate-limit-list');
+                if (!list) return;
+                const entries = getQuotaEntries();
+                const signature = entries.map(e => e.providerId + ':' + e.model.id).join('|');
+                if (list.dataset.signature === signature) return;
+
+                list.innerHTML = entries.map(entry => {
+                    const shared = entry.info.shared
+                        ? `<span class="ml-1 text-[8px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Shared</span>`
+                        : '';
+                    return `
+                    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/30 p-3" data-q-card data-q-provider="${entry.providerId}" data-q-model="${escapeHtml(entry.model.id)}">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <p class="text-[11px] font-semibold text-slate-700 dark:text-slate-200 truncate">${escapeHtml(entry.model.name)}</p>
+                                <p class="text-[9px] text-slate-400 truncate">${escapeHtml(entry.providerLabel)} ${shared}</p>
+                            </div>
+                            <span data-q="badge" title="Counts from the provider" class="flex-none text-[8px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Est.</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-2.5">
+                            <div>
+                                <div class="flex items-center justify-between text-[9px] mb-1">
+                                    <span class="text-slate-400">Day</span>
+                                    <span data-q="day-text" class="quota-label font-semibold text-slate-600 dark:text-slate-300">0 / 0</span>
+                                </div>
+                                <div class="quota-bar" role="progressbar" aria-label="Daily requests remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-q="day-bar">
+                                    <div class="quota-bar-fill" data-q="day-fill"></div>
+                                </div>
+                                <p data-q="day-reset" class="text-[9px] text-slate-400 mt-1">resets in ...</p>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between text-[9px] mb-1">
+                                    <span class="text-slate-400">Minute</span>
+                                    <span data-q="min-text" class="quota-label font-semibold text-slate-600 dark:text-slate-300">0 / 0</span>
+                                </div>
+                                <div class="quota-bar" role="progressbar" aria-label="Requests remaining this minute" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-q="min-bar">
+                                    <div class="quota-bar-fill" data-q="min-fill"></div>
+                                </div>
+                                <p data-q="min-reset" class="text-[9px] text-slate-400 mt-1">ready</p>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+                list.dataset.signature = signature;
+            }
+
+            function updateRateLimitCards() {
+                document.querySelectorAll('#rate-limit-list [data-q-card]').forEach(card => {
+                    const info = getModelRateInfo(card.dataset.qProvider, card.dataset.qModel);
+                    const dayPct = quotaPercent(info.dailyRemaining, info.dailyLimit);
+                    const minPct = quotaPercent(info.minuteRemaining, info.minuteLimit);
+
+                    setQuotaText(card.querySelector('[data-q="day-text"]'), `${formatQuota(info.dailyRemaining)} / ${formatQuota(info.dailyLimit)}`);
+                    setQuotaText(card.querySelector('[data-q="min-text"]'), `${formatQuota(info.minuteRemaining)} / ${formatQuota(info.minuteLimit)}`);
+                    setBar(card.querySelector('[data-q="day-fill"]'), dayPct);
+                    setBar(card.querySelector('[data-q="min-fill"]'), minPct);
+                    setQuotaText(card.querySelector('[data-q="day-reset"]'), dayResetLabel(info));
+                    setQuotaText(card.querySelector('[data-q="min-reset"]'), minuteResetLabel(info));
+
+                    const badge = card.querySelector('[data-q="badge"]');
+                    if (badge) {
+                        const label = info.live ? 'Live' : 'Est.';
+                        if (badge.textContent !== label) badge.textContent = label;
+                        const classes = 'flex-none text-[8px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full ' +
+                            (info.live
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400'
+                                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400');
+                        if (badge.className !== classes) badge.className = classes;
+                        const badgeTitle = info.live
+                            ? 'Live count reported by the provider'
+                            : 'Estimated from published limits and requests in this browser';
+                        if (badge.title !== badgeTitle) badge.title = badgeTitle;
+                    }
+                });
+            }
+
+            function updateModelQuotaBars() {
+                document.querySelectorAll('#model-selector .model-btn').forEach(btn => {
+                    const info = getModelRateInfo(provider, btn.dataset.model);
+                    const dayPct = quotaPercent(info.dailyRemaining, info.dailyLimit);
+                    const minPct = quotaPercent(info.minuteRemaining, info.minuteLimit);
+
+                    setQuotaText(btn.querySelector('[data-q="day-text"]'),
+                        `${info.live ? '' : '~'}${formatQuota(info.dailyRemaining)}/${formatQuota(info.dailyLimit)}`);
+                    setQuotaText(btn.querySelector('[data-q="min-text"]'),
+                        `${formatQuota(info.minuteRemaining)}/${formatQuota(info.minuteLimit)}`);
+                    setBar(btn.querySelector('[data-q="day-fill"]'), dayPct);
+                    setBar(btn.querySelector('[data-q="min-fill"]'), minPct);
+
+                    const dot = btn.querySelector('[data-q="live"]');
+                    if (dot) dot.classList.toggle('hidden', !info.live);
+
+                    const resetClock = new Date(info.dayResetAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const title = `${info.dailyRemaining} of ${info.dailyLimit} daily requests left (${dayResetLabel(info)}, at ${resetClock}); ` +
+                        `${info.minuteRemaining} of ${info.minuteLimit} this minute${info.minuteRemaining < info.minuteLimit ? ` (${minuteResetLabel(info)})` : ''}. ` +
+                        `${info.live ? 'Live data' : 'Estimated'}${info.shared ? '; shared across free OpenRouter models' : ''}.`;
+                    if (btn.title !== title) btn.title = title;
+                });
+            }
+
+            function updateQuotaUI() {
+                updateModelQuotaBars();
+                updateRateLimitCards();
+            }
+
+            function renderRateLimits() {
+                buildRateLimitCards();
+                updateRateLimitCards();
+            }
+
+            function startRateTicker() {
+                if (rateTicker) return;
+                let lastDay = utcDayKey();
+                let lastPersist = Date.now();
+                const tick = () => {
+                    const now = Date.now();
+                    const day = utcDayKey();
+                    const dayChanged = day !== lastDay;
+                    lastDay = day;
+
+                    getOpenRouterRateState();
+                    Object.keys(rateState.groq || {}).forEach(id => getGroqRateState(id));
+                    updateQuotaUI();
+
+                    if (dayChanged) {
+                        persistRateState();
+                        lastPersist = now;
+                        if (KEYS.openrouter) refreshOpenRouterLimits(true);
+                    } else if (now - lastPersist > QUOTA_PERSIST_EVERY_MS) {
+                        persistRateState();
+                        lastPersist = now;
+                    }
+
+                    const s = getOpenRouterRateState();
+                    if (KEYS.openrouter && now - (s.lastFetch || 0) > 300000) {
+                        refreshOpenRouterLimits(true);
+                    }
+                };
+                rateTicker = setInterval(tick, 1000);
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) tick();
+                });
+            }
+
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+            function setBrandColor(themeKey) {
+                const theme = THEMES[themeKey];
+                const root = document.documentElement;
+                root.style.setProperty('--brand-color', theme.color);
+                root.style.setProperty('--brand-rgb', theme.rgb);
+
+                Object.keys(theme).forEach(key => {
+                    if (key !== 'color' && key !== 'rgb') {
+                        root.style.setProperty(`--brand-${key}`, theme[key]);
+                    }
+                });
+
+                document.querySelectorAll('.theme-option-btn').forEach(btn => {
+                    const isActive = btn.dataset.theme === themeKey;
+                    btn.classList.toggle('selected', isActive);
+                    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+                safeStorageSet('yanai_brand_theme', themeKey);
+            }
+
+            function applySavedTheme() {
+                const saved = safeStorageGet('yanai_brand_theme') || 'orange';
+                setBrandColor(THEMES[saved] ? saved : 'orange');
+            }
+
+            function switchSettingTab(tabId) {
+                document.querySelectorAll('.setting-panel').forEach(p => p.classList.add('hidden'));
+                document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+                document.querySelectorAll('[id^="tab-"]').forEach(t => {
+                    t.classList.remove('border-brand-500', 'text-brand-500');
+                    t.classList.add('border-transparent', 'text-slate-500');
+                });
+                const activeTab = document.getElementById(`tab-${tabId}`);
+                activeTab.classList.add('border-brand-500', 'text-brand-500');
+                activeTab.classList.remove('border-transparent', 'text-slate-500');
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            const resizer = document.getElementById('sidebar-resizer');
+            let isResizing = false;
+            resizer.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+            });
+            window.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = e.clientX;
+                if (newWidth > 260 && newWidth < 450) sidebar.style.width = `${newWidth}px`;
+            });
+            window.addEventListener('mouseup', () => {
+                isResizing = false;
+                document.body.style.cursor = 'default';
+                document.body.style.userSelect = 'auto';
+            });
+
+            function init() {
+                KEYS.openrouter = safeStorageGet('yanai_or_key') || '';
+                KEYS.groq = safeStorageGet('yanai_groq_key') || '';
+
+                const savedProvider = safeStorageGet('yanai_provider');
+                if (savedProvider && PROVIDERS[savedProvider]) provider = savedProvider;
+
+                const savedModelsRaw = safeStorageGet('yanai_models');
+                if (savedModelsRaw) {
+                    try {
+                        const parsedModels = JSON.parse(savedModelsRaw);
+                        ['openrouter', 'groq'].forEach(pid => {
+                            if (parsedModels && typeof parsedModels[pid] === 'string' &&
+                                PROVIDERS[pid].models.some(m => m.id === parsedModels[pid])) {
+                                selectedModels[pid] = parsedModels[pid];
+                            }
+                        });
+                    } catch (e) { /* ignore corrupt preferences */ }
+                }
+
+                const savedTheme = safeStorageGet('yanai_theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+
+                const savedChats = safeStorageGet('yanai_all_chats');
+                if (savedChats) {
+                    try {
+                        const parsedChats = JSON.parse(savedChats);
+                        allChats = Array.isArray(parsedChats) ? parsedChats : [];
+                    } catch(e) { allChats = []; }
+                }
+                const savedDocs = safeStorageGet('yanai_library');
+                if (savedDocs) {
+                    try {
+                        const parsedDocs = JSON.parse(savedDocs);
+                        allUploadedDocs = Array.isArray(parsedDocs) ? parsedDocs : [];
+                    } catch(e) { allUploadedDocs = []; }
+                }
+
+                // Remove stats stored by the removed token-usage feature.
+                safeStorageRemove('yanai_usage');
+
+                const savedRates = safeStorageGet('yanai_rate_limits');
+                if (savedRates) {
+                    try {
+                        const parsedRates = JSON.parse(savedRates);
+                        if (parsedRates && typeof parsedRates === 'object') {
+                            rateState.openrouter = Object.assign(
+                                { dayKey: '', dailyUsed: 0, minute: [], live: null, lastFetch: 0, blockedUntil: 0 },
+                                parsedRates.openrouter && typeof parsedRates.openrouter === 'object' ? parsedRates.openrouter : {}
+                            );
+                            rateState.groq = parsedRates.groq && typeof parsedRates.groq === 'object' ? parsedRates.groq : {};
+                        }
+                        // Counters move constantly, so drop anything older than 10 minutes.
+                        const now = Date.now();
+                        const dropStaleLive = (state) => {
+                            if (state && state.live &&
+                                (!state.live.fetchedAt || now - state.live.fetchedAt > 600000)) {
+                                state.live = null;
+                            }
+                        };
+                        dropStaleLive(rateState.openrouter);
+                        Object.keys(rateState.groq || {}).forEach(id => dropStaleLive(rateState.groq[id]));
+                    } catch (e) { /* ignore corrupt quota data */ }
+                }
+                getOpenRouterRateState();
+                Object.keys(rateState.groq || {}).forEach(id => getGroqRateState(id));
+
+                applySavedTheme();
+                renderProviderSelector();
+                renderModelSelector();
+                updateProviderDisplay();
+                checkApiKeyStatus();
+                renderRateLimits();
+                renderChatList();
+                startRateTicker();
+                refreshOpenRouterLimits(true);
+                window.addEventListener('paste', handlePaste);
+            }
+
+            function renderChatList() {
+                const listContainer = document.getElementById('recent-chats-list');
+                listContainer.innerHTML = '';
+                const sortedChats = [...allChats].sort((a, b) => b.timestamp - a.timestamp);
+                sortedChats.forEach(chat => {
+                    const item = document.createElement('div');
+                    item.className = `chat-item group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all text-sm text-slate-600 dark:text-slate-400 hover:bg-white
+  dark:hover:bg-slate-900 border border-transparent ${chat.id === currentChatId ? 'active' : ''}`;
+                    item.onclick = () => loadChat(chat.id);
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2 truncate"><span class="truncate font-medium">${chat.title}</span></div>
+                        <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 transition-all">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12
+  12"></path></svg>
+                        </button>`;
+                    listContainer.appendChild(item);
+                });
+            }
+
+            function startNewChat() {
+                currentChatId = 'chat_' + Date.now();
+                allChats.push({ id: currentChatId, title: 'New Conversation', timestamp: Date.now(), messages: [] });
+                document.getElementById('messages').innerHTML = '';
+                document.getElementById('welcome-screen').classList.remove('hidden');
+                saveAllChats();
+                renderChatList();
+            }
+
+            function loadChat(id) {
+                currentChatId = id;
+                const chat = allChats.find(c => c.id === id);
+                if (!chat) return;
+                document.getElementById('messages').innerHTML = '';
+                if (chat.messages.length === 0) {
+                    document.getElementById('welcome-screen').classList.remove('hidden');
+                } else {
+                    document.getElementById('welcome-screen').classList.add('hidden');
+                    chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
+                }
+                renderChatList();
+                scrollToBottom();
+            }
+
+            function deleteChat(id) {
+                allChats = allChats.filter(c => c.id !== id);
+                saveAllChats();
+                renderChatList();
+                if (currentChatId === id) { currentChatId = null; document.getElementById('messages').innerHTML = ''; document.getElementById('welcome-screen').classList.remove('hidden'); }
+            }
+
+            function saveAllChats() { safeStorageSet('yanai_all_chats', JSON.stringify(allChats)); }
+            function saveLibrary() { safeStorageSet('yanai_library', JSON.stringify(allUploadedDocs)); }
+
+            function updateChatTitle(text) {
+                const chat = allChats.find(c => c.id === currentChatId);
+                if (chat && chat.title === 'New Conversation') {
+                    chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
+                    saveAllChats();
+                    renderChatList();
+                }
+            }
+
+            function renderProviderSelector() {
+                document.querySelectorAll('.provider-btn').forEach(btn => {
+                    const isActive = btn.dataset.provider === provider;
+                    btn.classList.remove(
+                        'bg-brand-500', 'text-white', 'shadow-sm', 'border-transparent',
+                        'border-slate-200', 'dark:border-slate-800', 'text-slate-600',
+                        'dark:text-slate-400', 'hover:bg-white', 'dark:hover:bg-slate-900'
+                    );
+                    if (isActive) {
+                        btn.classList.add('bg-brand-500', 'text-white', 'shadow-sm', 'border-transparent');
+                    } else {
+                        btn.classList.add(
+                            'border-slate-200', 'dark:border-slate-800', 'text-slate-600',
+                            'dark:text-slate-400', 'hover:bg-white', 'dark:hover:bg-slate-900'
+                        );
+                    }
+                });
+            }
+
+            function renderModelSelector() {
+                const wrap = document.getElementById('model-selector');
+                if (!wrap) return;
+                wrap.innerHTML = '';
+                const models = getActiveProvider().models;
+                models.forEach(model => {
+                    const selected = model.id === selectedModels[provider];
+                    const info = getModelRateInfo(provider, model.id);
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'model-btn w-full text-left px-3 py-2.5 rounded-xl text-sm transition-all border overflow-hidden ' +
+                        (selected
+                            ? 'is-active bg-brand-500 text-white shadow-sm border-transparent'
+                            : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900');
+                    btn.dataset.model = model.id;
+                    btn.onclick = () => setModel(model.id);
+                    btn.innerHTML =
+                        `<div class="flex items-start justify-between gap-2">` +
+                            `<div class="min-w-0">` +
+                                `<div class="font-semibold truncate">${escapeHtml(model.name)}</div>` +
+                                `<div class="text-[10px] leading-tight truncate ${selected ? 'quota-sub' : 'text-slate-400 dark:text-slate-500'}">${escapeHtml(model.desc)}</div>` +
+                            `</div>` +
+                            `<span class="live-dot ${info.live ? '' : 'hidden'}" data-q="live" title="Live provider data"></span>` +
+                        `</div>` +
+                        `<div class="grid grid-cols-2 gap-2 mt-2">` +
+                            `<div>` +
+                                `<div class="flex items-center justify-between text-[9px] ${selected ? 'quota-sub' : 'text-slate-400'}">` +
+                                    `<span>Day</span><span class="quota-label" data-q="day-text"></span>` +
+                                `</div>` +
+                                `<div class="quota-bar quota-bar-sm mt-0.5" role="progressbar" aria-label="Daily requests remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">` +
+                                    `<div class="quota-bar-fill" data-q="day-fill"></div>` +
+                                `</div>` +
+                            `</div>` +
+                            `<div>` +
+                                `<div class="flex items-center justify-between text-[9px] ${selected ? 'quota-sub' : 'text-slate-400'}">` +
+                                    `<span>Minute</span><span class="quota-label" data-q="min-text"></span>` +
+                                `</div>` +
+                                `<div class="quota-bar quota-bar-sm mt-0.5" role="progressbar" aria-label="Requests remaining this minute" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">` +
+                                    `<div class="quota-bar-fill" data-q="min-fill"></div>` +
+                                `</div>` +
+                            `</div>` +
+                        `</div>`;
+                    wrap.appendChild(btn);
+                });
+                updateModelQuotaBars();
+            }
+
+            function updateProviderDisplay() {
+                const p = getActiveProvider();
+                const model = getActiveModel();
+                const providerEl = document.getElementById('current-provider-display');
+                const modelEl = document.getElementById('current-model-display');
+                if (providerEl) providerEl.innerText = p.label;
+                if (modelEl) modelEl.innerText = model.name;
+            }
+
+            function setProvider(providerId) {
+                if (!PROVIDERS[providerId]) return;
+                provider = providerId;
+                safeStorageSet('yanai_provider', providerId);
+                renderProviderSelector();
+                renderModelSelector();
+                updateProviderDisplay();
+                checkApiKeyStatus();
+            }
+
+            function setModel(modelId) {
+                const p = getActiveProvider();
+                if (!p.models.some(m => m.id === modelId)) return;
+                selectedModels[p.id] = modelId;
+                persistSelectedModels();
+                renderModelSelector();
+                updateProviderDisplay();
+            }
+
+            function toggleTheme() {
+                const html = document.documentElement;
+                if (html.classList.contains('dark')) {
+                    html.classList.remove('dark');
+                    safeStorageSet('yanai_theme', 'light');
+                } else {
+                    html.classList.add('dark');
+                    safeStorageSet('yanai_theme', 'dark');
+                }
+            }
+
+            function checkApiKeyStatus() {
+                const input = document.getElementById('user-input');
+                const btn = document.getElementById('send-btn');
+                const warning = document.getElementById('api-warning');
+                const warningText = document.getElementById('api-warning-text');
+                const p = getActiveProvider();
+                const hasKey = !!KEYS[p.id];
+
+                if (!hasKey) {
+                    input.disabled = true; input.placeholder = `${p.label} API key required to chat...`;
+                    btn.disabled = true; warning.classList.remove('hidden');
+                    if (warningText) warningText.innerText = `${p.label} API key required to chat`;
+                } else {
+                    input.disabled = false; input.placeholder = "Message Yanai...";
+                    btn.disabled = false; warning.classList.add('hidden');
+                }
+            }
+
+            function toggleSettingsModal() {
+                const modal = document.getElementById('settings-modal');
+                const isHidden = modal.classList.contains('hidden');
+                modal.classList.toggle('hidden');
+                if (isHidden) {
+                    document.getElementById('settings-api-key').value = KEYS.openrouter;
+                    document.getElementById('settings-groq-key').value = KEYS.groq;
+                }
+            }
+
+            function saveSettings() {
+                const newOrKey = document.getElementById('settings-api-key').value.trim();
+                const newGroqKey = document.getElementById('settings-groq-key').value.trim();
+                if (newOrKey) {
+                    KEYS.openrouter = newOrKey;
+                    safeStorageSet('yanai_or_key', newOrKey);
+                    // A new key may belong to a different account, so drop cached counts.
+                    rateState.openrouter.live = null;
+                    rateState.openrouter.lastFetch = 0;
+                    persistRateState();
+                }
+                if (newGroqKey) {
+                    KEYS.groq = newGroqKey;
+                    safeStorageSet('yanai_groq_key', newGroqKey);
+                }
+                checkApiKeyStatus();
+                updateProviderDisplay();
+                refreshRateLimits();
+                toggleSettingsModal();
+            }
+
+            function clearProviderKey(providerId) {
+                const p = PROVIDERS[providerId];
+                if (!p) return;
+                if (!confirm(`Remove the saved ${p.label} API key from this browser?`)) return;
+                KEYS[providerId] = '';
+                safeStorageRemove(p.keyStorage);
+                const input = document.getElementById(providerId === 'groq' ? 'settings-groq-key' : 'settings-api-key');
+                if (input) input.value = '';
+                if (providerId === 'openrouter') {
+                    rateState.openrouter.live = null;
+                    rateState.openrouter.lastFetch = 0;
+                    persistRateState();
+                }
+                checkApiKeyStatus();
+                refreshRateLimits();
+            }
+
+            function clearAllData() {
+                if (confirm("Are you absolutely sure? This will delete all your conversations and your document library. This cannot be undone.")) {
+                    allChats = [];
+                    allUploadedDocs = [];
+                    currentChatId = null;
+                    safeStorageRemove('yanai_all_chats');
+                    safeStorageRemove('yanai_library');
+                    document.getElementById('messages').innerHTML = '';
+                    document.getElementById('welcome-screen').classList.remove('hidden');
+                    renderChatList();
+                    renderLibrary();
+                    alert("All data has been cleared.");
+                }
+            }
+
+            function toggleLibrary() {
+                const overlay = document.getElementById('library-overlay');
+                const panel = document.getElementById('library-panel');
+                if (overlay.classList.contains('hidden')) {
+                    overlay.classList.remove('hidden');
+                    setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+                    renderLibrary();
+                } else {
+                    panel.classList.add('translate-x-full');
+                    setTimeout(() => overlay.classList.add('hidden'), 300);
+                }
+            }
+
+            function renderLibrary() {
+                const list = document.getElementById('library-list');
+                list.innerHTML = '';
+                if (allUploadedDocs.length === 0) {
+                    list.innerHTML = '<p class="text-center text-slate-400 py-10">No documents uploaded yet.</p>';
+                    return;
+                }
+                allUploadedDocs.forEach((doc, index) => {
+                    const div = document.createElement('div');
+                    div.className = "flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 group";
+                    div.innerHTML = `<div class="flex items-center gap-3 truncate"><span class="text-lg">📄</span> <span class="text-sm font-medium truncate">${doc.name}</span></div>
+                                    <div class="flex items-center gap-3">
+                                      <span class="text-[10px] text-slate-400">${new Date(doc.date).toLocaleDateString()}</span>
+                                      <button onclick="deleteDoc(${index})" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-all">✕</button>
+                                    </div>`;
+                    list.appendChild(div);
+                });
+            }
+
+            function deleteDoc(index) {
+                allUploadedDocs.splice(index, 1);
+                saveLibrary();
+                renderLibrary();
+            }
+
+            async function extractTextFromFile(file) {
+                if (file.type === 'application/pdf') {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    let text = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const content = await page.getTextContent();
+                        text += content.items.map(s => s.str).join(" ") + "\n";
+                    }
+                    return text;
+                } else if (file.name.endsWith('.docx')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer });
+                    return result.value;
+                } else {
+                    return await file.text();
+                }
+            }
+
+            async function handleFileUpload(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                attachedFile.name = file.name;
+                document.getElementById('preview-name').innerText = file.name;
+                document.getElementById('file-preview').classList.remove('hidden');
+                try {
+                    const text = await extractTextFromFile(file);
+                    attachedFile.content = text;
+                    allUploadedDocs.push({ name: file.name, date: Date.now(), content: text });
+                    saveLibrary();
+                } catch (err) { alert("File Error: " + err.message); }
+            }
+
+            async function handleLibraryFileUpload(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    const text = await extractTextFromFile(file);
+                    allUploadedDocs.push({ name: file.name, date: Date.now(), content: text });
+                    saveLibrary();
+                    renderLibrary();
+                    alert(`Successfully added ${file.name} to your library!`);
+                } catch (err) {
+                    alert("File Error: " + err.message);
+                }
+            }
+
+            async function handleImageUpload(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                await processImageFile(file);
+            }
+
+            async function processImageFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const base64 = e.target.result;
+                        attachedImages.push({ name: file.name, base64: base64 });
+                        document.getElementById('preview-name').innerText =
+                            attachedImages.length === 1 ? file.name : `${attachedImages.length} images`;
+                        document.getElementById('file-preview').classList.remove('hidden');
+                        resolve();
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            async function handlePaste(e) {
+                const items = e.clipboardData.items;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        const blob = items[i].getAsFile();
+                        const file = new File([blob], `pasted-image-${Date.now()}.png`, { type: blob.type });
+                        await processImageFile(file);
+                    }
+                }
+            }
+
+            function triggerFileInput(type) {
+                toggleAttachMenu();
+                if (type === 'doc') document.getElementById('file-input').click();
+                if (type === 'img') document.getElementById('image-input').click();
+            }
+
+            function toggleAttachMenu() {
+                const menu = document.getElementById('attach-menu');
+                menu.classList.toggle('hidden');
+            }
+
+            window.addEventListener('click', (e) => {
+                if (!e.target.closest('#attach-btn') && !e.target.closest('#attach-menu')) {
+                    document.getElementById('attach-menu').classList.add('hidden');
+                }
+            });
+
+            function clearFile() {
+                attachedFile = { name: '', content: '' };
+                attachedImages = [];
+                document.getElementById('file-preview').classList.add('hidden');
+            }
+
+            function retrieveContext(query) {
+                if (!allUploadedDocs || allUploadedDocs.length === 0) return "";
+                const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
+                let relevantSnippets = [];
+                allUploadedDocs.forEach(doc => {
+                    if (!doc || !doc.content) return;
+                    const content = doc.content.toLowerCase();
+                    const foundKeywords = keywords.filter(kw => content.includes(kw));
+                    if (foundKeywords.length > 0) {
+                        const firstKw = foundKeywords[0];
+                        const index = content.indexOf(firstKw);
+                        const start = Math.max(0, index - 500);
+                        const end = Math.min(doc.content.length, index + 500);
+                        relevantSnippets.push(`[Source: ${doc.name}]\n${doc.content.substring(start, end)}`);
+                    }
+                });
+                return relevantSnippets.length > 0
+                    ? "\n\n### REFERENCE KNOWLEDGE ###\n" + relevantSnippets.join("\n\n") + "\n### END REFERENCE ###"
+                    : "";
+            }
+
+            async function typeWriter(element, text) {
+                let i = 0;
+                const speed = 5;
+                function type() {
+                    if (i < text.length && isTyping) {
+                        element.innerHTML = marked.parse(text.substring(0, i + 1));
+                        i++;
+                        setTimeout(type, speed);
+                        scrollToBottom();
+                    } else {
+                        if (i >= text.length) {
+                            isTyping = false;
+                            updateInputButtons();
+                        }
+                    }
+                }
+                type();
+            }
+
+            function appendMessage(role, text, save = true) {
+                const container = document.getElementById('messages');
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+
+                if (role === 'user') {
+                    msgDiv.innerHTML = `<div class="max-w-[85%] p-5 user-msg text-sm leading-relaxed"><div>${text}</div></div>`;
+                } else {
+                    msgDiv.innerHTML = `<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
+                    const target = msgDiv.querySelector('.typing-target');
+                    if (!save) {
+                        target.innerHTML = marked.parse(text);
+                    } else {
+                        typeWriter(target, text);
+                    }
+                }
+                container.appendChild(msgDiv);
+                scrollToBottom();
+
+                if (save) {
+                    const chat = allChats.find(c => c.id === currentChatId);
+                    if (chat) {
+                        chat.messages.push({ role, content: text });
+                        if (role === 'user') updateChatTitle(text);
+                        saveAllChats();
+                    }
+                }
+            }
+
+            function scrollToBottom() {
+                const win = document.getElementById('chat-window');
+                win.scrollTo({ top: win.scrollHeight, behavior: 'smooth' });
+            }
+
+            function stopResponse() {
+                if (currentAbortController) {
+                    currentAbortController.abort();
+                }
+                isGenerating = false;
+                isTyping = false;
+                updateInputButtons();
+            }
+
+            function updateInputButtons() {
+                const sendBtn = document.getElementById('send-btn');
+                const stopBtn = document.getElementById('stop-btn');
+                if (isGenerating || isTyping) {
+                    sendBtn.classList.add('hidden');
+                    stopBtn.classList.remove('hidden');
+                } else {
+                    sendBtn.classList.remove('hidden');
+                    stopBtn.classList.add('hidden');
+                }
+            }
+
+            /* ------------------- Groq request layer -------------------- */
+            function parseGroqErrorBody(raw, status) {
+                let message = '';
+                let param = null;
+                try {
+                    const data = JSON.parse(raw);
+                    if (data && data.error) {
+                        message = data.error.message || '';
+                        param = data.error.param || null;
+                    } else if (data && data.message) {
+                        message = data.message;
+                    }
+                } catch (e) { /* body was not JSON */ }
+
+                if (!message) {
+                    message = raw && raw.trim() ? raw.trim().slice(0, 300) : `Groq request failed (HTTP ${status}).`;
+                }
+                if (status === 401 || status === 403) {
+                    message = 'Invalid or unauthorized Groq API key. Update it in Settings.';
+                } else if (status === 429) {
+                    message = 'Groq rate limit reached. Free tier allows 30 requests/minute and 1,000/day per model (8K tokens/minute). Wait for the limit to reset, then try again.';
+                } else if (status >= 500) {
+                    message = `Groq service error (HTTP ${status}). Please try again shortly.`;
+                }
+                return new ApiError(message, status, param);
+            }
+
+            const TUNABLE_PARAMS = ['reasoning_effort', 'max_completion_tokens', 'top_p', 'temperature', 'stream'];
+            function findUnsupportedParam(message) {
+                if (!message) return null;
+                const lower = String(message).toLowerCase();
+                for (const param of TUNABLE_PARAMS) {
+                    if (lower.includes(param)) return param;
+                }
+                return null;
+            }
+
+            async function consumeGroqStream(response, onDelta) {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let full = '';
+                let finished = false;
+
+                const processLine = (rawLine) => {
+                    const line = rawLine.trim();
+                    if (!line || line.startsWith(':')) return false;
+                    if (!line.startsWith('data:')) return false;
+                    const payload = line.slice(5).trim();
+                    if (!payload) return false;
+                    if (payload === '[DONE]') return true;
+
+                    let json;
+                    try { json = JSON.parse(payload); } catch (e) { return false; }
+
+                    if (json && json.error) {
+                        throw new ApiError(
+                            json.error.message || 'Groq stream error',
+                            0,
+                            json.error.param || null,
+                            full.length > 0
+                        );
+                    }
+
+                    const choice = json && json.choices ? json.choices[0] : null;
+                    const delta = choice && choice.delta ? choice.delta.content : '';
+                    if (typeof delta === 'string' && delta.length > 0) {
+                        full += delta;
+                        try { onDelta(delta); } catch (e) { /* keep the stream alive if rendering fails */ }
+                    }
+                    return false;
+                };
+
+                try {
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split(/\r?\n/);
+                        buffer = lines.pop() || '';
+                        for (const line of lines) {
+                            if (processLine(line)) { finished = true; break; }
+                        }
+                        if (finished) break;
+                    }
+                    if (!finished && buffer) {
+                        processLine(buffer);
+                    }
+                } finally {
+                    try { if (finished) await reader.cancel(); } catch (e) { /* ignore */ }
+                    try { reader.releaseLock(); } catch (e) { /* ignore */ }
+                }
+
+                return full;
+            }
+
+            async function streamGroq(body, signal, onDelta, modelId) {
+                let response;
+                try {
+                    // Groq is called directly, so every request parameter reaches the API
+                    // instead of being filtered by an intermediary proxy.
+                    response = await fetch(GROQ_ENDPOINT, {
+                        method: 'POST',
+                        signal: signal,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${KEYS.groq}`
+                        },
+                        body: JSON.stringify(body)
+                    });
+                } catch (e) {
+                    if (e && e.name === 'AbortError') throw e;
+                    throw new Error('Could not reach Groq. Check your connection, or a network filter/browser extension may be blocking api.groq.com.');
+                }
+
+                applyGroqQuotaHeaders(modelId, response);
+
+                if (!response.ok) {
+                    const raw = await response.text().catch(() => '');
+                    throw parseGroqErrorBody(raw, response.status);
+                }
+
+                const contentType = (response.headers.get('content-type') || '').toLowerCase();
+
+                if (contentType.includes('application/json')) {
+                    const data = await response.json().catch(() => null);
+                    if (data && data.error) {
+                        throw new ApiError(data.error.message || 'Groq error', response.status, data.error.param || null);
+                    }
+                    const message = data && data.choices && data.choices[0] ? data.choices[0].message : null;
+                    const content = message && message.content ? message.content : '';
+                    if (content) {
+                        try { onDelta(content); } catch (e) { /* ignore render errors */ }
+                    }
+                    return content;
+                }
+
+                if (!response.body || typeof response.body.getReader !== 'function') {
+                    throw new Error('This browser could not read the Groq stream. Please use a current version of Chrome, Edge, Firefox or Safari.');
+                }
+
+                return await consumeGroqStream(response, onDelta);
+            }
+
+            async function streamGroqWithFallback(body, signal, onDelta, modelId) {
+                let currentBody = Object.assign({}, body);
+                let lastError = null;
+
+                for (let attempt = 0; attempt < 3; attempt++) {
+                    try {
+                        return await streamGroq(currentBody, signal, onDelta, modelId);
+                    } catch (err) {
+                        lastError = err;
+                        if (err && err.name === 'AbortError') throw err;
+                        if (!(err instanceof ApiError) || err.streamStarted) throw err;
+
+                        const param = err.param || findUnsupportedParam(err.message);
+                        if (!param || currentBody[param] === undefined) throw err;
+
+                        if (param === 'max_completion_tokens') {
+                            currentBody.max_tokens = currentBody.max_completion_tokens;
+                            delete currentBody.max_completion_tokens;
+                        } else {
+                            delete currentBody[param];
+                        }
+                        console.warn(`Groq rejected the "${param}" parameter; retrying without it.`);
+                    }
+                }
+                throw lastError || new Error('Groq request failed.');
+            }
+
+            /* ------------------- Outgoing message --------------------- */
+            function buildUserContent(text, providerId) {
+                let fullText = text;
+                if (attachedFile.content) {
+                    fullText = `\n\nDOCUMENT CONTENT:\n---\n${attachedFile.content}\n---\n` + fullText;
+                }
+                const libraryContext = retrieveContext(text);
+                if (libraryContext) fullText += libraryContext;
+
+                // Groq's text models take a plain string; OpenRouter keeps the array shape used for vision.
+                if (providerId === 'groq') {
+                    return fullText || 'Hello!';
+                }
+
+                const content = [];
+                if (fullText) content.push({ type: 'text', text: fullText });
+                attachedImages.forEach(img => content.push({ type: 'image_url', image_url: { url: img.base64 } }));
+                if (content.length === 0) content.push({ type: 'text', text: 'Hello!' });
+                return content;
+            }
+
+            function saveAiMessage(text, chatId) {
+                if (!text) return;
+                const targetId = chatId || currentChatId;
+                const chat = allChats.find(c => c.id === targetId);
+                if (!chat) return;
+                chat.messages.push({ role: 'ai', content: text });
+                saveAllChats();
+            }
+
+            async function handleSend() {
+                const input = document.getElementById('user-input');
+                const text = input.value.trim();
+
+                if (isGenerating) return;
+
+                let active = getActiveConfig();
+                if (!active.key) {
+                    alert(`Add your ${active.providerLabel} API key in Settings first.`);
+                    return;
+                }
+                if (!text && !attachedFile.content && attachedImages.length === 0) return;
+
+                if (attachedImages.length > 0 && !active.model.vision) {
+                    if (active.providerId === 'groq') {
+                        const switchToOr = confirm('Groq models (GPT-OSS and Qwen) do not accept image input.\n\nSwitch to OpenRouter with the Nvidia Nemotron 3.5 Super VL vision model?');
+                        if (!switchToOr) return;
+                        setProvider('openrouter');
+                        setModel('nvidia/nemotron-3.5-super-vl:free');
+                    } else {
+                        const switchToVision = confirm(`The current model (${active.model.name}) does not support images.\n\nSwitch to the Vision model (Super VL)?`);
+                        if (!switchToVision) return;
+                        setModel('nvidia/nemotron-3.5-super-vl:free');
+                    }
+                    active = getActiveConfig();
+                    if (!active.key) {
+                        alert(`Add your ${active.providerLabel} API key in Settings first.`);
+                        return;
+                    }
+                }
+
+                if (!currentChatId) startNewChat();
+                const activeChatId = currentChatId;
+                document.getElementById('welcome-screen').classList.add('hidden');
+
+                const chat = allChats.find(c => c.id === activeChatId);
+                const history = chat
+                    ? chat.messages
+                        .filter(m => m && m.content)
+                        .map(m => ({ role: m.role === 'ai' ? 'assistant' : m.role, content: m.content }))
+                    : [];
+
+                const userContent = buildUserContent(text, active.providerId);
+
+                const displayUserText = text || (attachedImages.length > 0 ? `${attachedImages.length} images` : (attachedFile.name ? `Analyze: ${attachedFile.name}` : "Hello!"));
+                appendMessage('user', displayUserText);
+
+                input.value = '';
+                input.style.height = '';
+                clearFile();
+
+                isGenerating = true;
+                updateInputButtons();
+
+                const startTime = Date.now();
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'flex justify-start message-appear';
+                loadingDiv.innerHTML = `<div class="ai-msg p-4 flex items-center gap-4"><div class="ai-core"><div class="core-center"></div><div class="core-ring ring-1"></div><div class="core-ring
+  ring-2"></div></div><span class="timer-text text-xs text-slate-400 italic font-medium">Yanai is thinking... 0s</span></div>`;
+                document.getElementById('messages').appendChild(loadingDiv);
+
+                timerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                    const timerSpan = loadingDiv.querySelector('.timer-text');
+                    if (timerSpan) timerSpan.innerText = `Yanai is thinking... ${elapsed}s`;
+                }, 1000);
+
+                const controller = new AbortController();
+                currentAbortController = controller;
+                let timedOut = false;
+                const timeoutId = setTimeout(() => { timedOut = true; controller.abort(); }, 60000);
+
+                let streamText = '';
+                let streamTarget = null;
+                let renderQueued = false;
+                let renderTimer = null;
+                let savedAi = false;
+
+                const ensureStreamTarget = () => {
+                    if (streamTarget) return;
+                    if (loadingDiv.isConnected) loadingDiv.remove();
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'flex justify-start message-appear';
+                    msgDiv.innerHTML = `<div class="max-w-[90%] p-6 ai-msg text-sm leading-relaxed"><div class="prose-ai typing-target"></div></div>`;
+                    document.getElementById('messages').appendChild(msgDiv);
+                    streamTarget = msgDiv.querySelector('.typing-target');
+                    scrollToBottom();
+                };
+
+                const renderStream = () => {
+                    if (!streamTarget) return;
+                    streamTarget.innerHTML = marked.parse(streamText) + '<span class="stream-cursor"></span>';
+                    scrollToBottom();
+                };
+
+                const onDelta = (delta) => {
+                    clearTimeout(timeoutId);
+                    ensureStreamTarget();
+                    streamText += delta;
+                    if (!renderQueued) {
+                        renderQueued = true;
+                        renderTimer = setTimeout(() => {
+                            renderQueued = false;
+                            renderStream();
+                        }, 40);
+                    }
+                };
+
+                const finalizeStream = () => {
+                    if (renderTimer) {
+                        clearTimeout(renderTimer);
+                        renderTimer = null;
+                    }
+                    renderQueued = false;
+                    if (streamTarget) {
+                        streamTarget.innerHTML = marked.parse(streamText);
+                    }
+                    if (streamText && !savedAi) {
+                        savedAi = true;
+                        saveAiMessage(streamText, activeChatId);
+                    }
+                    scrollToBottom();
+                };
+
+                try {
+                    const messages = [
+                        { role: 'system', content: buildSystemPrompt(active.providerId, active.model) },
+                        ...history,
+                        { role: 'user', content: userContent }
+                    ];
+
+                    recordRequestAttempt(active.providerId, active.model.id);
+
+                    if (active.providerId === 'groq') {
+                        const body = Object.assign({}, active.model.config, {
+                            model: active.model.id,
+                            messages: messages
+                        });
+
+                        const full = await streamGroqWithFallback(body, controller.signal, onDelta, active.model.id);
+                        clearTimeout(timeoutId);
+                        if (!full || !full.trim()) throw new Error('The AI returned an empty response.');
+                        finalizeStream();
+                        recordRequestSuccess('groq', active.model.id);
+                    } else {
+                        let response;
+                        try {
+                            response = await fetch(OPENROUTER_ENDPOINT, {
+                                method: 'POST',
+                                signal: controller.signal,
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${active.key}`
+                                },
+                                body: JSON.stringify({
+                                    model: active.model.id,
+                                    messages: messages,
+                                    max_tokens: OPENROUTER_MAX_TOKENS
+                                })
+                            });
+                        } catch (e) {
+                            if (e && e.name === 'AbortError') throw e;
+                            throw new Error('Could not reach OpenRouter. Check your connection, or a browser extension may be blocking openrouter.ai.');
+                        }
+
+                        clearTimeout(timeoutId);
+                        const raw = await response.text();
+                        let data = null;
+                        try { data = raw ? JSON.parse(raw) : null; } catch (e) { data = null; }
+
+                        const errorCode = data && data.error ? Number(data.error.code) || 0 : 0;
+                        const errorMessage = data && data.error && data.error.message ? data.error.message : '';
+
+                        if (response.status === 402 || errorCode === 402) {
+                            throw new Error('OpenRouter credits are too low for this request. Free models cost nothing — switch to a :free model.' + (errorMessage ? ` (${errorMessage})` : ''));
+                        }
+                        if (response.status === 429 || errorCode === 429) {
+                            const limitText = `${errorMessage} ${raw || ''}`.toLowerCase();
+                            const dailyExceeded = /per[-_ ]?day|daily|per day/.test(limitText);
+                            const minuteExceeded = /per[-_ ]?min|minute/.test(limitText);
+                            markOpenRouterRateLimited(dailyExceeded ? 'daily' : (minuteExceeded ? 'minute' : 'unknown'));
+                            throw new Error('OpenRouter rate limit reached. Free models allow 20 requests/minute and 50/day (1,000/day after purchasing $10 in credits). Please wait and try again.');
+                        }
+                        if (data && data.error) throw new Error(errorMessage || 'API Error occurred');
+                        if (!response.ok) throw new Error(`OpenRouter request failed (HTTP ${response.status}).`);
+                        if (!data || !data.choices || data.choices.length === 0) throw new Error('The AI returned an empty response.');
+
+                        const content = data.choices[0].message && data.choices[0].message.content
+                            ? data.choices[0].message.content
+                            : '';
+                        if (!content.trim()) throw new Error('The AI returned an empty response.');
+
+                        if (loadingDiv.isConnected) loadingDiv.remove();
+                        isTyping = true;
+                        appendMessage('ai', content);
+                        recordRequestSuccess('openrouter', active.model.id);
+                        refreshOpenRouterLimits(false);
+                    }
+                } catch (e) {
+                    clearTimeout(timeoutId);
+                    console.error('Chat request failed:', e);
+                    const aborted = e && e.name === 'AbortError';
+
+                    if (streamTarget && streamText.trim()) {
+                        finalizeStream();
+                        if (!aborted) {
+                            const note = document.createElement('div');
+                            note.className = 'text-xs text-red-500 mt-2';
+                            note.textContent = 'Stream interrupted: ' + (e && e.message ? e.message : 'unknown error');
+                            const host = streamTarget.closest('.ai-msg');
+                            if (host) host.appendChild(note);
+                        }
+                    } else {
+                        const message = aborted
+                            ? (timedOut ? 'Request timed out.' : 'Response stopped by user.')
+                            : 'Error: ' + (e && e.message ? e.message : 'Request failed');
+
+                        if (loadingDiv.isConnected) {
+                            const box = document.createElement('div');
+                            box.className = aborted
+                                ? 'bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl text-slate-500 dark:text-slate-400 text-sm'
+                                : 'bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm';
+                            box.textContent = message;
+                            loadingDiv.innerHTML = '';
+                            loadingDiv.appendChild(box);
+                        } else {
+                            const wrap = document.createElement('div');
+                            wrap.className = 'flex justify-start message-appear';
+                            const box = document.createElement('div');
+                            box.className = 'bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl text-red-500 text-sm max-w-[90%]';
+                            box.textContent = message;
+                            wrap.appendChild(box);
+                            document.getElementById('messages').appendChild(wrap);
+                            scrollToBottom();
+                        }
+                    }
+                } finally {
+                    clearTimeout(timeoutId);
+                    if (renderTimer) clearTimeout(renderTimer);
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    isGenerating = false;
+                    currentAbortController = null;
+                    updateInputButtons();
+                }
+            }
+
+            init();
+        </script>
+    </body>
+    </html>
